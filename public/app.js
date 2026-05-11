@@ -2278,8 +2278,9 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => {}); });
 }
 
-initOrbs();
-initWaveform();
+// Floating orbs and hero waveform disabled — perpetual rAF loops tanked FPS
+// initOrbs();
+// initWaveform();
 initScrollReveal();
 initStorySlider();
 initAvatarSpread();
@@ -3233,7 +3234,20 @@ function initHobbitAudio() {
     });
   }
 
-  // Start idle visualization immediately on init
+  // Gate idle visualization on IntersectionObserver — only paint when section is visible
   syncCanvasSize();
-  idleRafId = requestAnimationFrame(drawIdleFrame);
+  if (section && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      const visible = entries.some((e) => e.isIntersecting);
+      if (visible && !idleRafId && !isPlaying) {
+        idleRafId = requestAnimationFrame(drawIdleFrame);
+      } else if (!visible && idleRafId) {
+        cancelAnimationFrame(idleRafId);
+        idleRafId = null;
+      }
+    }, { rootMargin: '0px', threshold: 0.05 });
+    io.observe(section);
+  } else {
+    idleRafId = requestAnimationFrame(drawIdleFrame);
+  }
 }

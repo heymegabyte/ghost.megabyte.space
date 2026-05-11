@@ -77,7 +77,7 @@
       radial-gradient(36vmax 32vmax at 12% 78%, rgba(122, 255, 174, 0.12), transparent 60%),
       radial-gradient(34vmax 30vmax at 88% 70%, rgba(255, 109, 0, 0.13), transparent 60%),
       linear-gradient(180deg, #060610 0%, #0A0618 40%, #060610 100%);
-    background-size: 220% 220%, 220% 220%, 220% 220%, 220% 220%, 220% 220%, 100% 100%;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
     background-position:
       0% 0%,
       100% 0%,
@@ -86,10 +86,6 @@
       100% 50%,
       50% 50%;
     filter: saturate(1.05);
-    animation:
-      ghost-hue-shift 45s ease-in-out infinite,
-      ghost-hue-rotate 90s linear infinite;
-    will-change: background-position, filter;
   }
   body::after {
     content: "";
@@ -100,30 +96,6 @@
     background:
       radial-gradient(70vmax 60vmax at 50% 50%, transparent 0%, rgba(6, 6, 16, 0.55) 100%);
     mix-blend-mode: multiply;
-  }
-  @keyframes ghost-hue-shift {
-    0%, 100% {
-      background-position: 0% 0%, 100% 0%, 50% 100%, 0% 100%, 100% 50%, 50% 50%;
-    }
-    20% {
-      background-position: 30% 20%, 70% 30%, 20% 80%, 25% 65%, 75% 25%, 50% 50%;
-    }
-    40% {
-      background-position: 60% 40%, 40% 60%, 80% 60%, 50% 40%, 30% 70%, 50% 50%;
-    }
-    60% {
-      background-position: 20% 70%, 90% 80%, 30% 30%, 70% 25%, 50% 80%, 50% 50%;
-    }
-    80% {
-      background-position: 75% 30%, 15% 70%, 60% 20%, 80% 80%, 20% 35%, 50% 50%;
-    }
-  }
-  @keyframes ghost-hue-rotate {
-    0%, 100% { filter: saturate(1.05) hue-rotate(0deg); }
-    50% { filter: saturate(1.15) hue-rotate(40deg); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    body::before { animation: none; }
   }
 
   a { color: inherit; text-decoration: none; }
@@ -164,9 +136,7 @@
     position: sticky; top: 0; z-index: 20;
     padding-block: 1rem;
     padding-inline: max(1rem, calc(50vw - 1120px / 2 + 1rem));
-    background: rgba(6, 6, 16, 0.72);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    background: rgba(6, 6, 16, 0.94);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow:
       0 8px 24px rgba(0, 0, 0, 0.45),
@@ -226,14 +196,6 @@
     opacity: 0.55;
     z-index: -1;
     pointer-events: none;
-    animation: brand-halo-breathe 5.2s ease-in-out infinite;
-  }
-  @keyframes brand-halo-breathe {
-    0%, 100% { opacity: 0.45; transform: translateY(-50%) scale(1); }
-    50% { opacity: 0.78; transform: translateY(-50%) scale(1.08); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .brand-lockup::before { animation: none; opacity: 0.55; }
   }
   .brand-logo {
     width: 44px; height: 44px; border-radius: 12px;
@@ -807,17 +769,15 @@
       transparent 80%
     );
   }
-  .spirit-child { left: 8%; top: 16%; width: 140px; height: 220px; animation: float-ghost 5.2s ease-in-out infinite; }
-  .spirit-woman { right: 18%; top: 10%; width: 160px; height: 260px; animation: float-ghost 6.4s ease-in-out infinite reverse; }
+  .spirit-child { left: 8%; top: 16%; width: 140px; height: 220px; }
+  .spirit-woman { right: 18%; top: 10%; width: 160px; height: 260px; }
   .spirit-dog {
     left: 24%; bottom: 12%; width: 170px; height: 110px;
     transform: rotate(-8deg); border-radius: 60% 40% 45% 55%;
-    animation: skitter 4.4s ease-in-out infinite;
   }
   .spirit-hand {
     right: 8%; bottom: 8%; width: 150px; height: 210px;
     transform: rotate(16deg); border-radius: 44% 56% 28% 72% / 25% 25% 75% 75%;
-    animation: beckon 3.8s ease-in-out infinite;
   }
 
   /* Glitch text */
@@ -832,13 +792,15 @@
   }
   .glitch-text::before {
     color: var(--accent-red);
-    animation: glitch-1 3s infinite linear alternate-reverse;
     clip-path: inset(0 0 80% 0);
+    opacity: 0.4;
+    transform: translate3d(-1px, 0, 0);
   }
   .glitch-text::after {
     color: var(--accent-cyan);
-    animation: glitch-2 2.5s infinite linear alternate-reverse;
     clip-path: inset(80% 0 0 0);
+    opacity: 0.4;
+    transform: translate3d(1px, 0, 0);
   }
 
   /* Buttons */
@@ -2286,7 +2248,7 @@
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 40px rgba(255, 23, 68, 0.35));
     isolation: isolate;
-    animation: hotline-shimmer 6s ease-in-out infinite;
+    background-position: 50% 50%;
     transition: filter 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .hotline-number::before,
@@ -2312,33 +2274,14 @@
   .hotline-number:focus-visible {
     transform: translateY(-3px) scale(1.02);
     filter: drop-shadow(0 0 65px rgba(255, 23, 68, 0.55)) drop-shadow(0 0 30px rgba(0, 229, 255, 0.3));
-    animation-duration: 2s;
     outline: none;
   }
   .hotline-number:hover::before,
-  .hotline-number:focus-visible::before { opacity: 1; transform: translate3d(-3px, 0, 0); animation: hotline-glitch-r 2.4s steps(8, end) infinite; }
+  .hotline-number:focus-visible::before { opacity: 1; transform: translate3d(-3px, 0, 0); }
   .hotline-number:hover::after,
-  .hotline-number:focus-visible::after { opacity: 1; transform: translate3d(3px, 0, 0); animation: hotline-glitch-c 2.4s steps(8, end) infinite reverse; }
+  .hotline-number:focus-visible::after { opacity: 1; transform: translate3d(3px, 0, 0); }
   .hotline-number:active { transform: translateY(-1px) scale(0.99); }
-  @keyframes hotline-shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  @keyframes hotline-glitch-r {
-    0%, 100% { transform: translate3d(-3px, 0, 0); clip-path: inset(0 0 0 0); }
-    20% { transform: translate3d(-5px, -1px, 0); clip-path: inset(8% 0 60% 0); }
-    40% { transform: translate3d(-2px, 1px, 0); clip-path: inset(45% 0 22% 0); }
-    60% { transform: translate3d(-4px, 0, 0); clip-path: inset(70% 0 8% 0); }
-    80% { transform: translate3d(-3px, -1px, 0); clip-path: inset(20% 0 38% 0); }
-  }
-  @keyframes hotline-glitch-c {
-    0%, 100% { transform: translate3d(3px, 0, 0); clip-path: inset(0 0 0 0); }
-    25% { transform: translate3d(5px, 1px, 0); clip-path: inset(58% 0 12% 0); }
-    50% { transform: translate3d(2px, -1px, 0); clip-path: inset(15% 0 55% 0); }
-    75% { transform: translate3d(4px, 0, 0); clip-path: inset(38% 0 30% 0); }
-  }
   @media (prefers-reduced-motion: reduce) {
-    .hotline-number { animation: none; }
     .hotline-number::before, .hotline-number::after { display: none; }
   }
   .hotline-tagline {
@@ -2550,7 +2493,6 @@
         rgba(255, 23, 68, 0.015) 2px,
         rgba(255, 23, 68, 0.015) 4px
       );
-    animation: scanline-drift 8s linear infinite;
   }
 
   /* Dossier — The Evidence */
@@ -2657,23 +2599,17 @@
   .dossier-feature-bg::before,
   .dossier-feature-bg::after {
     content: ""; position: absolute; border-radius: 50%;
-    filter: blur(80px); opacity: 0.45;
-    animation: dossier-drift 14s ease-in-out infinite;
+    opacity: 0.3;
   }
   .dossier-feature-bg::before {
     width: 380px; height: 380px;
     top: -100px; left: -80px;
-    background: var(--feat-glow);
+    background: radial-gradient(circle, var(--feat-glow), transparent 70%);
   }
   .dossier-feature-bg::after {
     width: 320px; height: 320px;
     bottom: -120px; right: -60px;
-    background: var(--feat-glow);
-    animation-delay: -7s;
-  }
-  @keyframes dossier-drift {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(40px, -30px) scale(1.15); }
+    background: radial-gradient(circle, var(--feat-glow), transparent 70%);
   }
 
   .dossier-feature-shell {
@@ -3393,8 +3329,8 @@
   /* Ring motif */
   @keyframes ring-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   @keyframes ring-pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
-  .motif-ring:not(.motif-ring--one) { animation: ring-spin 24s linear infinite; transform-origin: center; }
-  .motif-ring-inner { animation: ring-spin 18s linear infinite reverse; transform-origin: center; }
+  .motif-ring:not(.motif-ring--one) { transform-origin: center; }
+  .motif-ring-inner { transform-origin: center; }
   .motif-ring:not(.motif-ring--one) circle,
   .motif-ring-inner circle { stroke: var(--feat-accent); fill: none; }
 
@@ -3432,7 +3368,6 @@
       radial-gradient(circle at 50% 50%, rgba(255, 220, 140, 0.35) 0%, rgba(255, 140, 30, 0.25) 30%, rgba(255, 60, 0, 0.18) 55%, transparent 75%);
     filter: blur(18px);
     z-index: 0;
-    animation: one-ring-glow 4.5s ease-in-out infinite;
   }
   .one-ring-spin {
     position: relative;
@@ -3441,9 +3376,7 @@
     z-index: 1;
     display: grid;
     place-items: center;
-    animation: one-ring-spin 48s linear infinite;
     transform-origin: center;
-    will-change: transform;
   }
   .one-ring-img {
     position: relative;
@@ -3479,19 +3412,14 @@
     -webkit-mask: radial-gradient(circle, transparent 40%, #000 52%, #000 60%, transparent 72%);
             mask: radial-gradient(circle, transparent 40%, #000 52%, #000 60%, transparent 72%);
     filter: blur(2px) saturate(1.4);
-    animation: one-ring-fire-pulse 3.6s ease-in-out infinite;
+    opacity: 0.75;
   }
   .one-ring-fire--inner {
     inset: 22%;
     -webkit-mask: radial-gradient(circle, transparent 38%, #000 50%, #000 56%, transparent 68%);
             mask: radial-gradient(circle, transparent 38%, #000 50%, #000 56%, transparent 68%);
-    animation: one-ring-fire-pulse 2.4s ease-in-out infinite reverse;
     opacity: 0.7;
     filter: blur(1.4px) saturate(1.6);
-  }
-  @keyframes one-ring-fire-pulse {
-    0%, 100% { opacity: 0.55; filter: blur(2px) saturate(1.3) hue-rotate(0deg); }
-    50% { opacity: 0.95; filter: blur(1px) saturate(1.7) hue-rotate(-12deg); }
   }
   .motif-ring-caption {
     font-family: 'Cinzel', 'Cinzel Decorative', serif;
@@ -3553,14 +3481,13 @@
     85% { opacity: 0.9; }
     100% { transform: translate(var(--mote-x), var(--mote-y)) scale(1.2); opacity: 0; }
   }
-  .dreamcatcher .dc-hoop-group { animation: dc-hoop-glow 5s ease-in-out infinite; transform-origin: 180px 170px; }
-  .dreamcatcher .dc-web { animation: dc-web-pulse 6s ease-in-out infinite; transform-origin: 180px 170px; transform-box: fill-box; }
-  .dreamcatcher .dc-strand--left { animation: dc-sway-left 5.5s ease-in-out infinite; transform-origin: 118px 298px; transform-box: fill-box; }
-  .dreamcatcher .dc-strand--center { animation: dc-sway-center 6.2s ease-in-out infinite; transform-origin: 180px 300px; transform-box: fill-box; }
-  .dreamcatcher .dc-strand--right { animation: dc-sway-right 5.8s ease-in-out infinite 0.4s; transform-origin: 242px 298px; transform-box: fill-box; }
+  .dreamcatcher .dc-hoop-group { transform-origin: 180px 170px; }
+  .dreamcatcher .dc-web { transform-origin: 180px 170px; transform-box: fill-box; }
+  .dreamcatcher .dc-strand--left { transform-origin: 118px 298px; transform-box: fill-box; }
+  .dreamcatcher .dc-strand--center { transform-origin: 180px 300px; transform-box: fill-box; }
+  .dreamcatcher .dc-strand--right { transform-origin: 242px 298px; transform-box: fill-box; }
   .dreamcatcher .dc-mote {
-    animation: dc-mote-rise 6.5s ease-out infinite;
-    animation-delay: var(--mote-delay, 0s);
+    opacity: 0;
     transform-origin: center;
     transform-box: fill-box;
   }
@@ -4770,7 +4697,6 @@
     border-radius: 999px;
     background: radial-gradient(circle, rgba(255, 23, 68, 0.4), transparent 70%);
     opacity: 0.5; z-index: -1;
-    animation: chat-toggle-breathe 3s ease-in-out infinite;
   }
   .chat-toggle:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(255, 23, 68, 0.45); }
   .chat-toggle-kbd {
