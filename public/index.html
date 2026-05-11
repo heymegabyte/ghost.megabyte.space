@@ -1055,32 +1055,32 @@
             </svg>
             </div>
           </div>
-          <div class="dossier-feature-media-row dossier-feature-media-row--dreams" aria-label="Four recurring dreams, rendered as evidence cards.">
+          <div class="dossier-feature-media-row dossier-feature-media-row--dreams" aria-label="Four recurring dreams, rendered as evidence cards. Click any tile to view full-size.">
             <figure class="dossier-feature-figure">
               <picture>
                 <source srcset="/dream-president.webp?v=20260511b" type="image/webp" />
-                <img src="/dream-president.webp?v=20260511b" alt="White House lawn portrait with the dreamer and fourteen adopted children — the POTUS-and-fourteen dream." width="1024" height="1536" loading="lazy" decoding="async" />
+                <img class="lightbox-trigger" data-lightbox-src="/dream-president.webp?v=20260511b" data-lightbox-caption="Dream 1 — In front of the White House with 14 children. The recurring dream of adopting 14 and becoming POTUS." src="/dream-president.webp?v=20260511b" alt="White House lawn portrait with the dreamer and fourteen adopted children — the POTUS-and-fourteen dream." width="1024" height="1536" loading="lazy" decoding="async" />
               </picture>
               <figcaption>Dream 1 &mdash; In front of the White House with 14 children. The recurring dream of adopting 14 and becoming POTUS.</figcaption>
             </figure>
             <figure class="dossier-feature-figure">
               <picture>
                 <source srcset="/dream-doom.webp?v=20260511c" type="image/webp" />
-                <img src="/dream-doom.webp?v=20260511c" alt="First-person view in a hellish DOOM arena, lone pistol in hand, floating red one-eyed cacodemons closing in, a distant figure on the path walking away." width="1024" height="1024" loading="lazy" decoding="async" />
+                <img class="lightbox-trigger" data-lightbox-src="/dream-doom.webp?v=20260511c" data-lightbox-caption="Dream 2 — DOOM, late game, with only a pistol. Jesus sacrificed himself for me; I was left to clear the floor alone." src="/dream-doom.webp?v=20260511c" alt="First-person view in a hellish DOOM arena, lone pistol in hand, floating red one-eyed cacodemons closing in, a distant figure on the path walking away." width="1024" height="1024" loading="lazy" decoding="async" />
               </picture>
               <figcaption>Dream 2 &mdash; DOOM, late game, with only a pistol. Jesus sacrificed himself for me; I was left to clear the floor alone.</figcaption>
             </figure>
             <figure class="dossier-feature-figure">
               <picture>
                 <source srcset="/dream-antichrist.webp?v=20260511b" type="image/webp" />
-                <img src="/dream-antichrist.webp?v=20260511b" alt="Newspaper front page revealing the Antichrist — face resembling the dreamer, dressed in Jesus-style robes." width="1448" height="1086" loading="lazy" decoding="async" />
+                <img class="lightbox-trigger" data-lightbox-src="/dream-antichrist.webp?v=20260511b" data-lightbox-caption="Dream 3 — The Antichrist in the newspaper. He looked like me, but dressed in Jesus-garb." src="/dream-antichrist.webp?v=20260511b" alt="Newspaper front page revealing the Antichrist — face resembling the dreamer, dressed in Jesus-style robes." width="1448" height="1086" loading="lazy" decoding="async" />
               </picture>
               <figcaption>Dream 3 &mdash; The Antichrist in the newspaper. He looked like me, but dressed in Jesus-garb.</figcaption>
             </figure>
             <figure class="dossier-feature-figure">
               <picture>
                 <source srcset="/dream-phs-track.webp?v=20260511b" type="image/webp" />
-                <img src="/dream-phs-track.webp?v=20260511b" alt="First-person POV of a man running on a track at dawn, a luminous hump in the lane ahead representing conquered nanobots." width="1024" height="1024" loading="lazy" decoding="async" />
+                <img class="lightbox-trigger" data-lightbox-src="/dream-phs-track.webp?v=20260511b" data-lightbox-caption="Dream 4 — POV, running the track. &ldquo;Conquered&rdquo; the nanobots by running over the hump. Dream world made it easy. Real world is quite different." src="/dream-phs-track.webp?v=20260511b" alt="First-person POV of a man running on a track at dawn, a luminous hump in the lane ahead representing conquered nanobots." width="1024" height="1024" loading="lazy" decoding="async" />
               </picture>
               <figcaption>Dream 4 &mdash; POV, running the track. &ldquo;Conquered&rdquo; the nanobots by running over the hump. Dream world made it easy. Real world is quite different.</figcaption>
             </figure>
@@ -2065,6 +2065,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
       <section class="full-bleed dossier-feature dossier-feature--entropy-origin reveal-section bx-from-right" data-testid="evidence-emf-alarm" data-severity="4">
         <div class="dossier-feature-bg" aria-hidden="true"></div>
         <div class="shell dossier-feature-shell">
+          <p class="dossier-feature-bridge">And then a sensor went on the wall &mdash; and the record became measurable.</p>
           <div class="dossier-feature-meta">
             <p class="eyebrow">EXHIBIT // ENTROPY ORIGIN</p>
             <span class="dossier-severity">SEV 4</span>
@@ -4380,6 +4381,11 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
       crossorigin="anonymous"
       defer
     ></script>
+    <dialog id="lightbox" class="lightbox" aria-label="Image lightbox">
+      <button type="button" class="lightbox-close" aria-label="Close image (Esc)">&times;</button>
+      <img class="lightbox-image" src="" alt="" />
+      <p class="lightbox-caption"></p>
+    </dialog>
     <script type="module" src="/app.js?v=20260511-perf1"></script>
     <script defer src="/features.js?v=20260511-perf1"></script>
     <script defer src="/celestial-map.js?v=20260511-perf1"></script>
@@ -4387,5 +4393,6 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
     <script defer src="/transitions.js?v=20260511-perf1"></script>
     <script defer src="/cinema.js?v=20260511-perf1"></script>
     <script defer src="/transmissions.js?v=20260511-perf1"></script>
+    <script defer src="/lightbox.js?v=20260511a"></script>
   </body>
 </html>
