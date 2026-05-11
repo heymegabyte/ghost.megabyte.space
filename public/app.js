@@ -2436,9 +2436,11 @@ function initHobbitAudio() {
     analyser.minDecibels = -90;
     analyser.maxDecibels = -10;
 
-    audio = new Audio('/hobbit-kettle-fire.mp3');
+    audio = new Audio();
+    audio.preload = 'none';
     audio.crossOrigin = 'anonymous';
     audio.loop = true;
+    audio.src = '/hobbit-kettle-fire.mp3';
     source = audioCtx.createMediaElementSource(audio);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);

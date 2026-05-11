@@ -65,10 +65,10 @@
     <meta name="theme-color" content="#060610" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Sora:wght@400;600;700&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700;800&family=Sora:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;700&family=Sora:wght@400;600;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="/styles.css?v=20260511-hbo2" />
     <script>
       history.scrollRestoration = 'manual';
@@ -263,7 +263,7 @@
 
     <header class="site-header">
       <a class="brand-lockup" href="/" aria-label="Ghost Signal — home" style="text-decoration:none;color:inherit;">
-        <img class="brand-logo" src="/logo-nav.png?v=20260501-ghost" alt="Ghost Signal logo" width="64" height="64" />
+        <img class="brand-logo" src="/logo-nav.png?v=20260501-ghost" alt="Ghost Signal logo" width="64" height="64" fetchpriority="high" decoding="async" />
         <div class="brand-mark">GHOST // SIGNAL</div>
       </a>
       <nav class="site-nav" aria-label="Primary">
@@ -463,7 +463,7 @@
           </ul>
         </div>
         <div class="hero-stage" aria-hidden="true">
-          <video class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+          <video class="hero-video" autoplay muted loop playsinline preload="auto" fetchpriority="high" aria-hidden="true">
             <source src="/hero-bg.mp4" type="video/mp4" />
           </video>
           <canvas class="hero-waveform" id="hero-waveform"></canvas>
@@ -885,7 +885,7 @@
           <figure class="dossier-feature-figure dossier-feature-figure--float-right">
             <picture>
               <source srcset="/evidence-radiation-tdr.webp" type="image/webp" />
-              <img src="/evidence-radiation-tdr.png" alt="Screenshot showing nearby cell tower SSIDs renamed to Radiation TDS and Radiation TDR" loading="lazy" width="800" height="1067" data-zoomable data-gallery="evidence" />
+              <img src="/evidence-radiation-tdr.webp" alt="Screenshot showing nearby cell tower SSIDs renamed to Radiation TDS and Radiation TDR" loading="lazy" decoding="async" width="800" height="1067" data-zoomable data-gallery="evidence" />
             </picture>
             <figcaption>EXHIBIT &middot; Cell-tower SSIDs broadcasting &ldquo;Radiation TDR&rdquo; and &ldquo;Radiation TDS&rdquo; in range of every device near me.</figcaption>
           </figure>
@@ -1239,7 +1239,7 @@
             <figure class="dossier-feature-figure dossier-feature-figure--gondor">
               <picture>
                 <source srcset="/evidence-4gondor.webp" type="image/webp" />
-                <img src="/evidence-4gondor.jpg" alt="4-GONDOR license plate on a Kia Stinger — Lord of the Rings reference spotted in traffic" loading="lazy" width="800" height="800" data-zoomable data-gallery="evidence" />
+                <img src="/evidence-4gondor.jpg" alt="4-GONDOR license plate on a Kia Stinger — Lord of the Rings reference spotted in traffic" loading="lazy" decoding="async" width="800" height="800" data-zoomable data-gallery="evidence" />
               </picture>
               <figcaption>4-GONDOR &mdash; Pennsylvania plate on a Kia Stinger.</figcaption>
             </figure>
@@ -1360,7 +1360,7 @@
                 <figure class="celestial-orb-frame celestial-orb-frame--inline">
                   <picture>
                     <source srcset="/pinky-brain.webp?v=20260501-ghost" type="image/webp" />
-                    <img src="/pinky-brain.png?v=20260501-ghost" alt="Pinky and the Brain — the cartoon mice plotting to take over the world" loading="lazy" decoding="async" width="1200" height="900" />
+                    <img src="/pinky-brain.webp?v=20260501-ghost" alt="Pinky and the Brain — the cartoon mice plotting to take over the world" loading="lazy" decoding="async" width="1200" height="900" />
                   </picture>
                   <figcaption>Pinky and the Brain &mdash; the cartoon, but the metaphor lands hard. One night, one orb, one plan.</figcaption>
                 </figure>
@@ -1506,7 +1506,7 @@
 
           <div class="evidence-grid porcine-grid">
             <div class="evidence-video">
-              <video controls preload="metadata" poster="" playsinline width="960" height="540">
+              <video controls preload="none" poster="" playsinline width="960" height="540">
                 <source src="/evidence-hacker-volume.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -1555,7 +1555,7 @@
           <figure class="dossier-feature-figure dossier-feature-figure--float-right">
             <picture>
               <source srcset="/evidence-jcsaves.webp" type="image/webp" />
-              <img src="/evidence-jcsaves.jpg" alt="JCSAVES license plate on a Lexus RX 300 — JC Saves, a reminder that even our leaders need salvation" loading="lazy" width="800" height="800" data-zoomable data-gallery="evidence" />
+              <img src="/evidence-jcsaves.jpg" alt="JCSAVES license plate on a Lexus RX 300 — JC Saves, a reminder that even our leaders need salvation" loading="lazy" decoding="async" width="800" height="800" data-zoomable data-gallery="evidence" />
             </picture>
             <figcaption>JC SAVES — spotted in traffic. The signal speaks through license plates too.</figcaption>
           </figure>
@@ -1637,13 +1637,13 @@
             <p class="dossier-feature-body">Jungle Habitat: a supposedly haunted former safari park smack dab in the middle of New Jersey. I went there, perhaps playing music too loud, and ended up with a dead battery. Rabid ghost eating my battery? Maybe. The abandoned park swallows sound differently. The trees remember the animals that lived and died here.</p>
             <div class="dossier-feature-media-row dossier-feature-media-row--jungle">
               <figure class="dossier-feature-figure">
-                <video controls preload="metadata" playsinline loading="lazy" class="dossier-video" width="270" height="480" style="aspect-ratio: 270 / 480;">
+                <video controls preload="none" playsinline loading="lazy" class="dossier-video" width="270" height="480" style="aspect-ratio: 270 / 480;">
                   <source src="/evidence-jungle-habitat-1.mp4" type="video/mp4" />
                 </video>
                 <figcaption>Jungle Habitat, West Milford, NJ &mdash; clip 1.</figcaption>
               </figure>
               <figure class="dossier-feature-figure">
-                <video controls preload="metadata" playsinline loading="lazy" class="dossier-video" width="640" height="360" style="aspect-ratio: 16 / 9;">
+                <video controls preload="none" playsinline loading="lazy" class="dossier-video" width="640" height="360" style="aspect-ratio: 16 / 9;">
                   <source src="/evidence-jungle-habitat-2.mp4" type="video/mp4" />
                 </video>
                 <figcaption>Jungle Habitat, West Milford, NJ &mdash; clip 2.</figcaption>
@@ -1744,18 +1744,18 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
           <p class="dossier-feature-body">Volunteering near Newark Penn Station. Calmness changes how the world responds. Multi-colored bags seemed to switch to black bags as if the scene had been edited in place.</p>
           <p class="dossier-feature-body">Beyond the line work — soup, sandwiches, the regular shifts — I run extra social work and the AI / technology arm of the operation at <a href="https://mission.megabyte.space" target="_blank" rel="noopener">mission.megabyte.space</a>. The bigger play: source the unhoused as a real labor force, paid in dignity and dollars, through <a href="https://labor.megabyte.space" target="_blank" rel="noopener">labor.megabyte.space</a>. Charity is the floor. Employment is the ceiling.</p>
           <figure class="dossier-feature-figure">
-            <video controls preload="metadata" playsinline loading="lazy" class="dossier-video">
+            <video controls preload="none" playsinline loading="lazy" class="dossier-video">
               <source src="/evidence-wb-mason.mp4" type="video/mp4" />
             </video>
             <figcaption>Who But W.B. Mason? Meet the Free Masons. The signs overlap in ways you can't unsee.</figcaption>
           </figure>
           <div class="dossier-feature-media-row">
             <figure class="dossier-feature-figure">
-              <img src="/evidence-church-plaque.webp" alt="Gateway Center interfaith chapel plaque, May 1974 — the first religious services held here" loading="lazy" />
+              <img src="/evidence-church-plaque.webp" alt="Gateway Center interfaith chapel plaque, May 1974 — the first religious services held here" loading="lazy" decoding="async" />
               <figcaption>The interfaith chapel plaque, Gateway Center, Newark.</figcaption>
             </figure>
             <figure class="dossier-feature-figure">
-              <img src="/evidence-church-gothic.webp" alt="Dismantled Gothic church architecture with stained glass — pieces of faith, stored in silence" loading="lazy" />
+              <img src="/evidence-church-gothic.webp" alt="Dismantled Gothic church architecture with stained glass — pieces of faith, stored in silence" loading="lazy" decoding="async" />
               <figcaption>Gothic church artifacts in storage. Faith dismantled, faith remembered.</figcaption>
             </figure>
           </div>
@@ -1780,7 +1780,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                 <ol class="avatar-slides" data-slide-track>
                   <li class="avatar-slide is-active" data-slide-index="0">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/WTC1688.webp" alt="WTC1688 license plate spotted in Parsippany, New Jersey" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/WTC1688.webp" alt="WTC1688 license plate spotted in Parsippany, New Jersey" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">WTC1688</span>
@@ -1793,7 +1793,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="1">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/DC.webp" alt="DC license plate" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/DC.webp" alt="DC license plate" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">DC</span>
@@ -1806,7 +1806,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="2">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/EXIT.webp" alt="EXIT sign" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/EXIT.webp" alt="EXIT sign" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">EXIT</span>
@@ -1819,7 +1819,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="3">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/check.webp" alt="Matter materializing on a wall" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/check.webp" alt="Matter materializing on a wall" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">CHECK</span>
@@ -1832,7 +1832,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="4">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/lightning-bolt.webp" alt="Lightning bolt in the distance" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/lightning-bolt.webp" alt="Lightning bolt in the distance" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">LIGHTNING</span>
@@ -1845,7 +1845,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="5">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/WTC2001.webp" alt="WTC2001 license plate" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/WTC2001.webp" alt="WTC2001 license plate" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">WTC2001 &amp; SUP FOOL</span>
@@ -1858,7 +1858,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="6">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/time-travelers.webp" alt="Cartoony time-traveler dream imagery" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/time-travelers.webp" alt="Cartoony time-traveler dream imagery" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">TIME TRAVELERS</span>
@@ -1871,7 +1871,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="7">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/cane.webp" alt="The cane" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/cane.webp" alt="The cane" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">CANE</span>
@@ -1884,7 +1884,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="8">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/old-car.webp" alt="Old car at the curb, an artifact from a license-plate fever dream" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/old-car.webp" alt="Old car at the curb, an artifact from a license-plate fever dream" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">OLD CAR</span>
@@ -1897,7 +1897,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="9">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/samsung.webp" alt="SAMSUNG license plate near a grave" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/samsung.webp" alt="SAMSUNG license plate near a grave" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">SAMSUNG</span>
@@ -1910,7 +1910,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="10">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/scientist.webp" alt="Scientist mid-experiment with an iron washer" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/scientist.webp" alt="Scientist mid-experiment with an iron washer" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">SCIENTIST</span>
@@ -1923,7 +1923,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="11">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/o.webp" alt="The O — a moment of intimacy at the nanostructures lab, confused about resonance, certain I was being watched" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/o.webp" alt="The O — a moment of intimacy at the nanostructures lab, confused about resonance, certain I was being watched" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">O</span>
@@ -1936,7 +1936,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="12">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/up-tipp.webp" alt="UP TIPP plate" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/up-tipp.webp" alt="UP TIPP plate" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">UP TIPP</span>
@@ -1949,7 +1949,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
                   </li>
                   <li class="avatar-slide" data-slide-index="13">
                     <figure class="avatar-slide-figure">
-                      <img src="/story/UUU90D.webp" alt="UUU90D — the license plate my car was assigned naturally" loading="lazy" data-zoomable data-gallery="avatar-frame" />
+                      <img src="/story/UUU90D.webp" alt="UUU90D — the license plate my car was assigned naturally" loading="lazy" decoding="async" data-zoomable data-gallery="avatar-frame" />
                     </figure>
                     <div class="avatar-slide-body">
                       <span class="avatar-frame-label">UUU90D</span>
@@ -1971,20 +1971,20 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
               <span class="avatar-hint">Tap a thumbnail or use &larr; / &rarr;</span>
             </div>
             <div class="avatar-thumbs" role="tablist" aria-label="Avatar Frame slides" data-slide-thumbs>
-              <button type="button" class="avatar-thumb is-active" role="tab" aria-selected="true" data-slide-jump="0" aria-label="Slide 1: WTC1688"><img src="/story/WTC1688.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="1" aria-label="Slide 2: DC"><img src="/story/DC.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="2" aria-label="Slide 3: EXIT"><img src="/story/EXIT.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="3" aria-label="Slide 4: CHECK"><img src="/story/check.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="4" aria-label="Slide 5: LIGHTNING"><img src="/story/lightning-bolt.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="5" aria-label="Slide 6: WTC2001 and SUP FOOL"><img src="/story/WTC2001.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="6" aria-label="Slide 7: TIME TRAVELERS"><img src="/story/time-travelers.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="7" aria-label="Slide 8: CANE"><img src="/story/cane.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="8" aria-label="Slide 9: OLD CAR"><img src="/story/old-car.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="9" aria-label="Slide 10: SAMSUNG"><img src="/story/samsung.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="10" aria-label="Slide 11: SCIENTIST"><img src="/story/scientist.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="11" aria-label="Slide 12: O"><img src="/story/o.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="12" aria-label="Slide 13: UP TIPP"><img src="/story/up-tipp.webp" alt="" loading="lazy" /></button>
-              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="13" aria-label="Slide 14: UUU90D"><img src="/story/UUU90D.webp" alt="" loading="lazy" /></button>
+              <button type="button" class="avatar-thumb is-active" role="tab" aria-selected="true" data-slide-jump="0" aria-label="Slide 1: WTC1688"><img fetchpriority="low" src="/story/WTC1688.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="1" aria-label="Slide 2: DC"><img fetchpriority="low" src="/story/DC.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="2" aria-label="Slide 3: EXIT"><img fetchpriority="low" src="/story/EXIT.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="3" aria-label="Slide 4: CHECK"><img fetchpriority="low" src="/story/check.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="4" aria-label="Slide 5: LIGHTNING"><img fetchpriority="low" src="/story/lightning-bolt.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="5" aria-label="Slide 6: WTC2001 and SUP FOOL"><img fetchpriority="low" src="/story/WTC2001.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="6" aria-label="Slide 7: TIME TRAVELERS"><img fetchpriority="low" src="/story/time-travelers.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="7" aria-label="Slide 8: CANE"><img fetchpriority="low" src="/story/cane.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="8" aria-label="Slide 9: OLD CAR"><img fetchpriority="low" src="/story/old-car.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="9" aria-label="Slide 10: SAMSUNG"><img fetchpriority="low" src="/story/samsung.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="10" aria-label="Slide 11: SCIENTIST"><img fetchpriority="low" src="/story/scientist.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="11" aria-label="Slide 12: O"><img fetchpriority="low" src="/story/o.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="12" aria-label="Slide 13: UP TIPP"><img fetchpriority="low" src="/story/up-tipp.webp" alt="" loading="lazy" decoding="async" /></button>
+              <button type="button" class="avatar-thumb" role="tab" aria-selected="false" data-slide-jump="13" aria-label="Slide 14: UUU90D"><img fetchpriority="low" src="/story/UUU90D.webp" alt="" loading="lazy" decoding="async" /></button>
             </div>
           </div>
         </div>
@@ -2004,7 +2004,7 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
           </div>
           <div class="evidence-grid">
             <div class="evidence-video">
-              <video controls preload="metadata" playsinline width="960" height="540">
+              <video controls preload="none" playsinline width="960" height="540">
                 <source src="/evidence-emf-alarm.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -4239,7 +4239,7 @@ print(r.content.hex())</code></pre>
       </svg>
     </button>
 
-    <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js" defer></script>
     <script
       src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -4247,7 +4247,7 @@ print(r.content.hex())</code></pre>
       defer
     ></script>
     <script type="module" src="/app.js?v=20260511-hbo2"></script>
-    <script src="/features.js?v=20260511-hbo2"></script>
+    <script defer src="/features.js?v=20260511-hbo2"></script>
     <script defer src="/celestial-map.js?v=20260511-hbo2"></script>
     <script defer src="/enhance.js?v=20260511-hbo2"></script>
     <script defer src="/transitions.js?v=20260511-hbo2"></script>

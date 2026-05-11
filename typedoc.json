@@ -1,0 +1,43 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/types.ts",
+    "src/lib/chat.ts",
+    "src/lib/config.ts",
+    "src/lib/entropy.ts",
+    "src/lib/errors.ts",
+    "src/lib/headers.ts",
+    "src/lib/history.ts",
+    "src/lib/home-assistant.ts",
+    "src/lib/mock-sensor.ts",
+    "src/lib/rate-limit.ts",
+    "src/lib/snapshots.ts",
+    "src/lib/test-helpers.ts",
+    "src/lib/timeline-events.ts",
+    "src/lib/twilio.ts"
+  ],
+  "out": "docs/api",
+  "name": "ghost.megabyte.space — Worker API",
+  "readme": "README.md",
+  "includeVersion": true,
+  "githubPages": false,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "skipErrorChecking": false,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "sort": ["kind", "alphabetical"],
+  "categorizeByGroup": true,
+  "navigationLinks": {
+    "Repo": "https://github.com/megabyte-labs/ghost.megabyte.space",
+    "Live API": "https://ghost.megabyte.space/api/docs",
+    "OpenAPI": "https://ghost.megabyte.space/api/v1/openapi.json"
+  },
+  "treatWarningsAsErrors": false,
+  "logLevel": "Info"
+}
