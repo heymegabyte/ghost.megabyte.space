@@ -11754,3 +11754,55 @@
   color: #00E5FF !important;
 }
 
+/* ============================================================
+   UNLAYERED — Defensive card edge-padding floor (HIGHEST TIER)
+   Cards never touch the viewport edge, at any breakpoint,
+   regardless of full-bleed escapes or container math edge cases.
+   ============================================================ */
+.status-grid,
+.pillar-grid,
+.platform-pillars-grid,
+.docs-grid,
+.dossier-grid,
+.evidence-grid,
+.timeline-grid,
+.recent-readings-grid {
+  padding-inline: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+/* Plate-vault tier (when not the merged mosaic wall) keeps its
+   1.5rem floor; the merged mosaic is intentionally edge-to-edge. */
+.plate-vault-tier:not(.plate-vault-tier-merged) {
+  padding-inline: max(1rem, 1.5vw);
+}
+
+/* Generic .card class anywhere in the tree gets a guaranteed
+   1rem outer breathing room when it is a direct child of <main>
+   or <section> that escaped the .shell container. */
+main > .status-card,
+main > .pillar-card,
+main > .docs-card,
+main > .dossier-card,
+section > .status-card,
+section > .pillar-card,
+section > .docs-card,
+section > .dossier-card {
+  margin-inline: max(1rem, env(safe-area-inset-left));
+}
+
+/* Below 460px (smallest phones, foldables) — pin a hard 0.75rem
+   inline padding on every card grid so cards keep breathing room
+   even when the viewport math collapses to its minimum. */
+@media (max-width: 460px) {
+  .status-grid,
+  .pillar-grid,
+  .platform-pillars-grid,
+  .docs-grid,
+  .dossier-grid,
+  .evidence-grid,
+  .timeline-grid,
+  .recent-readings-grid {
+    padding-inline: 0.75rem;
+  }
+}
+
