@@ -70,6 +70,12 @@ export interface Env {
   LISTMONK_API_TOKEN?: string;
   /** Listmonk list id to subscribe new emails to. */
   LISTMONK_LIST_ID?: string;
+  /** HMAC-SHA256 shared secret used to verify Listmonk webhook deliveries. */
+  LISTMONK_WEBHOOK_SECRET?: string;
+  /** PostHog project API key. Webhook events fan out here when set. */
+  POSTHOG_API_KEY?: string;
+  /** PostHog ingestion host (defaults to `https://us.i.posthog.com`). */
+  POSTHOG_HOST?: string;
 }
 
 /** Raw `/api/states/...` payload returned by Home Assistant. */
@@ -201,6 +207,30 @@ export interface ChatMessage {
   content: string;
   createdAt: string;
   ipAddress?: string;
+}
+
+/** One row of `email_events` (Listmonk + SMTP-provider event ledger). */
+export interface EmailEventRow {
+  id: string;
+  eventType: string;
+  email?: string;
+  campaignId?: number;
+  subscriberId?: number;
+  source?: string;
+  reason?: string;
+  rawPayload: string;
+  posthogStatus?: string;
+  receivedAt: string;
+}
+
+/** One row of `email_suppressions` (authoritative do-not-send list). */
+export interface EmailSuppressionRow {
+  email: string;
+  reason: "unsubscribe" | "hard_bounce" | "soft_bounce" | "complaint" | "manual" | "invalid";
+  source?: string;
+  campaignId?: number;
+  notes?: string;
+  suppressedAt: string;
 }
 
 /** One row of `call_transmissions` (Twilio hotline persistence). */

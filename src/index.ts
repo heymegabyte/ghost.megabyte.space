@@ -33,6 +33,7 @@
  *  - `GET  /api/v1/transmission-count` — combined chat + call count.
  *  - `POST /api/v1/debate` — Anthropic-backed debate endpoint.
  *  - `POST /api/v1/newsletter/subscribe` — Listmonk passthrough.
+ *  - `POST /api/v1/listmonk/webhook` — HMAC-verified ingestion → D1 + PostHog.
  *
  * Static + redirect surface:
  *  - `GET /transmissions` → 301 → `/#transmissions`.
@@ -84,6 +85,7 @@ import timelineYamlText from "./data/timeline.yaml";
 import { handleChat, getChatHistory } from "./lib/chat";
 import { buildGreetingTwiml, handleGather, getTransmissions, getTransmissionCount } from "./lib/twilio";
 import { storyMilestones, timelineAnnotations } from "./lib/timeline-events";
+import { ingestListmonkEvent, verifyListmonkSignature } from "./lib/email-events";
 import type { AppVariables, Env, TimelineData } from "./types";
 
 type Bindings = {
@@ -268,9 +270,21 @@ const RandomSchema = z
   })
   .openapi("GhostEmfRandom");
 
+/** Primary Hono application — every route, middleware, and webhook hangs off this instance. */
 const app = new OpenAPIHono<Bindings>();
+/** Semver string surfaced via {@link healthRoute} and the OpenAPI document. Bump on every behavior-affecting deploy. */
 const version = "0.2.0";
 
+/**
+ * Server-rendered HTML for the legacy `/transmissions` deep link.
+ *
+ * Returned by the 301 redirect target so search engines and direct shares land
+ * on a fully-rendered page rather than a JS-only SPA shell. Content stays in
+ * lockstep with the `#transmissions` section of the homepage.
+ *
+ * @returns A complete `<!doctype html>` document — caller is responsible for
+ *          setting `Content-Type: text/html; charset=utf-8`.
+ */
 function transmissionsPageHtml(): string {
   return `<!doctype html>
 <html lang="en">
@@ -476,7 +490,16 @@ function transmissionsPageHtml(): string {
 </html>`;
 }
 
+/** Memoized parse of `src/data/timeline.yaml`. The bundle inlines the YAML at build time, so parsing once per isolate is sufficient. */
 let cachedTimeline: TimelineData | null = null;
+
+/**
+ * Lazily parse and memoize `src/data/timeline.yaml` for the lifetime of the
+ * Worker isolate.
+ *
+ * @returns The fully parsed {@link TimelineData} document including categories
+ *          and the events array.
+ */
 function getTimelineData(): TimelineData {
   if (!cachedTimeline) {
     cachedTimeline = parseYaml(timelineYamlText) as TimelineData;
@@ -484,10 +507,24 @@ function getTimelineData(): TimelineData {
   return cachedTimeline;
 }
 
+/**
+ * Access the Cloudflare global Cache API "default" bucket.
+ *
+ * Wrapped so the unsafe type assertion lives in exactly one place — every
+ * caller can rely on a proper {@link Cache} return type.
+ */
 function getDefaultCache(): Cache {
   return (caches as CacheStorage & { default: Cache }).default;
 }
 
+/**
+ * Read a previously cached JSON envelope from Cloudflare's edge cache.
+ *
+ * @typeParam T - Expected shape of the cached payload.
+ * @param cacheKey - The synthetic {@link Request} used as the cache key (same
+ *                   key passed to {@link writeCachedJson}).
+ * @returns Parsed payload on hit, `null` on miss. Never throws on miss.
+ */
 async function readCachedJson<T>(cacheKey: Request): Promise<T | null> {
   const cached = await getDefaultCache().match(cacheKey);
   if (!cached) {
@@ -497,6 +534,16 @@ async function readCachedJson<T>(cacheKey: Request): Promise<T | null> {
   return (await cached.json()) as T;
 }
 
+/**
+ * Write a JSON payload into the edge cache asynchronously via `waitUntil` so it
+ * never blocks the response.
+ *
+ * @param cacheKey      - Synthetic {@link Request} used as the cache key.
+ * @param payload       - Anything `JSON.stringify`-safe.
+ * @param cacheControl  - Verbatim `Cache-Control` header (e.g. `"public, max-age=3, s-maxage=3, stale-while-revalidate=30"`).
+ * @param executionCtx  - Worker execution context — required so the cache PUT
+ *                        survives past the response.
+ */
 function writeCachedJson(
   cacheKey: Request,
   payload: unknown,
@@ -1307,6 +1354,53 @@ app.post("/api/v1/newsletter/subscribe", async (c) => {
   }
 });
 
+/**
+ * Listmonk webhook → D1 `email_events` + `email_suppressions` + PostHog fan-out.
+ *
+ * Listmonk delivers `{ event, data }` envelopes signed with HMAC-SHA256 in
+ * `X-Listmonk-Signature` using the shared secret `LISTMONK_WEBHOOK_SECRET`.
+ * Unsigned or mis-signed requests get a 401 — there is no anonymous fallback.
+ *
+ * On success the route returns `{ ok, eventId, eventType, suppressed }` so
+ * Listmonk's "Test webhook" UI shows actionable feedback.
+ */
+app.post("/api/v1/listmonk/webhook", async (c) => {
+  const secret = c.env.LISTMONK_WEBHOOK_SECRET;
+  if (!secret) {
+    return c.json({ error: "Webhook secret not configured.", code: "MISCONFIGURED" }, 503);
+  }
+
+  const rawBody = await c.req.text();
+  const signature = c.req.header("x-listmonk-signature") ?? c.req.header("X-Listmonk-Signature") ?? null;
+  const verified = await verifyListmonkSignature(rawBody, signature, secret);
+  if (!verified) {
+    return c.json({ error: "Invalid signature.", code: "UNAUTHORIZED" }, 401);
+  }
+
+  let payload: unknown;
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    return c.json({ error: "Invalid JSON body.", code: "BAD_REQUEST" }, 400);
+  }
+
+  try {
+    const result = await ingestListmonkEvent(c.env, payload);
+    return c.json({
+      ok: true,
+      eventId: result.eventId,
+      eventType: result.eventType,
+      email: result.email ?? null,
+      suppressed: result.suppressed,
+      posthog: result.posthogStatus,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("listmonk_webhook_exception", { message });
+    return c.json({ error: "Webhook ingestion failed.", code: "INGEST_FAILED" }, 500);
+  }
+});
+
 app.get("/transmissions", (c) => c.redirect("/#transmissions", 301));
 app.get("/docs", (c) => c.redirect("/#docs", 301));
 app.get("/docs.html", (c) => c.redirect("/#docs", 301));
@@ -1599,7 +1693,19 @@ app.get("/__test/seed", async (c) => {
   );
 });
 
-// Strip Telnet IAC negotiation sequences from raw TCP data
+/**
+ * Strip Telnet IAC negotiation sequences from a raw TCP byte stream so the
+ * MUD client (`xterm.js`) only renders human-readable bytes.
+ *
+ * Handled commands per RFC 854 / RFC 855:
+ *  - `IAC WILL|WONT|DO|DONT <option>` (3-byte negotiation) — dropped.
+ *  - `IAC SB <option> ... IAC SE` (variable-length sub-negotiation) — dropped.
+ *  - `IAC IAC` (escaped `0xFF` literal) — emitted as a single `0xFF`.
+ *  - Other `IAC <cmd>` 2-byte commands (NOP, GA, etc.) — dropped.
+ *
+ * @param data - Raw bytes received from the upstream TCP socket.
+ * @returns Bytes with all Telnet protocol framing removed.
+ */
 function stripTelnet(data: Uint8Array): Uint8Array {
   const out: number[] = [];
   let i = 0;
@@ -1722,6 +1828,21 @@ app.get("*", async (c) => {
   });
 });
 
+/**
+ * Centralized error handler — converts every thrown value into the canonical
+ * `{ error, code, details?, requestId }` JSON envelope produced by {@link jsonError}.
+ *
+ * Mapping order (matters):
+ *  1. {@link ApiError} → use its own `status` + `code` verbatim.
+ *  2. {@link HTTPException} (thrown by Hono internals or `c.notFound()`) →
+ *     wrap as `HTTP_<status>` while preserving the status code.
+ *  3. Anything else → log via `console.error` (surfaces in `wrangler tail`) and
+ *     return `500 INTERNAL_ERROR` with a generic message so we never leak
+ *     stack traces to the public.
+ *
+ * Every response carries the per-request correlation id set by the
+ * request-id middleware so failures can be cross-referenced in logs.
+ */
 app.onError((error, c) => {
   const requestId = c.get("requestId") ?? crypto.randomUUID();
 
@@ -1737,6 +1858,16 @@ app.onError((error, c) => {
   return jsonError(new ApiError("Something went wrong on our end.", 500, "INTERNAL_ERROR"), requestId);
 });
 
+/**
+ * Worker module export.
+ *
+ *  - `fetch`     — primary request handler, delegates to the Hono app.
+ *  - `scheduled` — cron handler bound to `*​/1 * * * *` in `wrangler.jsonc`.
+ *                  Wraps {@link persistSnapshot} in `ctx.waitUntil` so the cron
+ *                  invocation completes only after the D1 write is durable.
+ *                  The `_controller` arg is ignored on purpose — only one cron
+ *                  expression is registered so disambiguation is unnecessary.
+ */
 export default {
   fetch: app.fetch,
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
