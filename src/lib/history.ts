@@ -1,6 +1,34 @@
+/**
+ * History-window parsing + downsampling helpers.
+ *
+ * Provides the shared validation that backs every endpoint accepting `start`/`end`
+ * or `minutes` query parameters (`/history`, `/snapshot`, `/export`,
+ * `/google-sheets`, `/random`, `__test/seed`).
+ *
+ * @packageDocumentation
+ */
+
 import { ApiError } from "./errors";
 import type { HistoryPoint, HistoryWindow } from "../types";
 
+/**
+ * Normalize and validate a history window from either explicit ISO bounds
+ * or a relative `minutes` lookback.
+ *
+ * Rules:
+ *  - If either `start` or `end` is supplied, both are required.
+ *  - Both bounds must parse as valid ISO timestamps.
+ *  - `end` must be strictly after `start`.
+ *  - The total span may not exceed 10 years (`24 * 3650` hours).
+ *  - If neither bound is supplied, the window is `[now - minutes, now]`
+ *    where `minutes` defaults to `60`.
+ *
+ * @param input.start    Optional ISO start timestamp.
+ * @param input.end      Optional ISO end timestamp.
+ * @param input.minutes  Relative lookback window (used only when start/end are absent).
+ * @throws {@link ApiError} `VALIDATION_ERROR` (`400`) on any rule violation.
+ * @returns Canonical `{ start, end }` ISO pair.
+ */
 export function parseHistoryWindow(input: {
   start?: string;
   end?: string;
@@ -43,6 +71,15 @@ export function parseHistoryWindow(input: {
   };
 }
 
+/**
+ * Largest-Triangle-Three-Buckets-style uniform downsample to `targetPoints` samples.
+ *
+ * Picks evenly spaced points by index. Returns the input unchanged when the request
+ * is non-positive, larger than the input length, or otherwise impossible.
+ *
+ * @param points        Time-ordered series.
+ * @param targetPoints  Desired output length (typically the caller's `points` query param).
+ */
 export function downsamplePoints(points: HistoryPoint[], targetPoints: number): HistoryPoint[] {
   if (targetPoints <= 0 || points.length <= targetPoints) {
     return points;

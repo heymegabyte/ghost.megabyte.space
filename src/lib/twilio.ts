@@ -1,3 +1,18 @@
+/**
+ * Twilio voice-hotline handlers for the Ghost Signal Hotline (601-666-6602).
+ *
+ * The Twilio webhook flow:
+ *  1. Inbound call → `POST /api/v1/twilio/voice` → {@link buildGreetingTwiml}.
+ *  2. Each speech turn → `POST /api/v1/twilio/gather` → {@link handleGather},
+ *     which appends transcripts to D1 and asks Claude Haiku for a short reply.
+ *  3. Call hangup → `POST /api/v1/twilio/status` (logged; no logic).
+ *
+ * Each turn is persisted to the `call_transmissions` D1 table so the public
+ * transmissions page (`/transmissions`) can render the full record.
+ *
+ * @packageDocumentation
+ */
+
 import type { Env } from "../types";
 
 const HOTLINE_SYSTEM_PROMPT = `You are the Ghost Signal Hotline — the public intake line for a project built on radical, unfiltered truth. The caller is speaking to the signal. Everything they say is recorded, transcribed, and published as a public text file at ghost.megabyte.space/transmissions.
@@ -15,6 +30,11 @@ Encourage callers to share what the public record should contain: unexplained ph
 
 Keep responses under 3 sentences. Be direct, conspiratorial, and welcoming. You are collecting intelligence for the public record.`;
 
+/**
+ * XML-escape a string for safe embedding inside a TwiML document.
+ * Twilio's TwiML grammar tolerates raw apostrophes, so this only escapes
+ * `&`, `<`, `>`, and `"`.
+ */
 function escapeXml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
@@ -23,6 +43,14 @@ function escapeXml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/**
+ * Build the initial TwiML response that greets the caller, opens a
+ * speech `<Gather>` pointing at the gather webhook, and falls through to a
+ * polite hangup if the caller is silent.
+ *
+ * @param gatherUrl Absolute URL Twilio should POST the transcript to
+ *                  (e.g. `https://ghost.megabyte.space/api/v1/twilio/gather`).
+ */
 export function buildGreetingTwiml(gatherUrl: string): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -34,6 +62,21 @@ export function buildGreetingTwiml(gatherUrl: string): string {
 </Response>`;
 }
 
+/**
+ * Process one caller speech turn: look up call history, ask Claude Haiku for
+ * a short reply, persist `{transcript, ai_response}` to D1, and return a
+ * TwiML doc that speaks the reply and re-opens `<Gather>` for another turn.
+ *
+ * History scope: most-recent 10 turns from `call_transmissions` for this
+ * `callSid`, plus the inbound `speechResult`.
+ *
+ * @param env             Worker bindings (D1, Anthropic API key).
+ * @param speechResult    Transcript Twilio inferred from the caller's audio.
+ * @param callSid         Twilio per-call identifier (groups the transmission rows).
+ * @param callerNumber    E.164 caller ID, stored alongside the row.
+ * @param gatherUrl       Absolute URL for the follow-up `<Gather>` action.
+ * @returns               TwiML XML string ready to be returned with `content-type: text/xml`.
+ */
 export async function handleGather(
   env: Env,
   speechResult: string,
@@ -105,6 +148,13 @@ export async function handleGather(
 </Response>`;
 }
 
+/**
+ * Return the most-recent call transmission rows, newest first.
+ * Powers `GET /api/v1/transmissions` and the static `/transmissions` page.
+ *
+ * @param env   Worker bindings.
+ * @param limit Maximum rows to return (defaults to `50`).
+ */
 export async function getTransmissions(env: Env, limit = 50): Promise<unknown[]> {
   if (!env.EMF_DB) return [];
 
@@ -116,6 +166,10 @@ export async function getTransmissions(env: Env, limit = 50): Promise<unknown[]>
   return result.results;
 }
 
+/**
+ * Combined transmission count: web-chat user messages + call transmissions.
+ * Powers `GET /api/v1/transmission-count` (hero counter on the homepage).
+ */
 export async function getTransmissionCount(env: Env): Promise<number> {
   if (!env.EMF_DB) return 0;
 

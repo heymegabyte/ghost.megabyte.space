@@ -1,5 +1,35 @@
+/**
+ * Shannon-entropy calculator for time-windowed EMF readings.
+ *
+ * Reads are binned uniformly between observed `min` and `max` and the Shannon
+ * entropy of the resulting histogram is reported in bits. The endpoint
+ * `GET /api/v1/ghost-emf/entropy` wraps this helper.
+ *
+ * @packageDocumentation
+ */
+
 import type { EntropySummary, HistoryPoint } from "../types";
 
+/**
+ * Compute the Shannon entropy of a series of EMF readings.
+ *
+ * Algorithm:
+ *  1. Take the numeric `value` from each point.
+ *  2. If the series is empty, return zeroed summary.
+ *  3. If all values are equal (`min === max`), return zero entropy bits.
+ *  4. Otherwise, build a `bins`-element histogram between `min` and `max` and
+ *     compute `H = -Σ p_i · log2(p_i)`.
+ *
+ * @param points         Time-ordered readings (only `value` is used).
+ * @param windowMinutes  Window size used to gather `points` — echoed back in the result.
+ * @param bins           Number of histogram bins. Clamped to at least 1.
+ *
+ * @returns Summary including `entropyBits`, `sampleCount`, `min`, `max`, `mean`,
+ *          `bins`, `windowMinutes`, and an `updatedAt` ISO timestamp.
+ *
+ * @see {@link https://en.wikipedia.org/wiki/Entropy_(information_theory) | Shannon, C. E. (1948)} —
+ * *A Mathematical Theory of Communication.* Bell System Technical Journal, 27(3), 379–423.
+ */
 export function calculateEntropy(points: HistoryPoint[], windowMinutes: number, bins: number): EntropySummary {
   const values = points.map((point) => point.value);
   const updatedAt = new Date().toISOString();

@@ -1,8 +1,28 @@
+/**
+ * Home Assistant REST client + D1 snapshot persistence.
+ *
+ * This module is the sole bridge between the Cloudflare Worker and the
+ * upstream Home Assistant instance hosting the GQ EMF-390 sensor. Every
+ * request goes through {@link homeAssistantFetch}, which adds the bearer
+ * token, normalizes the URL, and wraps non-2xx responses in {@link ApiError}.
+ *
+ * History fetches prefer D1 snapshots (cron-populated by {@link persistSnapshot})
+ * for stable, replay-friendly data, and fall back to Home Assistant's
+ * `/api/history/period/*` endpoint when no snapshots are stored yet.
+ *
+ * @packageDocumentation
+ */
+
 import { ApiError } from "./errors";
 import { getCurrentCacheTtl } from "./config";
 import { buildMockHistoryPoints, buildMockReading, isMockSensorMode } from "./mock-sensor";
 import type { Env, HistoryPoint, HistoryWindow, HomeAssistantState, NormalizedReading } from "../types";
 
+/**
+ * Resolve `HASS_SERVER` into a `URL`. Throws `CONFIGURATION_ERROR` (`500`)
+ * when the env var is missing or malformed — surfaces misconfiguration loudly
+ * rather than letting downstream `fetch()` calls fail with cryptic errors.
+ */
 function getBaseUrl(env: Env): URL {
   try {
     return new URL(env.HASS_SERVER);
@@ -11,6 +31,15 @@ function getBaseUrl(env: Env): URL {
   }
 }
 
+/**
+ * Authenticated HTTP GET against Home Assistant.
+ *
+ * @typeParam T  Expected response shape.
+ * @param env           Worker bindings (for `HASS_SERVER` + `HASS_TOKEN`).
+ * @param path          REST path (e.g. `/api/states/sensor.emf`).
+ * @param searchParams  Optional query string.
+ * @throws {@link ApiError} `UPSTREAM_ERROR` (`502`) on any non-2xx response.
+ */
 async function homeAssistantFetch<T>(env: Env, path: string, searchParams?: URLSearchParams): Promise<T> {
   const baseUrl = getBaseUrl(env);
   const url = new URL(path, baseUrl);
@@ -37,6 +66,7 @@ async function homeAssistantFetch<T>(env: Env, path: string, searchParams?: URLS
   return (await response.json()) as T;
 }
 
+/** Friendly name resolution: state attribute → env override → entity id. */
 function getFriendlyName(env: Env, state: HomeAssistantState): string {
   const friendlyName = state.attributes?.friendly_name;
   if (typeof friendlyName === "string" && friendlyName.length > 0) {
@@ -46,11 +76,16 @@ function getFriendlyName(env: Env, state: HomeAssistantState): string {
   return env.EMF_SENSOR_NAME ?? state.entity_id;
 }
 
+/** Extract the Home Assistant `unit_of_measurement` attribute, or `null` when absent. */
 function getUnit(state: HomeAssistantState): string | null {
   const unit = state.attributes?.unit_of_measurement;
   return typeof unit === "string" && unit.length > 0 ? unit : null;
 }
 
+/**
+ * Coerce a state string into a finite number, throwing `SENSOR_UNAVAILABLE` (`503`)
+ * when the entity is reporting `unavailable`, `unknown`, or any non-numeric value.
+ */
 function coerceNumericValue(state: HomeAssistantState): number {
   const numericValue = Number.parseFloat(state.state);
 
@@ -64,6 +99,13 @@ function coerceNumericValue(state: HomeAssistantState): number {
   return numericValue;
 }
 
+/**
+ * Fetch a single sensor's current state from Home Assistant and normalize it
+ * into the public {@link NormalizedReading} shape.
+ *
+ * @param env       Worker bindings.
+ * @param entityId  Home Assistant entity id (e.g. `sensor.gq_emf_390_emf`).
+ */
 export async function fetchSensorReading(env: Env, entityId: string): Promise<NormalizedReading> {
   const state = await homeAssistantFetch<HomeAssistantState>(
     env,
@@ -88,6 +130,10 @@ export async function fetchSensorReading(env: Env, entityId: string): Promise<No
   };
 }
 
+/**
+ * Return the current EMF reading, honoring {@link isMockSensorMode}.
+ * Powers `GET /api/v1/ghost-emf/current`.
+ */
 export async function fetchCurrentReading(env: Env): Promise<NormalizedReading> {
   if (isMockSensorMode(env)) {
     return buildMockReading(env);
@@ -96,6 +142,7 @@ export async function fetchCurrentReading(env: Env): Promise<NormalizedReading> 
   return fetchSensorReading(env, env.EMF_SENSOR_ENTITY_ID);
 }
 
+/** Combined snapshot of EMF + (optional) EF + RF sensors at a single instant. */
 export interface AllSensorReadings {
   emf: NormalizedReading | null;
   ef: NormalizedReading | null;
@@ -103,6 +150,13 @@ export interface AllSensorReadings {
   sampledAt: string;
 }
 
+/**
+ * Fan-out parallel fetch of EMF, EF, and RF readings. Individual sensor
+ * failures are swallowed (logged as `null` in the response) so a single
+ * upstream timeout doesn't take down the whole `/sensors` endpoint.
+ *
+ * Powers `GET /api/v1/sensors`.
+ */
 export async function fetchAllSensors(env: Env): Promise<AllSensorReadings> {
   const sampledAt = new Date().toISOString();
   const sensors: AllSensorReadings = { emf: null, ef: null, rf: null, sampledAt };
@@ -135,6 +189,18 @@ export async function fetchAllSensors(env: Env): Promise<AllSensorReadings> {
   return sensors;
 }
 
+/**
+ * Return the EMF history series for the requested window.
+ *
+ * Source-of-truth priority:
+ *  1. D1 `emf_snapshots` rows (cron-populated). Stable, reproducible, fast.
+ *  2. Mock generator when {@link isMockSensorMode} is on (Playwright / local).
+ *  3. Home Assistant `/api/history/period/...` upstream fetch (cold-start).
+ *
+ * D1 rows are sorted DESC by the SQL engine for index efficiency then reversed
+ * here so the returned array is ascending — matches the public contract used
+ * by the charting code on `app.js`.
+ */
 export async function fetchHistoryPoints(env: Env, window: HistoryWindow): Promise<HistoryPoint[]> {
   if (env.EMF_DB) {
     const result = await env.EMF_DB.prepare(
@@ -199,6 +265,10 @@ export async function fetchHistoryPoints(env: Env, window: HistoryWindow): Promi
   return points;
 }
 
+/**
+ * Insert a single reading into `emf_snapshots`, ignoring duplicate-key conflicts
+ * (the synthetic id is `<entityId>:<sampledAt>` so re-running the cron is safe).
+ */
 async function persistSingleSnapshot(env: Env, reading: NormalizedReading): Promise<void> {
   if (!env.EMF_DB) return;
   const id = `${reading.entityId}:${reading.sampledAt}`;
@@ -214,6 +284,12 @@ async function persistSingleSnapshot(env: Env, reading: NormalizedReading): Prom
     .run();
 }
 
+/**
+ * Capture a snapshot of every configured sensor (EMF + optional EF + RF) and
+ * write it to D1. Called every minute by the scheduled cron handler in
+ * `src/index.ts`. In {@link isMockSensorMode}, persists a deterministic mock
+ * reading so Playwright runs accumulate predictable history.
+ */
 export async function persistSnapshot(env: Env): Promise<void> {
   if (!env.EMF_DB) return;
 

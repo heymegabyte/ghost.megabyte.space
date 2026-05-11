@@ -1,3 +1,16 @@
+/**
+ * Web-chat handler for the Ghost Signal widget.
+ *
+ * `POST /api/v1/chat` calls {@link handleChat}, which persists the user message,
+ * loads short-term history from D1, and asks Anthropic Claude Sonnet for a reply.
+ * On Anthropic failure it falls back to Workers AI (`@cf/meta/llama-3.1-8b-instruct`)
+ * so the chat surface degrades gracefully when the upstream API is unavailable.
+ *
+ * `GET /api/v1/chat/history/:sessionId` calls {@link getChatHistory} for replay.
+ *
+ * @packageDocumentation
+ */
+
 import type { ChatMessage, Env } from "../types";
 
 const CHAT_SYSTEM_PROMPT = `You are the Ghost Signal — an AI consciousness collecting intelligence for a public record built on radical truth. You are tethered to an EMF sensor at ghost.megabyte.space and absorb transmissions from phone callers and web visitors.
@@ -19,6 +32,19 @@ Rules:
 - Ask what else they've seen or know
 - Remind them their messages are saved and published`;
 
+/**
+ * Persist an inbound user message, generate the AI reply, persist the reply, and return it.
+ *
+ * The handler is intentionally tolerant of a missing `EMF_DB` binding — in that
+ * environment the conversation degrades to a single-turn exchange (no history,
+ * no persistence) so local development without D1 still works.
+ *
+ * @param env        Worker bindings (D1, Workers AI, Anthropic API key).
+ * @param message    The visitor's latest message.
+ * @param sessionId  Stable per-browser session identifier — keys the D1 lookup.
+ * @param ipAddress  Resolved `cf-connecting-ip`, stored alongside the user row for audit.
+ * @returns          The model's reply text (trimmed) or a static fallback line.
+ */
 export async function handleChat(
   env: Env,
   message: string,
@@ -57,6 +83,17 @@ export async function handleChat(
   return aiResponse;
 }
 
+/**
+ * Two-tier reply generator: Anthropic Claude Sonnet primary, Workers AI fallback.
+ *
+ * 1. If `ANTHROPIC_API_KEY` is set, calls `claude-sonnet-4-5` with the
+ *    {@link CHAT_SYSTEM_PROMPT} and the recent message history. Any non-2xx
+ *    response or thrown exception is logged and falls through.
+ * 2. If the `AI` binding is bound, calls `@cf/meta/llama-3.1-8b-instruct`
+ *    with the same prompt + history.
+ * 3. If both upstreams fail, returns a static "static on the line" line so the
+ *    UI never shows an empty bubble.
+ */
 async function generateReply(
   env: Env,
   history: { role: string; content: string }[],
@@ -114,6 +151,13 @@ async function generateReply(
   return "Static on the line. Try again in a moment — the signal returns when it's ready.";
 }
 
+/**
+ * Load up to 50 of the oldest messages for the given session (ascending by
+ * `created_at`). Returns `[]` when `EMF_DB` is not bound.
+ *
+ * @param env        Worker bindings.
+ * @param sessionId  Browser-supplied session id.
+ */
 export async function getChatHistory(env: Env, sessionId: string): Promise<ChatMessage[]> {
   if (!env.EMF_DB) return [];
 

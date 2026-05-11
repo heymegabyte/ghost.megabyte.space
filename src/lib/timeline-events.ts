@@ -1,5 +1,27 @@
+/**
+ * Hand-curated narrative + technical milestones rendered on the homepage timeline
+ * and surfaced through `GET /api/v1/ghost-emf/timeline`.
+ *
+ * Two separate arrays power two visual treatments:
+ *  - {@link timelineAnnotations}: technical events overlaid on the live EMF chart
+ *    (sensor went online, public API launched, etc.).
+ *  - {@link storyMilestones}: narrative "dossier" cards rendered as a vertical
+ *    journey on `/#timeline`.
+ *
+ * Anything added here is automatically picked up by the homepage renderer. To
+ * extend the project's *primary* timeline (event log, evidence cards), edit
+ * `src/data/timeline.yaml` instead — that file is parsed at request time and
+ * has its own schema.
+ *
+ * @packageDocumentation
+ */
+
 import type { StoryMilestone, TimelineAnnotation } from "../types";
 
+/**
+ * Technical milestone overlays for the EMF chart (date-pinned events).
+ * Each annotation renders as a vertical guide on the live chart.
+ */
 export const timelineAnnotations: TimelineAnnotation[] = [
   {
     id: "usb-bridge-online",
@@ -17,6 +39,10 @@ export const timelineAnnotations: TimelineAnnotation[] = [
   },
 ];
 
+/**
+ * Narrative chapters surfaced as the homepage story timeline.
+ * Order is intentional — the array order is the render order.
+ */
 export const storyMilestones: StoryMilestone[] = [
   {
     id: "avatar-mud-era",

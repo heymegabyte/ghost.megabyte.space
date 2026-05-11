@@ -1,6 +1,21 @@
+/**
+ * Deterministic mock sensor for Playwright + local development.
+ *
+ * When `MOCK_SENSOR_MODE=1` is set (see `.dev.vars.playwright`), every helper that
+ * would normally call Home Assistant routes through this module instead. The values
+ * are derived from `Math.sin` / `Math.cos` of the current minute so a test run started
+ * at the same wall clock observes the same readings across worker restarts.
+ *
+ * @packageDocumentation
+ */
+
 import { getCurrentCacheTtl } from "./config";
 import type { Env, HistoryPoint, HistoryWindow, NormalizedReading, SnapshotRecord } from "../types";
 
+/**
+ * Generate a deterministic mG value in roughly `[0.35, 1.3]` from the floor-minute of `date`.
+ * Sum of three sinusoids — fast, dependency-free, and stable across cold starts.
+ */
 function getDeterministicValueAt(date: Date): number {
   const minutes = Math.floor(date.getTime() / 60_000);
   const waveA = Math.sin(minutes / 11) * 0.22;
@@ -9,10 +24,16 @@ function getDeterministicValueAt(date: Date): number {
   return Number((0.82 + waveA + waveB + waveC).toFixed(3));
 }
 
+/** `true` when the Worker should bypass Home Assistant and synthesise readings locally. */
 export function isMockSensorMode(env: Env): boolean {
   return env.MOCK_SENSOR_MODE === "1";
 }
 
+/**
+ * Build a `/api/v1/ghost-emf/current` response payload from the deterministic generator.
+ * @param env  Worker env (for sensor IDs + cache TTL).
+ * @param date Timestamp the reading is reported at (defaults to `new Date()`).
+ */
 export function buildMockReading(env: Env, date = new Date()): NormalizedReading {
   const timestamp = date.toISOString();
   const numericValue = getDeterministicValueAt(date);
@@ -35,6 +56,7 @@ export function buildMockReading(env: Env, date = new Date()): NormalizedReading
   };
 }
 
+/** Generate one synthetic data point per minute inside the requested window. */
 export function buildMockHistoryPoints(window: HistoryWindow): HistoryPoint[] {
   const start = new Date(window.start);
   const end = new Date(window.end);
@@ -51,6 +73,7 @@ export function buildMockHistoryPoints(window: HistoryWindow): HistoryPoint[] {
   return points;
 }
 
+/** Project {@link buildMockHistoryPoints} into the D1 snapshot row shape used by `__test/seed`. */
 export function buildMockSnapshotRecords(env: Env, window: HistoryWindow): SnapshotRecord[] {
   return buildMockHistoryPoints(window).map((point) => ({
     entityId: env.EMF_SENSOR_ENTITY_ID,

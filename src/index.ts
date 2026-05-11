@@ -1,3 +1,63 @@
+/**
+ * Ghost Signal Worker — Cloudflare Workers entrypoint.
+ *
+ * Single-file Hono router wiring every public-facing route, every webhook, and
+ * the scheduled cron handler. Designed as a sibling reference for future
+ * Claude Code passes: every cluster of routes is grouped + commented, every
+ * top-level utility carries TSDoc, and every Zod schema has an `.openapi(...)`
+ * name so `/api/v1/openapi.json` stays accurate.
+ *
+ * ## Route map (canonical inventory — keep in sync with `docs/ROUTES.md`)
+ *
+ * Public API (rate-limited via {@link publicReadRateLimit} mounted on
+ * `/api/v1/ghost-emf/*` — note that `/api/v1/sensors` is intentionally NOT
+ * under the prefix and is NOT rate-limited):
+ *  - `GET /health` — liveness probe.
+ *  - `GET /api/v1/ghost-emf/meta` — discovery metadata.
+ *  - `GET /api/v1/ghost-emf/current` — latest EMF reading.
+ *  - `GET /api/v1/sensors` — combined EMF + EF + RF snapshot.
+ *  - `GET /api/v1/ghost-emf/history` — downsampled history series.
+ *  - `GET /api/v1/ghost-emf/entropy` — Shannon entropy summary.
+ *  - `GET /api/v1/ghost-emf/snapshot` — raw snapshot rows.
+ *  - `GET /api/v1/ghost-emf/export` — CSV / Excel download.
+ *  - `GET /api/v1/ghost-emf/google-sheets` — `=IMPORTDATA(...)` helper.
+ *  - `GET /api/v1/ghost-emf/random` — reproducible RNG from snapshot hash.
+ *  - `GET /api/v1/ghost-emf/timeline` — narrative + technical milestones.
+ *
+ * Conversational surfaces (web chat + Twilio voice hotline):
+ *  - `POST /api/v1/chat` — visitor → Ghost Signal reply.
+ *  - `GET  /api/v1/chat/history/:sessionId` — replay a chat session.
+ *  - `POST /api/v1/twilio/voice|gather|status` — TwiML webhooks for 601-666-6602.
+ *  - `GET  /api/v1/transmissions` — latest call rows.
+ *  - `GET  /api/v1/transmissions/live` — Server-Sent Events stream.
+ *  - `GET  /api/v1/transmission-count` — combined chat + call count.
+ *  - `POST /api/v1/debate` — Anthropic-backed debate endpoint.
+ *  - `POST /api/v1/newsletter/subscribe` — Listmonk passthrough.
+ *
+ * Static + redirect surface:
+ *  - `GET /transmissions` → 301 → `/#transmissions`.
+ *  - `GET /docs`, `GET /docs.html` → 301 → `/#docs`.
+ *  - `GET /transmissions/:callSid.txt` — plain-text transmission dump.
+ *  - `GET /api/v1/openapi.json` — OpenAPI 3.0 document (mounted via `app.doc`).
+ *  - `GET /api/docs` — Scalar API reference UI (relaxed CSP).
+ *  - `OPTIONS /api/*` — CORS preflight.
+ *
+ * Test-mode (gated by `TEST_HELPERS_ENABLED=1`):
+ *  - `GET /__test/reset` — truncate `emf_snapshots`.
+ *  - `GET /__test/seed` — deterministic mock-sensor backfill.
+ *
+ * Realtime:
+ *  - `GET /ws/mud` — WebSocket → TCP MUD proxy with Telnet IAC stripping.
+ *
+ * Fallback:
+ *  - `GET *` — static assets via the `ASSETS` binding.
+ *
+ * Scheduled:
+ *  - cron `*​/1 * * * *` → {@link persistSnapshot} via the `scheduled` export.
+ *
+ * @packageDocumentation
+ */
+
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";

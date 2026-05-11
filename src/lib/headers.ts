@@ -1,3 +1,34 @@
+/**
+ * Security + caching response-header helpers.
+ *
+ * Hardens every Worker response with the modern security header set
+ * (HSTS, CSP, COOP, COEP-compatible CORP, Permissions-Policy) and provides
+ * a non-destructive way to overlay additional headers onto an upstream Response.
+ *
+ * The `/api/docs` route receives a relaxed CSP (Scalar API reference loads
+ * Cloudflare-hosted CDN scripts + inline styles), while every other route gets
+ * the strict policy.
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * Return a fresh `Response` that copies the body + status from `response` and
+ * overlays `headers` on top of the existing header set.
+ *
+ * Native `Response` instances are immutable — this helper is the supported way
+ * to add cache-control / security headers without losing the upstream body.
+ *
+ * @example
+ * ```ts
+ * return applyResponseHeaders(assetResponse, {
+ *   "cache-control": "public, max-age=31536000, immutable",
+ * });
+ * ```
+ *
+ * @param response Upstream `Response` (e.g. from `env.ASSETS.fetch(...)`).
+ * @param headers  Headers to set or overwrite (case-insensitive).
+ */
 export function applyResponseHeaders(response: Response, headers: HeadersInit): Response {
   const next = new Response(response.body, response);
 
@@ -8,6 +39,20 @@ export function applyResponseHeaders(response: Response, headers: HeadersInit): 
   return next;
 }
 
+/**
+ * Build the canonical security-header set for a given request path.
+ *
+ * Routes under `/api/docs` get a relaxed CSP because the Scalar API reference
+ * needs jsDelivr-hosted scripts, inline `data:` images, and `unsafe-inline`
+ * styles. Every other route gets the strict CSP with explicit allowlists for
+ * Cloudflare Insights, jsDelivr, Google Maps, YouTube-nocookie, OpenStreetMap
+ * tiles, and Google Fonts.
+ *
+ * Cross-origin headers are pinned to `same-origin` (COOP) and `same-site` (CORP)
+ * for the strongest cross-origin isolation that still allows static assets to load.
+ *
+ * @param pathname Request URL pathname (e.g. `c.req.path` or `new URL(c.req.url).pathname`).
+ */
 export function getSecurityHeaders(pathname: string): Headers {
   const headers = new Headers({
     "referrer-policy": "strict-origin-when-cross-origin",
