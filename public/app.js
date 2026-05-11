@@ -34,12 +34,59 @@ const safetyNoteEl = $("safety-note");
 const timelineTrackEl = $("timeline-track");
 const timelineContainerEl = $("timeline-container");
 const timelineDetailEl = $("timeline-detail");
+const chatWidgetEl = $("chat-widget");
 const chatToggleEl = $("chat-toggle");
 const chatPanelEl = $("chat-panel");
+const chatBackdropEl = $("chat-backdrop");
 const chatCloseEl = $("chat-close");
 const chatFormEl = $("chat-form");
 const chatInputEl = $("chat-input");
+const chatInputCountEl = $("chat-input-count");
 const chatMessagesEl = $("chat-messages");
+const chatMessagesWrapEl = $("chat-messages-wrap");
+const chatStartersEl = $("chat-starters");
+const chatAttachEl = $("chat-attach");
+const chatAttachmentsEl = $("chat-attachments");
+const chatDropOverlayEl = $("chat-drop-overlay");
+const chatMicEl = $("chat-mic");
+const chatTtsEl = $("chat-tts-toggle");
+const chatTtsStopEl = $("chat-tts-stop");
+const chatSendEl = $("chat-send");
+const chatSettingsToggleEl = $("chat-settings-toggle");
+const chatSettingsEl = $("chat-settings");
+const chatSettingsCloseEl = $("chat-settings-close");
+const chatSearchToggleEl = $("chat-search-toggle");
+const chatSearchBarEl = $("chat-search-bar");
+const chatSearchInputEl = $("chat-search-input");
+const chatSearchCountEl = $("chat-search-count");
+const chatStatusDotEl = $("chat-status-dot");
+const chatStatusTextEl = $("chat-status-text");
+const chatScrollBottomEl = $("chat-scroll-bottom");
+const chatUnreadBadgeEl = $("chat-unread-badge");
+const chatResizeHandleEl = $("chat-resize-handle");
+const chatHelpLinkEl = $("chat-help-link");
+const chatShortcutsEl = $("chat-shortcuts");
+const chatShortcutsCloseEl = $("chat-shortcuts-close");
+const chatModeLabelEl = $("chat-mode-label");
+const chatSetVoiceEl = $("chat-set-voice");
+const chatSetRateEl = $("chat-set-rate");
+const chatSetRateValEl = $("chat-set-rate-val");
+const chatSetLangEl = $("chat-set-lang");
+const chatSetSoundEl = $("chat-set-sound");
+const chatSetNotifyEl = $("chat-set-notify");
+const chatSetAutoscrollEl = $("chat-set-autoscroll");
+const chatSetConfidentialEl = $("chat-set-confidential");
+const chatSetSuggestEl = $("chat-set-suggest");
+const chatSetCompactEl = $("chat-set-compact");
+const chatSetContrastEl = $("chat-set-contrast");
+const chatSetReduceMotionEl = $("chat-set-reducemotion");
+const chatFontDecEl = $("chat-font-dec");
+const chatFontIncEl = $("chat-font-inc");
+const chatFontValEl = $("chat-font-val");
+const chatThemeSwatchEls = $$(".chat-theme-swatch");
+const chatActionExportEl = $("chat-action-export");
+const chatActionShareEl = $("chat-action-share");
+const chatActionClearEl = $("chat-action-clear");
 const openChatEl = $("open-chat");
 const rangeButtons = $$(".range-button[data-range]");
 const efValueEl = $("ef-value");
@@ -413,31 +460,150 @@ function selectTimelineEvent(index) {
 
 /* ── Chat ── */
 
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+let chatRecognition = null;
+let chatRecognitionActive = false;
+const chatAttachments = [];
+const chatHistory = [];
+let chatAutoScrollLocked = true;
+let chatUnreadCount = 0;
+let chatLastSentMessage = "";
+
+const CHAT_PREFS_KEY = "ghost-chat-prefs";
+const CHAT_TRANSCRIPT_KEY = "ghost-chat-transcript";
+const CHAT_PREF_DEFAULTS = {
+  tts: false, voice: "", rate: 1.0, lang: "en-US",
+  sound: false, notify: false, autoscroll: true, confidential: false, suggest: true,
+  theme: "red", fontPct: 100, compact: false, contrast: false, reducemotion: false,
+  width: 440,
+};
+
+function loadChatPrefs() {
+  try {
+    const raw = localStorage.getItem(CHAT_PREFS_KEY);
+    return Object.assign({}, CHAT_PREF_DEFAULTS, raw ? JSON.parse(raw) : {});
+  } catch { return { ...CHAT_PREF_DEFAULTS }; }
+}
+function saveChatPrefs() { try { localStorage.setItem(CHAT_PREFS_KEY, JSON.stringify(chatPrefs)); } catch {} }
+const chatPrefs = loadChatPrefs();
+
+function applyChatPrefs() {
+  if (!chatPanelEl) return;
+  chatPanelEl.dataset.theme = chatPrefs.theme;
+  chatPanelEl.classList.toggle("is-compact", !!chatPrefs.compact);
+  chatPanelEl.classList.toggle("is-high-contrast", !!chatPrefs.contrast);
+  chatPanelEl.classList.toggle("is-reduce-motion", !!chatPrefs.reducemotion);
+  chatPanelEl.style.fontSize = `${chatPrefs.fontPct}%`;
+  if (chatPrefs.width && chatPrefs.width > 320) {
+    chatPanelEl.style.width = `min(${chatPrefs.width}px, 100vw)`;
+  }
+  if (chatTtsEl) chatTtsEl.setAttribute("aria-pressed", String(chatPrefs.tts));
+}
+
 function toggleChat(open) {
   state.chatOpen = open ?? !state.chatOpen;
+  chatWidgetEl?.classList.toggle("is-open", state.chatOpen);
   chatPanelEl?.classList.toggle("is-open", state.chatOpen);
   chatToggleEl?.setAttribute("aria-expanded", String(state.chatOpen));
   chatPanelEl?.setAttribute("aria-hidden", String(!state.chatOpen));
-  if (state.chatOpen) chatInputEl?.focus();
+  document.body.classList.toggle("chat-open", state.chatOpen);
+  if (state.chatOpen) {
+    chatUnreadCount = 0;
+    updateUnreadBadge();
+    setTimeout(() => chatInputEl?.focus(), 320);
+  } else {
+    if (chatRecognitionActive) chatRecognition?.stop();
+    closeChatSettings();
+    closeChatShortcuts();
+  }
 }
 
-function addChatMessage(role, text) {
-  if (!chatMessagesEl) return;
+function fmtTime(d = new Date()) {
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function renderRichText(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code}</code></pre>`);
+  html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  html = html.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/(^|[^a-z])(https?:\/\/[^\s<]+)/g, (m, lead, url) => `${lead}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+  return html;
+}
+
+function addChatMessage(role, text, opts = {}) {
+  if (!chatMessagesEl) return null;
   const msg = el("div", `chat-message chat-${role}`);
-  const p = el("p", null, text);
-  msg.append(p);
+  msg.dataset.msgRole = role;
+  msg.dataset.msgText = text;
+  const time = fmtTime();
+  const latencyHtml = opts.latencyMs ? `<span class="chat-msg-latency">${Math.round(opts.latencyMs)}ms</span>` : "";
+  const actionsHtml = role === "assistant"
+    ? `<button type="button" class="chat-msg-action" data-msg-action="copy" aria-label="Copy">copy</button>
+       <button type="button" class="chat-msg-action" data-msg-action="speak" aria-label="Read aloud">speak</button>
+       <button type="button" class="chat-msg-action" data-msg-action="regen" aria-label="Regenerate">regen</button>`
+    : `<button type="button" class="chat-msg-action" data-msg-action="copy" aria-label="Copy">copy</button>`;
+  const attachmentsHtml = opts.attachments?.length
+    ? `<div class="chat-msg-attachments">${opts.attachments.map((a) => a.previewUrl ? `<img class="chat-msg-attachment-img" src="${a.previewUrl}" alt="${escapeHtml(a.name)}" />` : `<span class="chat-attachment-chip"><span>${escapeHtml(a.name)}</span></span>`).join("")}</div>`
+    : "";
+  const avatar = role === "assistant" ? "◊" : "✶";
+  msg.innerHTML = `
+    <div class="chat-msg-row">
+      <span class="chat-avatar chat-avatar-${role === "assistant" ? "ai" : "user"}" aria-hidden="true">${avatar}</span>
+      <div class="chat-msg-body">
+        <p class="chat-msg-text">${renderRichText(text)}</p>
+        ${attachmentsHtml}
+        <div class="chat-msg-meta">
+          <time class="chat-msg-time">${time}</time>
+          ${latencyHtml}
+          ${actionsHtml}
+        </div>
+      </div>
+    </div>`;
   chatMessagesEl.append(msg);
+  chatHistory.push({ role, text, ts: Date.now() });
+  saveTranscript();
+  if (chatAutoScrollLocked) scrollChatToBottom();
+  else if (role === "assistant") { chatUnreadCount++; updateUnreadBadge(); }
+  if (role === "assistant" && chatPrefs.tts) speakText(text);
+  if (role === "assistant" && chatPrefs.sound) playReplyChime();
+  if (role === "assistant" && chatPrefs.notify && document.hidden) tryNotify(text);
+  return msg;
+}
+
+function scrollChatToBottom() {
+  if (!chatMessagesEl) return;
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  chatScrollBottomEl?.setAttribute("hidden", "");
+  chatUnreadCount = 0;
+  updateUnreadBadge();
+}
+
+function updateUnreadBadge() {
+  if (!chatUnreadBadgeEl) return;
+  if (chatUnreadCount > 0) {
+    chatUnreadBadgeEl.hidden = false;
+    chatUnreadBadgeEl.textContent = String(chatUnreadCount > 99 ? "99+" : chatUnreadCount);
+  } else {
+    chatUnreadBadgeEl.hidden = true;
+  }
 }
 
 function showTyping() {
   if (!chatMessagesEl) return;
   const typing = el("div", "chat-message chat-assistant chat-typing-msg");
   typing.id = "chat-typing";
-  const p = el("p", "chat-typing", "The signal is processing...");
-  typing.append(p);
+  typing.innerHTML = `
+    <div class="chat-msg-row">
+      <span class="chat-avatar chat-avatar-ai" aria-hidden="true">◊</span>
+      <div class="chat-msg-body"><p class="chat-msg-text">The signal is processing<span class="chat-typing-dots">…</span></p></div>
+    </div>`;
   chatMessagesEl.append(typing);
-  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  if (chatAutoScrollLocked) scrollChatToBottom();
 }
 
 function removeTyping() {
@@ -445,9 +611,97 @@ function removeTyping() {
   if (t) t.remove();
 }
 
+function hideStarters() { chatStartersEl?.classList.add("is-hidden"); }
+function showStarters() { chatStartersEl?.classList.remove("is-hidden"); }
+
+function speakText(text, opts = {}) {
+  if (!("speechSynthesis" in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g, ""));
+    u.rate = opts.rate ?? chatPrefs.rate ?? 1.0;
+    u.pitch = 0.9;
+    u.volume = 0.95;
+    if (chatPrefs.voice) {
+      const voices = window.speechSynthesis.getVoices();
+      const v = voices.find((vc) => vc.name === chatPrefs.voice);
+      if (v) u.voice = v;
+    }
+    u.onstart = () => { chatTtsStopEl?.removeAttribute("hidden"); };
+    u.onend = () => { chatTtsStopEl?.setAttribute("hidden", ""); };
+    u.onerror = () => { chatTtsStopEl?.setAttribute("hidden", ""); };
+    window.speechSynthesis.speak(u);
+  } catch {}
+}
+
+let chatChimeCtx = null;
+function playReplyChime() {
+  try {
+    chatChimeCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+    const o = chatChimeCtx.createOscillator();
+    const g = chatChimeCtx.createGain();
+    o.connect(g); g.connect(chatChimeCtx.destination);
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(0.001, chatChimeCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.06, chatChimeCtx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, chatChimeCtx.currentTime + 0.4);
+    o.start();
+    o.stop(chatChimeCtx.currentTime + 0.4);
+  } catch {}
+}
+
+function tryNotify(text) {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  try { new Notification("Ghost Signal", { body: text.slice(0, 140), silent: true }); } catch {}
+}
+
+function saveTranscript() {
+  if (chatPrefs.confidential) return;
+  try { localStorage.setItem(CHAT_TRANSCRIPT_KEY, JSON.stringify(chatHistory.slice(-100))); } catch {}
+}
+
+function restoreTranscript() {
+  if (chatPrefs.confidential) return;
+  try {
+    const raw = localStorage.getItem(CHAT_TRANSCRIPT_KEY);
+    if (!raw) return;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || arr.length === 0) return;
+    chatMessagesEl?.querySelectorAll(".chat-message").forEach((n, i) => { if (i > 0) n.remove(); });
+    arr.forEach((m) => addChatMessage(m.role, m.text));
+    hideStarters();
+  } catch {}
+}
+
+function renderAttachments() {
+  if (!chatAttachmentsEl) return;
+  if (chatAttachments.length === 0) {
+    chatAttachmentsEl.hidden = true;
+    chatAttachmentsEl.innerHTML = "";
+    return;
+  }
+  chatAttachmentsEl.hidden = false;
+  chatAttachmentsEl.innerHTML = chatAttachments.map((f, i) => {
+    const isImage = f.type?.startsWith("image/");
+    const preview = isImage && f.previewUrl ? `<img src="${f.previewUrl}" alt="" class="chat-attachment-preview" />` : "";
+    return `<span class="chat-attachment-chip">${preview}<span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span><button type="button" class="chat-attachment-remove" data-idx="${i}" aria-label="Remove ${escapeHtml(f.name)}">&times;</button></span>`;
+  }).join("");
+}
+
 async function sendChatMessage(message) {
-  addChatMessage("user", message);
+  hideStarters();
+  const attachmentsForRender = chatAttachments.map((a) => ({ name: a.name, previewUrl: a.previewUrl }));
+  const attachmentSuffix = chatAttachments.length > 0
+    ? ` [attached: ${chatAttachments.map((f) => f.name).join(", ")}]`
+    : "";
+  const displayMessage = message + attachmentSuffix;
+  addChatMessage("user", displayMessage, { attachments: attachmentsForRender });
+  chatLastSentMessage = message;
+  chatAttachments.length = 0;
+  renderAttachments();
   showTyping();
+  const t0 = performance.now();
 
   try {
     const res = await fetch("/api/v1/chat", {
@@ -455,24 +709,368 @@ async function sendChatMessage(message) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ message, sessionId: state.chatSessionId }),
     });
-
     removeTyping();
-
+    const latencyMs = performance.now() - t0;
     if (!res.ok) {
-      addChatMessage("assistant", "The signal encountered interference. Try again.");
+      setChatStatus(false);
+      addChatMessage("assistant", "The signal encountered interference. Try again.", { latencyMs });
       return;
     }
-
+    setChatStatus(true);
     const data = await res.json();
     if (data.sessionId) {
       state.chatSessionId = data.sessionId;
       localStorage.setItem("ghost-chat-session", data.sessionId);
     }
-    addChatMessage("assistant", data.response);
+    addChatMessage("assistant", data.response, { latencyMs });
   } catch {
     removeTyping();
+    setChatStatus(false);
     addChatMessage("assistant", "Connection lost. The signal will return.");
   }
+}
+
+function setChatStatus(online) {
+  if (chatStatusDotEl) chatStatusDotEl.classList.toggle("is-offline", !online);
+  if (chatStatusTextEl) chatStatusTextEl.textContent = online ? "Online" : "Offline";
+}
+
+function autoGrowTextarea() {
+  if (!chatInputEl) return;
+  chatInputEl.style.height = "auto";
+  chatInputEl.style.height = Math.min(chatInputEl.scrollHeight, 200) + "px";
+}
+
+function updateCharCount() {
+  if (!chatInputCountEl || !chatInputEl) return;
+  const len = chatInputEl.value.length;
+  const max = Number(chatInputEl.maxLength || 2000);
+  chatInputCountEl.textContent = `${len}/${max}`;
+  chatInputCountEl.classList.toggle("is-near", len > max * 0.85 && len <= max);
+  chatInputCountEl.classList.toggle("is-over", len >= max);
+  if (chatSendEl) chatSendEl.disabled = len === 0 || len > max;
+}
+
+function runSlashCommand(cmd) {
+  const c = cmd.trim().toLowerCase();
+  if (c === "/clear") { clearConversation(); return true; }
+  if (c === "/help") { openChatShortcuts(); return true; }
+  if (c === "/stop") { window.speechSynthesis?.cancel(); chatTtsStopEl?.setAttribute("hidden", ""); return true; }
+  if (c === "/export") { exportTranscript(); return true; }
+  if (c === "/share") { shareConversation(); return true; }
+  if (c === "/search") { toggleChatSearch(true); return true; }
+  return false;
+}
+
+function clearConversation() {
+  if (!chatMessagesEl) return;
+  chatHistory.length = 0;
+  saveTranscript();
+  Array.from(chatMessagesEl.querySelectorAll(".chat-message")).slice(1).forEach((n) => n.remove());
+  showStarters();
+  state.chatSessionId = crypto.randomUUID();
+  localStorage.setItem("ghost-chat-session", state.chatSessionId);
+}
+
+function exportTranscript() {
+  const lines = chatHistory.map((m) => `### ${m.role === "user" ? "You" : "Signal"} · ${new Date(m.ts).toLocaleString()}\n\n${m.text}\n`);
+  const md = `# Ghost Signal — Transcript\n\nSession: ${state.chatSessionId}\n\n${lines.join("\n")}`;
+  const blob = new Blob([md], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `ghost-signal-${state.chatSessionId.slice(0, 8)}.md`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function shareConversation() {
+  const url = `${location.origin}/?session=${state.chatSessionId}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    addChatMessage("assistant", `Share link copied: ${url}`);
+  } catch {
+    addChatMessage("assistant", `Share link: ${url}`);
+  }
+}
+
+function openChatSettings() {
+  chatSettingsEl?.removeAttribute("hidden");
+  requestAnimationFrame(() => chatSettingsEl?.classList.add("is-open"));
+  chatSettingsToggleEl?.setAttribute("aria-expanded", "true");
+}
+function closeChatSettings() {
+  chatSettingsEl?.classList.remove("is-open");
+  chatSettingsToggleEl?.setAttribute("aria-expanded", "false");
+  setTimeout(() => chatSettingsEl?.setAttribute("hidden", ""), 220);
+}
+function openChatShortcuts() {
+  chatShortcutsEl?.removeAttribute("hidden");
+  requestAnimationFrame(() => chatShortcutsEl?.classList.add("is-open"));
+}
+function closeChatShortcuts() {
+  chatShortcutsEl?.classList.remove("is-open");
+  setTimeout(() => chatShortcutsEl?.setAttribute("hidden", ""), 220);
+}
+
+function toggleChatSearch(force) {
+  const next = typeof force === "boolean" ? force : !!chatSearchBarEl?.hasAttribute("hidden");
+  if (next) {
+    chatSearchBarEl?.removeAttribute("hidden");
+    chatSearchToggleEl?.setAttribute("aria-pressed", "true");
+    setTimeout(() => chatSearchInputEl?.focus(), 50);
+  } else {
+    chatSearchBarEl?.setAttribute("hidden", "");
+    chatSearchToggleEl?.setAttribute("aria-pressed", "false");
+    if (chatSearchInputEl) chatSearchInputEl.value = "";
+    applyChatSearchFilter("");
+  }
+}
+
+function applyChatSearchFilter(query) {
+  if (!chatMessagesEl) return;
+  const q = query.trim().toLowerCase();
+  const msgs = Array.from(chatMessagesEl.querySelectorAll(".chat-message"));
+  let matches = 0;
+  msgs.forEach((m) => {
+    if (!q) { m.classList.remove("is-hidden"); return; }
+    const t = (m.dataset.msgText || m.textContent || "").toLowerCase();
+    const hit = t.includes(q);
+    m.classList.toggle("is-hidden", !hit);
+    if (hit) matches++;
+  });
+  if (chatSearchCountEl) chatSearchCountEl.textContent = q ? String(matches) : "0";
+}
+
+function initChatVoice() {
+  if (!chatMicEl) return;
+  if (!SpeechRecognitionCtor) {
+    chatMicEl.disabled = true;
+    chatMicEl.title = "Voice input not supported in this browser";
+    chatMicEl.setAttribute("aria-label", "Voice input unavailable");
+    return;
+  }
+  chatRecognition = new SpeechRecognitionCtor();
+  chatRecognition.continuous = false;
+  chatRecognition.interimResults = true;
+  chatRecognition.lang = chatPrefs.lang || "en-US";
+  let finalTranscript = "";
+  chatRecognition.onstart = () => {
+    chatRecognitionActive = true;
+    chatMicEl.classList.add("is-recording");
+    chatMicEl.setAttribute("aria-pressed", "true");
+    chatMicEl.setAttribute("aria-label", "Stop voice input");
+    finalTranscript = chatInputEl?.value ? chatInputEl.value + " " : "";
+  };
+  chatRecognition.onresult = (event) => {
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalTranscript += transcript;
+      else interim += transcript;
+    }
+    if (chatInputEl) {
+      chatInputEl.value = (finalTranscript + interim).trim();
+      autoGrowTextarea();
+      updateCharCount();
+    }
+  };
+  const stopRecording = () => {
+    chatRecognitionActive = false;
+    chatMicEl.classList.remove("is-recording");
+    chatMicEl.setAttribute("aria-pressed", "false");
+    chatMicEl.setAttribute("aria-label", "Start voice input");
+  };
+  chatRecognition.onerror = stopRecording;
+  chatRecognition.onend = stopRecording;
+  chatMicEl.addEventListener("click", () => {
+    if (chatRecognitionActive) chatRecognition?.stop();
+    else { try { chatRecognition.lang = chatPrefs.lang || "en-US"; chatRecognition.start(); } catch {} }
+  });
+}
+
+function initChatTts() {
+  if (!chatTtsEl) return;
+  if (!("speechSynthesis" in window)) {
+    chatTtsEl.disabled = true;
+    chatTtsEl.title = "Text-to-speech not supported";
+    return;
+  }
+  chatTtsEl.setAttribute("aria-pressed", String(chatPrefs.tts));
+  chatTtsEl.addEventListener("click", () => {
+    chatPrefs.tts = !chatPrefs.tts;
+    saveChatPrefs();
+    chatTtsEl.setAttribute("aria-pressed", String(chatPrefs.tts));
+    if (!chatPrefs.tts) window.speechSynthesis?.cancel();
+  });
+  chatTtsStopEl?.addEventListener("click", () => {
+    window.speechSynthesis?.cancel();
+    chatTtsStopEl.setAttribute("hidden", "");
+  });
+  if ("speechSynthesis" in window && chatSetVoiceEl) {
+    const populate = () => {
+      const voices = window.speechSynthesis.getVoices();
+      chatSetVoiceEl.innerHTML = '<option value="">Default</option>' +
+        voices.map((v) => `<option value="${escapeHtml(v.name)}"${v.name === chatPrefs.voice ? " selected" : ""}>${escapeHtml(v.name)} (${v.lang})</option>`).join("");
+    };
+    populate();
+    window.speechSynthesis.onvoiceschanged = populate;
+  }
+}
+
+function initChatSettings() {
+  if (chatSetRateEl) {
+    chatSetRateEl.value = String(chatPrefs.rate);
+    if (chatSetRateValEl) chatSetRateValEl.textContent = `${Number(chatPrefs.rate).toFixed(2)}×`;
+    chatSetRateEl.addEventListener("input", () => {
+      chatPrefs.rate = Number(chatSetRateEl.value);
+      if (chatSetRateValEl) chatSetRateValEl.textContent = `${chatPrefs.rate.toFixed(2)}×`;
+      saveChatPrefs();
+    });
+  }
+  if (chatSetVoiceEl) {
+    chatSetVoiceEl.addEventListener("change", () => { chatPrefs.voice = chatSetVoiceEl.value; saveChatPrefs(); });
+  }
+  if (chatSetLangEl) {
+    chatSetLangEl.value = chatPrefs.lang;
+    chatSetLangEl.addEventListener("change", () => {
+      chatPrefs.lang = chatSetLangEl.value; saveChatPrefs();
+      if (chatRecognition) chatRecognition.lang = chatPrefs.lang;
+    });
+  }
+  const checks = [
+    [chatSetSoundEl, "sound"], [chatSetNotifyEl, "notify"], [chatSetAutoscrollEl, "autoscroll"],
+    [chatSetConfidentialEl, "confidential"], [chatSetSuggestEl, "suggest"],
+    [chatSetCompactEl, "compact"], [chatSetContrastEl, "contrast"], [chatSetReduceMotionEl, "reducemotion"],
+  ];
+  checks.forEach(([el2, key]) => {
+    if (!el2) return;
+    el2.checked = !!chatPrefs[key];
+    el2.addEventListener("change", () => {
+      chatPrefs[key] = el2.checked;
+      saveChatPrefs();
+      applyChatPrefs();
+      if (key === "notify" && el2.checked && "Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().catch(() => {});
+      }
+      if (key === "confidential" && el2.checked) {
+        try { localStorage.removeItem(CHAT_TRANSCRIPT_KEY); } catch {}
+      }
+      if (key === "autoscroll") chatAutoScrollLocked = el2.checked;
+    });
+  });
+  chatThemeSwatchEls.forEach((sw) => {
+    sw.classList.toggle("is-active", sw.dataset.theme === chatPrefs.theme);
+    sw.addEventListener("click", () => {
+      chatPrefs.theme = sw.dataset.theme; saveChatPrefs();
+      chatThemeSwatchEls.forEach((s) => s.classList.toggle("is-active", s === sw));
+      applyChatPrefs();
+    });
+  });
+  if (chatFontValEl) chatFontValEl.textContent = `${chatPrefs.fontPct}%`;
+  chatFontDecEl?.addEventListener("click", () => { chatPrefs.fontPct = Math.max(80, chatPrefs.fontPct - 10); saveChatPrefs(); applyChatPrefs(); if (chatFontValEl) chatFontValEl.textContent = `${chatPrefs.fontPct}%`; });
+  chatFontIncEl?.addEventListener("click", () => { chatPrefs.fontPct = Math.min(140, chatPrefs.fontPct + 10); saveChatPrefs(); applyChatPrefs(); if (chatFontValEl) chatFontValEl.textContent = `${chatPrefs.fontPct}%`; });
+  chatActionExportEl?.addEventListener("click", exportTranscript);
+  chatActionShareEl?.addEventListener("click", shareConversation);
+  chatActionClearEl?.addEventListener("click", () => { if (confirm("Clear conversation? This cannot be undone.")) clearConversation(); });
+}
+
+function initChatResize() {
+  if (!chatResizeHandleEl || !chatPanelEl) return;
+  let startX = 0; let startW = 0; let dragging = false;
+  const onMove = (e) => {
+    if (!dragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const dx = startX - x;
+    const next = Math.max(340, Math.min(window.innerWidth, startW + dx));
+    chatPanelEl.style.width = `${next}px`;
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    chatPrefs.width = parseInt(chatPanelEl.style.width || "440", 10);
+    saveChatPrefs();
+    window.removeEventListener("mousemove", onMove);
+    window.removeEventListener("mouseup", onUp);
+    window.removeEventListener("touchmove", onMove);
+    window.removeEventListener("touchend", onUp);
+  };
+  const onDown = (e) => {
+    dragging = true;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    startW = chatPanelEl.offsetWidth;
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onUp);
+  };
+  chatResizeHandleEl.addEventListener("mousedown", onDown);
+  chatResizeHandleEl.addEventListener("touchstart", onDown, { passive: true });
+  chatResizeHandleEl.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const cur = chatPanelEl.offsetWidth;
+    const next = e.key === "ArrowLeft" ? cur + 24 : cur - 24;
+    chatPanelEl.style.width = `${Math.max(340, Math.min(window.innerWidth, next))}px`;
+    chatPrefs.width = parseInt(chatPanelEl.style.width, 10); saveChatPrefs();
+  });
+}
+
+function initChatScrollWatch() {
+  if (!chatMessagesEl) return;
+  chatMessagesEl.addEventListener("scroll", () => {
+    const nearBottom = chatMessagesEl.scrollTop + chatMessagesEl.clientHeight >= chatMessagesEl.scrollHeight - 40;
+    chatAutoScrollLocked = nearBottom && chatPrefs.autoscroll;
+    if (nearBottom) {
+      chatScrollBottomEl?.setAttribute("hidden", "");
+      chatUnreadCount = 0; updateUnreadBadge();
+    } else {
+      chatScrollBottomEl?.removeAttribute("hidden");
+    }
+  }, { passive: true });
+  chatScrollBottomEl?.addEventListener("click", scrollChatToBottom);
+}
+
+function initChatDragDrop() {
+  if (!chatPanelEl) return;
+  let dragDepth = 0;
+  chatPanelEl.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    dragDepth++;
+    chatWidgetEl?.classList.add("is-dragging");
+    chatDropOverlayEl?.removeAttribute("hidden");
+  });
+  chatPanelEl.addEventListener("dragover", (e) => e.preventDefault());
+  chatPanelEl.addEventListener("dragleave", () => {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) {
+      chatWidgetEl?.classList.remove("is-dragging");
+      chatDropOverlayEl?.setAttribute("hidden", "");
+    }
+  });
+  chatPanelEl.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dragDepth = 0;
+    chatWidgetEl?.classList.remove("is-dragging");
+    chatDropOverlayEl?.setAttribute("hidden", "");
+    const files = Array.from(e.dataTransfer?.files || []);
+    addAttachments(files);
+  });
+}
+
+function addAttachments(files) {
+  for (const f of files) {
+    const entry = { name: f.name, size: f.size, type: f.type, previewUrl: null };
+    if (f.type?.startsWith("image/")) {
+      try { entry.previewUrl = URL.createObjectURL(f); } catch {}
+    }
+    chatAttachments.push(entry);
+  }
+  renderAttachments();
+}
+
+function initChatOnlineWatch() {
+  setChatStatus(navigator.onLine);
+  window.addEventListener("online", () => setChatStatus(true));
+  window.addEventListener("offline", () => setChatStatus(false));
 }
 
 /* ── API Loaders ── */
@@ -1779,6 +2377,7 @@ if (document.body.dataset.page === "home") {
   // Chat widget
   chatToggleEl?.addEventListener("click", () => toggleChat());
   chatCloseEl?.addEventListener("click", () => toggleChat(false));
+  chatBackdropEl?.addEventListener("click", () => toggleChat(false));
   openChatEl?.addEventListener("click", () => toggleChat(true));
   document.querySelectorAll('[data-action="open-chat"]').forEach((el) =>
     el.addEventListener("click", () => toggleChat(true))
@@ -1788,14 +2387,155 @@ if (document.body.dataset.page === "home") {
     e.preventDefault();
     const msg = chatInputEl?.value?.trim();
     if (!msg) return;
+    if (msg.startsWith("/")) {
+      const handled = runSlashCommand(msg);
+      if (handled) {
+        chatInputEl.value = "";
+        autoGrowTextarea();
+        updateCharCount();
+        return;
+      }
+    }
     chatInputEl.value = "";
+    autoGrowTextarea();
+    updateCharCount();
     sendChatMessage(msg);
   });
 
-  // Close chat on Escape, open on Cmd/Ctrl+K
+  // Textarea: Enter→send, Shift+Enter→newline, ↑ recalls last sent
+  chatInputEl?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      chatFormEl?.dispatchEvent(new Event("submit", { cancelable: true }));
+      return;
+    }
+    if (e.key === "ArrowUp" && !chatInputEl.value && chatLastSentMessage) {
+      e.preventDefault();
+      chatInputEl.value = chatLastSentMessage;
+      autoGrowTextarea();
+      updateCharCount();
+      chatInputEl.setSelectionRange(chatInputEl.value.length, chatInputEl.value.length);
+    }
+  });
+  chatInputEl?.addEventListener("input", () => {
+    autoGrowTextarea();
+    updateCharCount();
+  });
+
+  // Starter prompts: click → send immediately + hide bar
+  chatStartersEl?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".chat-starter");
+    if (!btn) return;
+    const prompt = btn.dataset.starter || btn.textContent.trim();
+    if (!prompt) return;
+    if (chatInputEl) chatInputEl.value = "";
+    autoGrowTextarea();
+    updateCharCount();
+    sendChatMessage(prompt);
+  });
+
+  // Per-message action delegation (copy/speak/regen)
+  chatMessagesEl?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".chat-msg-action");
+    if (!btn) return;
+    const action = btn.dataset.msgAction;
+    const row = btn.closest(".chat-message");
+    const text = row?.querySelector(".chat-msg-text")?.textContent || "";
+    if (action === "copy") {
+      navigator.clipboard?.writeText(text).then(() => {
+        btn.textContent = "Copied";
+        setTimeout(() => { btn.textContent = "Copy"; }, 1200);
+      });
+    } else if (action === "speak") {
+      speakText(text);
+    } else if (action === "regen") {
+      const last = chatHistory.slice().reverse().find((m) => m.role === "user");
+      if (last) sendChatMessage(last.content);
+    }
+  });
+
+  // File attachments
+  chatAttachEl?.addEventListener("change", (e) => {
+    addAttachments(e.target.files);
+    e.target.value = "";
+  });
+  chatAttachmentsEl?.addEventListener("click", (e) => {
+    const rm = e.target.closest(".chat-attachment-remove");
+    if (!rm) return;
+    const idx = Number(rm.dataset.idx);
+    if (Number.isFinite(idx)) chatAttachments.splice(idx, 1);
+    renderAttachments();
+  });
+
+  // Search bar
+  chatSearchToggleEl?.addEventListener("click", () => toggleChatSearch());
+  chatSearchInputEl?.addEventListener("input", (e) => applyChatSearchFilter(e.target.value));
+
+  // Settings drawer
+  chatSettingsToggleEl?.addEventListener("click", openChatSettings);
+  chatSettingsCloseEl?.addEventListener("click", closeChatSettings);
+
+  // Shortcuts overlay
+  chatHelpLinkEl?.addEventListener("click", openChatShortcuts);
+  chatShortcutsCloseEl?.addEventListener("click", closeChatShortcuts);
+  chatShortcutsEl?.addEventListener("click", (e) => {
+    if (e.target === chatShortcutsEl) closeChatShortcuts();
+  });
+
+  // Scroll-to-bottom button
+  chatScrollBottomEl?.addEventListener("click", () => {
+    chatAutoScrollLocked = true;
+    chatUnreadCount = 0;
+    updateUnreadBadge();
+    scrollChatToBottom();
+  });
+
+  // TTS stop
+  chatTtsStopEl?.addEventListener("click", () => {
+    try { window.speechSynthesis?.cancel(); } catch {}
+    chatTtsStopEl.hidden = true;
+  });
+
+  // Chat init chain
+  applyChatPrefs();
+  restoreTranscript();
+  initChatVoice();
+  initChatTts();
+  initChatSettings();
+  initChatResize();
+  initChatScrollWatch();
+  initChatDragDrop();
+  initChatOnlineWatch();
+  autoGrowTextarea();
+  updateCharCount();
+  setChatStatus(navigator.onLine);
+
+  // Global keyboard shortcuts
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && state.chatOpen) toggleChat(false);
-    if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); toggleChat(true); }
+    const t = e.target;
+    const inField = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+    if (e.key === "Escape") {
+      if (chatShortcutsEl && !chatShortcutsEl.hidden) { closeChatShortcuts(); return; }
+      if (chatSettingsEl && chatSettingsEl.classList.contains("is-open")) { closeChatSettings(); return; }
+      if (state.chatOpen) { toggleChat(false); return; }
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      toggleChat(true);
+      setTimeout(() => chatInputEl?.focus(), 50);
+      return;
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+      if (state.chatOpen) {
+        e.preventDefault();
+        toggleChatSearch();
+      }
+      return;
+    }
+    if (e.key === "?" && !inField && state.chatOpen) {
+      e.preventDefault();
+      openChatShortcuts();
+    }
   });
 
   // Scroll-triggered dossier cards and emo ducks

@@ -1,5 +1,5 @@
 /* Ghost Signal Service Worker — versioned multi-cache with update toast support */
-const VERSION = '2026-05-11-v3';
+const VERSION = '2026-05-11-v6';
 const PRECACHE = `ghost-precache-${VERSION}`;
 const RUNTIME_HTML = `ghost-html-${VERSION}`;
 const RUNTIME_ASSETS = `ghost-assets-${VERSION}`;
