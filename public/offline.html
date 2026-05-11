@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Offline — The Ghost Signal</title>
+  <meta name="robots" content="noindex" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="icon" href="/favicon.ico?v=20260501-ghost" sizes="any" />
+  <meta name="theme-color" content="#060610" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      background: #060610;
+      color: #F0E6FF;
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #00E5FF;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 800;
+      margin: 0 0 1rem;
+      color: #FF1744;
+    }
+    p {
+      font-size: 1rem;
+      color: #8B7FA0;
+      max-width: 38ch;
+      line-height: 1.6;
+      margin: 0 auto 1.2rem;
+    }
+    .actions { display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; margin-top:1.5rem; }
+    a.btn {
+      display:inline-flex; align-items:center; min-height:44px;
+      color: #060610; background:#00E5FF; text-decoration:none;
+      font-weight:700; padding:0.6rem 1.4rem; border-radius:999px;
+      font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase;
+      transition: transform 200ms ease, background 200ms ease;
+    }
+    a.btn:hover { background:#33ECFF; transform: translateY(-2px); }
+    a.btn:focus-visible { outline:2px solid #FF1744; outline-offset:4px; }
+    a.btn-ghost { background:transparent; color:#00E5FF; border:1px solid rgba(0,229,255,0.4); }
+    a.btn-ghost:hover { background:rgba(0,229,255,0.08); }
+    .signal {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(255,23,68,0.1);
+      border: 1px solid rgba(255,23,68,0.3);
+      margin: 0 auto 2rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,23,68,0.45); }
+      50% { box-shadow: 0 0 0 18px rgba(255,23,68,0); }
+    }
+    .glyph { font-family: 'Courier New', monospace; color: rgba(0,229,255,0.4); font-size:0.75rem; letter-spacing:0.4em; margin-top:1.6rem; }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="logo">GHOST // SIGNAL</div>
+    <div class="signal" aria-hidden="true">📡</div>
+    <h1>You're Offline</h1>
+    <p>The signal is unreachable. Cached pages still work.</p>
+    <div class="actions">
+      <a class="btn" href="/">Try the Home Page</a>
+      <a class="btn btn-ghost" href="javascript:location.reload()">Retry Connection</a>
+    </div>
+    <p style="margin-top:1.6rem;font-size:0.85rem;">When the connection restores, the sensor will resume transmitting.</p>
+    <div class="glyph">// SIGNAL_INTERRUPTED //</div>
+  </div>
+  <script>
+    window.addEventListener('online', () => location.reload());
+  </script>
+</body>
+</html>

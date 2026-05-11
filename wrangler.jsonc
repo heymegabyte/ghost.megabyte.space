@@ -49,6 +49,9 @@
     "CURRENT_CACHE_TTL_SECONDS": "2",
     "HISTORY_CACHE_TTL_SECONDS": "15",
     "ENTROPY_CACHE_TTL_SECONDS": "15",
-    "PUBLIC_API_RATE_LIMIT_PER_MINUTE": "60"
+    "PUBLIC_API_RATE_LIMIT_PER_MINUTE": "60",
+    "LISTMONK_URL": "https://listmonk.megabyte.space",
+    "LISTMONK_API_USER": "automation",
+    "LISTMONK_LIST_ID": "8"
   }
 }

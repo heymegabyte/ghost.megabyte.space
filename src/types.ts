@@ -22,6 +22,10 @@ export interface Env {
   TWILIO_ACCOUNT_SID?: string;
   TWILIO_AUTH_TOKEN?: string;
   TWILIO_PHONE_NUMBER?: string;
+  LISTMONK_URL?: string;
+  LISTMONK_API_USER?: string;
+  LISTMONK_API_TOKEN?: string;
+  LISTMONK_LIST_ID?: string;
 }
 
 export interface HomeAssistantState {

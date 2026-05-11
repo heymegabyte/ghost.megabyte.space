@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Signal Lost — The Ghost Signal</title>
+  <meta name="description" content="404 — this frequency does not exist on ghost.megabyte.space. The entity has moved on. Return to the signal." />
+  <meta name="robots" content="noindex,follow" />
+  <link rel="canonical" href="https://ghost.megabyte.space/404" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="icon" href="/favicon.ico?v=20260501-ghost" sizes="any" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20260501-ghost" />
+  <meta name="theme-color" content="#060610" />
+  <meta property="og:title" content="Signal Lost — The Ghost Signal" />
+  <meta property="og:description" content="404. The entity you're looking for has moved on. The signal continues." />
+  <meta property="og:image" content="https://ghost.megabyte.space/og-image.jpg?v=20260501-666" />
+  <meta property="og:type" content="website" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(ellipse at top, #1a0f2e 0%, #060610 65%);
+      color: #F0E6FF;
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      text-align: center;
+      padding: 2rem;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,229,255,0.025) 2px, rgba(0,229,255,0.025) 3px
+      );
+      pointer-events: none;
+      animation: scan 9s linear infinite;
+    }
+    @keyframes scan { from { transform: translateY(0); } to { transform: translateY(-50px); } }
+    .stage { position: relative; z-index: 1; max-width: 540px; }
+    .logo {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #00E5FF;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      animation: flicker 4s ease-in-out infinite;
+    }
+    @keyframes flicker {
+      0%, 92%, 100% { opacity: 1; }
+      94% { opacity: 0.4; }
+      96% { opacity: 1; }
+      98% { opacity: 0.7; }
+    }
+    .code {
+      font-size: clamp(5rem, 18vw, 10rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF1744 0%, #7C3AED 50%, #00E5FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.04em;
+      text-shadow: 0 0 80px rgba(124,58,237,0.4);
+    }
+    h1 {
+      font-size: clamp(1.3rem, 4vw, 2rem);
+      font-weight: 700;
+      margin: 0 0 0.8rem;
+      color: #F0E6FF;
+    }
+    p {
+      font-size: 1rem;
+      color: #8B7FA0;
+      max-width: 44ch;
+      line-height: 1.65;
+      margin: 0 auto 1rem;
+    }
+    .muted { color: #58506B; font-size: 0.85rem; margin-top: 1.5rem; }
+    .actions {
+      display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 1.8rem;
+    }
+    a.btn {
+      display: inline-block;
+      color: #060610;
+      background: #FF1744;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.7rem 1.5rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    a.btn:hover { background: #ff4466; transform: translateY(-2px); box-shadow: 0 12px 36px rgba(255,23,68,0.35); }
+    a.btn:focus-visible { outline: 2px solid #00E5FF; outline-offset: 4px; }
+    a.btn-ghost {
+      background: transparent;
+      color: #00E5FF;
+      border: 1px solid rgba(0,229,255,0.4);
+    }
+    a.btn-ghost:hover { background: rgba(0,229,255,0.08); }
+    .glyph {
+      font-family: 'Courier New', monospace;
+      color: rgba(0,229,255,0.55);
+      font-size: 0.78rem;
+      letter-spacing: 0.4em;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="logo">GHOST // SIGNAL</div>
+    <p class="code" aria-hidden="true">404</p>
+    <h1>Signal Lost</h1>
+    <p>This frequency doesn't exist. The entity has moved on, the wall has been re-plastered, the white van has driven off.</p>
+    <p>The signal continues elsewhere.</p>
+    <div class="actions">
+      <a class="btn" href="/">Return to the Signal</a>
+      <a class="btn btn-ghost" href="tel:+16016666602">Call the Hotline</a>
+    </div>
+    <p class="muted">If you followed a real link to get here, <a style="color:#00E5FF;text-decoration:none;border-bottom:1px solid rgba(0,229,255,0.4);" href="mailto:hey@megabyte.space?subject=Broken%20link%20on%20ghost.megabyte.space">tell me</a>.</p>
+    <div class="glyph">// 0x666 // ENTITY_NOT_FOUND //</div>
+  </div>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+    console.log('%cGHOST // SIGNAL', 'font:700 18px monospace;color:#00E5FF;text-shadow:0 0 8px #00E5FF;');
+    console.log('%c404 — but the signal is fine. Try /docs for the real fun.', 'color:#7C3AED;font-style:italic;');
+  </script>
+</body>
+</html>

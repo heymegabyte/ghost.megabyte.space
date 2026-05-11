@@ -1152,22 +1152,104 @@ app.post("/api/v1/debate", async (c) => {
 });
 
 app.post("/api/v1/newsletter/subscribe", async (c) => {
+  const ip = c.req.header("cf-connecting-ip") || "unknown";
+  if (c.env.RATE_LIMIT_KV) {
+    const key = `newsletter:${ip}`;
+    const count = parseInt((await c.env.RATE_LIMIT_KV.get(key)) || "0", 10);
+    if (count >= 5) {
+      return c.json({ error: "Too many requests. Try again in a minute." }, 429);
+    }
+    c.executionCtx.waitUntil(
+      c.env.RATE_LIMIT_KV.put(key, String(count + 1), { expirationTtl: 60 })
+    );
+  }
+
   const body = await c.req.json<{ email?: string }>().catch(() => ({} as { email?: string }));
   const email = body.email?.trim()?.toLowerCase();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
     return c.json({ error: "Valid email required." }, 400);
   }
+  // Anonymous by design — never store a real name. Listmonk requires `name`,
+  // so we send a fixed placeholder. The 666 channel is for people to share
+  // what happened to them without identifying themselves.
+  const name = "anonymous";
+
+  // Best-effort local mirror (D1) — keeps a private record of every signup.
   if (c.env.EMF_DB) {
-    await c.env.EMF_DB.prepare(
-      "INSERT OR IGNORE INTO newsletter_subscribers (email, subscribed_at) VALUES (?, ?)"
-    ).bind(email, new Date().toISOString()).run();
+    c.executionCtx.waitUntil(
+      c.env.EMF_DB.prepare(
+        "INSERT OR IGNORE INTO newsletter_subscribers (email, subscribed_at) VALUES (?, ?)"
+      ).bind(email, new Date().toISOString()).run().then(() => undefined).catch(() => undefined)
+    );
   }
-  return c.json({ ok: true, message: "Subscribed. The signal will find you." });
+
+  // Forward to Listmonk. Without creds, treat as success (D1 mirror still recorded).
+  const listmonkUrl = c.env.LISTMONK_URL;
+  const listmonkUser = c.env.LISTMONK_API_USER;
+  const listmonkToken = c.env.LISTMONK_API_TOKEN;
+  const listmonkListId = parseInt(c.env.LISTMONK_LIST_ID || "0", 10);
+
+  if (!listmonkUrl || !listmonkUser || !listmonkToken || !listmonkListId) {
+    return c.json({ ok: true, message: "Subscribed. The signal will find you." });
+  }
+
+  try {
+    const auth = btoa(`${listmonkUser}:${listmonkToken}`);
+    const res = await fetch(`${listmonkUrl.replace(/\/$/, "")}/api/subscribers`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Basic ${auth}`,
+        "user-agent": "ghost.megabyte.space/1.0",
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        status: "enabled",
+        lists: [listmonkListId],
+        preconfirm_subscriptions: true,
+      }),
+    });
+
+    if (res.ok) {
+      return c.json({ ok: true, message: "Subscribed. The signal will find you." });
+    }
+
+    const text = await res.text();
+    // 409: already exists. Re-add to the list to be safe, then treat as success.
+    if (res.status === 409 || /already exists/i.test(text)) {
+      try {
+        const listRes = await fetch(`${listmonkUrl.replace(/\/$/, "")}/api/subscribers/lists`, {
+          method: "PUT",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Basic ${auth}`,
+          },
+          body: JSON.stringify({
+            query: `subscribers.email = '${email.replace(/'/g, "''")}'`,
+            action: "add",
+            target_list_ids: [listmonkListId],
+            status: "confirmed",
+          }),
+        });
+        void listRes;
+      } catch {
+        // ignore — original 409 is still a logical success
+      }
+      return c.json({ ok: true, message: "You're already on the list. Signal locked." });
+    }
+
+    console.error("listmonk_subscribe_failed", { status: res.status, body: text.slice(0, 500) });
+    return c.json({ error: "Subscription service is offline. Try again shortly." }, 502);
+  } catch (err) {
+    console.error("listmonk_subscribe_exception", err);
+    return c.json({ error: "Network error reaching the signal relay." }, 502);
+  }
 });
 
-app.get("/transmissions", async (c) => {
-  return c.html(transmissionsPageHtml());
-});
+app.get("/transmissions", (c) => c.redirect("/#transmissions", 301));
+app.get("/docs", (c) => c.redirect("/#docs", 301));
+app.get("/docs.html", (c) => c.redirect("/#docs", 301));
 
 app.get("/transmissions/:callSid.txt", async (c) => {
   const callSid = c.req.param("callSid");
@@ -1567,8 +1649,8 @@ app.get("*", async (c) => {
   }
 
   if (assetResponse.status === 404 && !assetPath.includes(".")) {
-    const fallback = await c.env.ASSETS.fetch(new Request(new URL("/index.html", url).toString(), { method: "GET" }));
-    return applyResponseHeaders(fallback, {
+    const notFoundPage = await c.env.ASSETS.fetch(new Request(new URL("/404.html", url).toString(), { method: "GET" }));
+    return applyResponseHeaders(new Response(notFoundPage.body, { status: 404, headers: notFoundPage.headers }), {
       "cache-control": "public, max-age=0, must-revalidate",
     });
   }

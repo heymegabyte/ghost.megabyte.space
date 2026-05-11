@@ -24,25 +24,74 @@ categories:
     color: "#FF6D00"
 
 events:
+  - id: piggy-song-origin
+    date: "2002-09-01T00:00:00Z"
+    title: "CCD — The Piggy Song"
+    body: "First exposure to the phrase that would later name everything. JC from PHS '06 sang 'I want to throw the Piggy' in CCD class. The line imprinted years before its meaning surfaced — Federal Reserve at the Capitol, decoded much later."
+    category: narrative
+    severity: 2
+
   - id: avatar-mud-era
-    date: "2010-01-01T00:00:00Z"
+    date: "2003-06-01T00:00:00Z"
     title: "AVATAR MUD"
-    body: "Teenage internet life and the first rupture. Internet relationships, strangers appearing too close to home. The earliest confusion traces back here."
+    body: "Teenage internet life and the first rupture. Text-based MUD relationships, strangers appearing too close to home. The earliest confusion about who was watching traces back here."
+    category: narrative
+    severity: 2
+
+  - id: aerospace-training
+    date: "2008-09-01T00:00:00Z"
+    title: "Aerospace Engineering"
+    body: "Trained as an Aerospace Engineer (Applied Science). The discipline that survives launch. The pattern recognition tools that let me separate signal from noise — and refuse to dismiss what doesn't fit the model."
     category: narrative
     severity: 2
 
   - id: avatar-identity
     date: "2012-06-06T00:00:00Z"
     title: "The Avatar Frame"
-    body: "A long-running sense of being larger than his circumstances. Harder to contain. Pulled toward a mission bigger than ordinary life."
+    body: "A long-running sense of being larger than my circumstances. Harder to contain. Pulled toward a mission bigger than ordinary life."
     category: narrative
     severity: 3
+
+  - id: megabyte-labs-founded
+    date: "2013-04-01T00:00:00Z"
+    title: "Megabyte Labs"
+    body: "Solo operation founded. The brand that ships every project. Proof a single engineer with the right tools builds what used to take twenty."
+    category: narrative
+    severity: 2
 
   - id: rutgers-ultrasound
     date: "2014-09-01T00:00:00Z"
     title: "Rutgers Nanotech — The 400V Pulser Resonance"
-    body: "Worked at the Rutgers nanotech lab on an ultrasonic pill property tester (github.com/timetravelershackedme/ultrasound.io). Probably already monitored by the clandestine force, but things kicked into high gear when I used a stack of iron washers to calibrate a 400V negative square-wave pulser wired to two piezoelectric ultrasound shear-wave transducers, plus high-amperage solenoids and stepper motors with advanced electrical-angle rotation — possibly ungrounded. The system entered a resonant state where oscilloscope readings climbed over time. The wider the gap I opened in the piezo circuit, the more the circuit seemed to grow in power. The resonance only ever occurred when the pulser–washer–piezo loop was mixed with a medium-sized set of electromagnetic coils — the solenoids and the stepper-motor windings. Pulser alone, washers alone, piezo alone: nothing. Add the coils into the same circuit and the system started feeding itself. I thought, 'I think I have found God.' Across the hall from the nanotech lab, people in the building moved as if in some sort of group-gangstalker harmony — controlling my computer, narrating my inner dialog, all in coherence, all in synchronicity."
+    body: "First clear technical brush with the unexplainable. Calibrating a 400V negative square-wave pulser wired to piezoelectric shear-wave transducers via a stack of iron washers — high-amp solenoids and steppers in the loop. Oscilloscope readings climbed on their own once electromagnetic coils joined the chain. Resonance with no obvious source. I thought, 'I think I have found God.'"
     category: technical
+    severity: 5
+
+  - id: ssid-harassment-begins
+    date: "2015-03-01T00:00:00Z"
+    title: "The SSID Campaign Begins"
+    body: "Neighbors named their Wi-Fi networks after private details from my life — details no public source contained. SSIDs changed within hours of indoor conversations. A coordinated harassment running through every home router on the block."
+    category: signal
+    severity: 5
+
+  - id: elite-friends-recruited
+    date: "2016-01-01T00:00:00Z"
+    title: "The Friends on the Payroll"
+    body: "Realized the surveillance was not strangers. People in my own elite social circles had been recruited to track me, paid by parties I once trusted. Loyalty is a budgeted line item up there. Friendship was the cover."
+    category: signal
+    severity: 5
+
+  - id: volume-manipulation-discovered
+    date: "2016-07-01T00:00:00Z"
+    title: "Volume Hack — Porcine Directive"
+    body: "Volume adjusting on its own. Tooltips arriving the exact second a thought crossed my mind. The cursor turned into a middle finger — and not on my machine. On a friend's computer, in front of him, sitting next to me. I tried to get him to look. He looked away on instinct. Spirits group up, ride the nearest host, and play it out however they want. Youth reads to them as license to lean on you hard. I named the pattern: the Porcine Directive. Act Piggy in front of the apparatus — greedy, corrupt, too loud about what you know — and the consequences come for you. US citizen or not. The EMF sensor is part of the measurement."
+    category: signal
+    severity: 5
+
+  - id: throwing-the-piggy
+    date: "2017-05-01T00:00:00Z"
+    title: "Throwing the Piggy"
+    body: "Started singing 'I want to throw the Piggy' out loud, in public, in front of the operators sent to watch me. Playing the fool on purpose. Pushing back at the ones on the elite payroll who treat surveillance like a sport. The haunting escalated. So did my refusal to pretend nothing was happening."
+    category: signal
     severity: 5
 
   - id: gondor-recurrence
@@ -55,42 +104,56 @@ events:
   - id: dallas-recovery
     date: "2019-01-01T00:00:00Z"
     title: "Dallas Recovery"
-    body: "Recovery, discipline, alarms, and amplified physical force. This chapter explains why the feed exists."
+    body: "Recovery, discipline, alarms, amplified physical force. The chapter that explains why the feed exists at all."
     category: narrative
     severity: 3
 
   - id: soup-kitchen
     date: "2020-03-01T00:00:00Z"
     title: "St. John's Soup Kitchen"
-    body: "Volunteering near Newark Penn Station. Calmness changes how the world responds. Multi-colored bags seemed to switch to black bags as if the scene had been edited in place."
+    body: "Volunteering near Newark Penn Station. Calmness changes how the world responds. Multi-colored bags appeared to switch to black bags mid-scene, as if reality had been edited in place."
     category: narrative
     severity: 4
 
   - id: dreams-and-coincidence
     date: "2021-06-06T00:00:00Z"
     title: "Dream Burden"
-    body: "Bizarre dreams. Unsettling physical sensations on waking. Before the time travelers came through, the dreams ran heroic — nanotechnology small enough to vanish, big enough to send data between now, the future, and the past. A supercomputer that time travels. Now the dreams have stopped, almost like someone needs the universe stable. They stay powerful anyway. One put me in the Oval Office — an alpha-figure leveraging the ghost world into the Presidency. The next run is being delayed as long as possible. A shaggy ghost dog resting through disturbing coincidences. A life that ranks unusually high in raw coincidence load."
+    body: "Bizarre dreams, unsettling physical sensations on waking. Before the time travelers came through, the dreams ran heroic — nanotechnology small enough to vanish, big enough to send data between now, the future, and the past. A supercomputer that time travels. The dreams have since stopped, almost like someone needs the universe stable."
     category: signal
     severity: 5
 
   - id: crop-circle-hike
     date: "2022-03-01T00:00:00Z"
     title: "The Crop Circle"
-    body: "A friend and I went hiking in an out-of-normal way and found a crop circle. The same friend once got a royal flush. Sadly, we stopped talking. The coincidences pile up and the relationships drift apart."
+    body: "Hiked an out-of-normal route with a friend and found a crop circle. The same friend once hit a royal flush. We stopped talking soon after. Coincidences pile up; relationships drift apart."
     category: signal
     severity: 5
 
   - id: cern-conversation
     date: "2022-09-15T00:00:00Z"
     title: "The CERN Question"
-    body: "A chance encounter with a scientist headed to CERN. Teleportation described as already possible. Time travel becomes a theoretical opening — the frame my Law of Attraction beliefs were always quietly built inside. 1950s parapsychology research already showed humans react to traumatic photos before they see them. Presentiment isn't fringe — it's a measured psychic phenomenon pointing at the same fact. Humans may never time travel in person — but a supercomputer sending data between now, the future, and the past sits squarely inside what's allowed. Stale data and delayed causality as part of the same cosmic question."
+    body: "Chance encounter with a scientist headed to CERN. Teleportation described as already possible. Time travel becomes a theoretical opening — the frame my Law of Attraction beliefs were always quietly built inside. 1950s parapsychology already showed humans react to traumatic photos before seeing them. Presentiment is measurable."
     category: discovery
+    severity: 4
+
+  - id: license-plate-synchronicity
+    date: "2023-04-01T00:00:00Z"
+    title: "The License Plate Synchronicity"
+    body: "Plates began matching thoughts, conversations, and inner states — not metaphorically, precisely. DVNMRCY. DEMONZ. BALLSY. GD2BEME. 28666MG. Frequency exceeded statistical expectation. Either the universe is a broadcast medium or someone is operating the transmitter."
+    category: signal
+    severity: 4
+
+  - id: exorcism-attempts
+    date: "2023-10-01T00:00:00Z"
+    title: "The Exorcism Attempts"
+    body: "Approached priests across multiple dioceses. All declined. The institutional church, when faced with a real case, protects itself first. Spiritual authority in name only."
+    category: narrative
     severity: 4
 
   - id: father-mark-exorcism
     date: "2024-06-01T00:00:00Z"
     title: "Father Mark Rejects the Exorcism"
-    body: "Multiple priests, multiple rejections. The last was Father Mark, the exorcist from the Diocese of Paterson. Rejected because his spirit was scared. Everyone abandoned the guy who campaigned alien and 666."
+    body: "The last priest, Father Mark of the Diocese of Paterson — exorcist on paper — refused. His spirit was scared. Every official channel abandoned the guy waving alien and 666."
     category: narrative
     severity: 5
 
@@ -136,3 +199,9 @@ events:
     category: narrative
     severity: 4
 
+  - id: entropy-api-live
+    date: "2026-05-06T00:00:00Z"
+    title: "Free Entropy API"
+    body: "True random numbers derived from the living EMF field become publicly available. Entropy no algorithm can fake, seeded by electromagnetic fluctuations in a haunted corridor."
+    category: technical
+    severity: 3

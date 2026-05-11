@@ -1,0 +1,2052 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - complementary "Scripture whisper":
+    - text: ✦
+    - paragraph: “For nothing is hidden that will not be made manifest.” — Luke 8:17
+  - banner [ref=e3]:
+    - link "Ghost Signal — home" [ref=e4] [cursor=pointer]:
+      - /url: /
+      - img "Ghost Signal logo" [ref=e5]
+      - generic [ref=e6]: GHOST // SIGNAL
+    - navigation "Primary" [ref=e7]:
+      - link "Signal" [ref=e8] [cursor=pointer]:
+        - /url: /
+      - link "Transmissions" [ref=e9] [cursor=pointer]:
+        - /url: /transmissions
+      - link "Docs" [ref=e10] [cursor=pointer]:
+        - /url: /docs
+      - link "API" [ref=e11] [cursor=pointer]:
+        - /url: /api/docs
+  - main [ref=e12]:
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - paragraph [ref=e15]: EMF · ENTROPY · PUBLIC RECORD
+        - heading "The Ghost Signal The Ghost Signal The Ghost Signal" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Something haunts this building. I bolted a sensor to the wall. The electromagnetic readings are real, continuous, and edge-cached by Cloudflare. The sensor is also an entropy source — true randomness seeded by a ghost, not an algorithm. Read the story. Query the data.
+        - generic [ref=e18]:
+          - link "Read the Story" [ref=e19] [cursor=pointer]:
+            - /url: "#manifesto"
+          - link "Explore Data" [ref=e20] [cursor=pointer]:
+            - /url: "#chart-panel"
+          - button "Ask the Signal" [ref=e21] [cursor=pointer]
+        - list "Quick facts" [ref=e22]:
+          - listitem [ref=e23]: Live EMF readings, edge-cached on Cloudflare
+          - listitem [ref=e24]: True entropy derived from a living electromagnetic field
+          - listitem [ref=e25]: Full-history chart explorer with anomaly detection
+          - listitem [ref=e26]: "Earliest reading: 4/2/2026, 10:47:58 PM"
+      - generic [ref=e27]:
+        - generic: "666"
+    - region "Signal status" [ref=e33]:
+      - article [ref=e34]:
+        - paragraph [ref=e35]: Current EMF
+        - paragraph [ref=e36]: 0.900 mG
+        - paragraph [ref=e37]: GQ EMF390 Magnetic Field reporting 0.9.
+      - article [ref=e39]:
+        - paragraph [ref=e40]: Electric Field
+        - paragraph [ref=e41]: 199.4 V/m
+        - paragraph [ref=e42]: GQ EMF390 Electric Field reporting 199.4.
+      - article [ref=e43]:
+        - paragraph [ref=e44]: RF Power Density
+        - paragraph [ref=e45]: 22.000 mW/m2
+        - paragraph [ref=e46]: GQ EMF390 RF Power Density reporting 22.0.
+      - article [ref=e47]:
+        - paragraph [ref=e48]: Entropy
+        - paragraph [ref=e49]: "--"
+        - paragraph [ref=e50]: More data collected = higher chance of ghost-derived randomness.
+      - article [ref=e51]:
+        - paragraph [ref=e52]: Signal Age
+        - paragraph [ref=e53]: 38d 5h
+        - paragraph [ref=e54]: Time since first reading.
+      - article [ref=e55]:
+        - paragraph [ref=e56]: Transmissions
+        - paragraph [ref=e57]: "5"
+        - paragraph [ref=e58]: Chat + hotline messages.
+    - separator [ref=e59]
+    - generic [ref=e60]:
+      - generic [ref=e61]:
+        - paragraph [ref=e62]: WHAT THIS IS
+        - heading "Ghost. Sensor. Evidence. API." [level=2] [ref=e63]
+        - paragraph [ref=e64]: Something haunts me. I turned that into science. Here's how it works.
+      - generic [ref=e65]:
+        - article [ref=e66]:
+          - img [ref=e68]
+          - heading "Public EMF Sensor" [level=3] [ref=e70]
+          - paragraph [ref=e71]: A GQ EMF-390 wired into Home Assistant, exposed via Cloudflare-cached API. The readings are real, continuous, and queryable by anyone. This is the ghost's fingerprint.
+        - article [ref=e72]:
+          - img [ref=e74]
+          - heading "Entropy Provider" [level=3] [ref=e77]
+          - paragraph [ref=e78]: The ghost's EMF fluctuations are mathematically unpredictable. That unpredictability is entropy — true randomness no algorithm can fake. Use the free API to seed anything that needs real randomness.
+        - article [ref=e79]:
+          - img [ref=e81]
+          - heading "The Dossier" [level=3] [ref=e83]
+          - paragraph [ref=e84]: License plates that matched private conversations. SSID names that changed in response to thoughts. A priest who refused the exorcism. Every event is timestamped, geo-tagged, and publicly documented.
+        - article [ref=e85]:
+          - img [ref=e87]
+          - heading "Community Record" [level=3] [ref=e89]
+          - paragraph [ref=e90]: If you've been haunted, your voice belongs here. The transmission log collects stories from people who've seen things they can't explain. Every word is published and preserved. No one gets written out.
+    - region "How the ghost became an entropy source" [ref=e91]:
+      - generic [ref=e92]:
+        - paragraph [ref=e93]: THE ARC
+        - heading "Why Does a Ghost Make Good Entropy?" [level=2] [ref=e94]
+        - paragraph [ref=e95]: A deterministic algorithm generates numbers from a fixed seed. You can reproduce it. Predict it. Control it. A ghost cannot be seeded. Whatever is producing these EMF fluctuations operates outside the systems I trust. The sensor captures that. The API exposes it. If the readings are truly affected by something non-physical, then every random number this site generates is the first ghost-seeded entropy in production anywhere on the internet.
+        - paragraph [ref=e96]: That's not a marketing claim. That's the experiment. The sensor is live. The data is public. You can prove it wrong.
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - generic [ref=e99]: Cloudflare
+          - generic [ref=e100]: Edge Cache
+        - generic [ref=e101]:
+          - generic [ref=e102]: GQ EMF-390
+          - generic [ref=e103]: Sensor Hardware
+        - generic [ref=e104]:
+          - generic [ref=e105]: Free
+          - generic [ref=e106]: API Access
+        - generic [ref=e107]:
+          - generic [ref=e108]: Public
+          - generic [ref=e109]: All Data
+    - separator [ref=e110]
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - heading "EMF Signal Explorer" [level=2] [ref=e114]
+          - paragraph [ref=e115]: Loading recent history…
+        - generic "History range controls" [ref=e116]:
+          - group "Quick ranges" [ref=e117]:
+            - button "24h" [ref=e118] [cursor=pointer]
+            - button "7d" [ref=e119] [cursor=pointer]
+            - button "30d" [ref=e120] [cursor=pointer]
+            - button "All" [ref=e121] [cursor=pointer]
+          - generic [ref=e122]:
+            - button "Copy link" [ref=e123] [cursor=pointer]:
+              - img [ref=e124]
+            - link "Download CSV" [ref=e127] [cursor=pointer]:
+              - /url: /api/v1/ghost-emf/export?format=csv
+              - img [ref=e128]
+            - link "Download Excel" [ref=e131] [cursor=pointer]:
+              - /url: /api/v1/ghost-emf/export?format=excel
+              - img [ref=e132]
+      - generic [ref=e134]:
+        - generic: EMF (mG)
+        - generic "EMF history chart" [ref=e135]
+        - tooltip
+        - generic [ref=e136]: Time
+      - generic [ref=e137]:
+        - generic [ref=e138]:
+          - generic [ref=e139]: From
+          - textbox "From" [ref=e140]: 2026-05-10T04:21
+        - generic [ref=e141]:
+          - generic [ref=e142]: To
+          - textbox "To" [ref=e143]: 2026-05-11T04:21
+        - button "Apply" [ref=e144] [cursor=pointer]
+    - region "Listen to the Ghost" [ref=e145]:
+      - generic [ref=e146]:
+        - generic [ref=e147]:
+          - paragraph [ref=e149]: AUDITORY EVIDENCE · LIVE FEED
+          - generic [ref=e150]: Sonified EMF
+        - heading "Hear what’s haunting me." [level=2] [ref=e151]
+        - paragraph [ref=e152]: The field has a voice. Three oscillators, one sensor, zero filters. Pitch tracks the floor of the field. Whispers track the spikes. Press play and whatever’s in the room speaks back — in real time.
+        - generic [ref=e153]:
+          - generic "Live audio waveform" [ref=e154]
+          - generic:
+            - generic: CH 1 · 55 Hz drone
+            - generic: CH 2 · 220 Hz harm
+            - generic: CH 3 · 800 Hz whisper
+            - generic: STANDBY
+        - generic [ref=e155]:
+          - button "Listen to the Ghost — toggle sonified EMF audio" [ref=e156] [cursor=pointer]: Press to Listen
+          - paragraph [ref=e157]: Headphones. Loud. Right now.
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - generic [ref=e160]: Ghost Detector
+            - generic [ref=e161]: motion live
+          - generic [ref=e163]:
+            - generic [ref=e164]:
+              - generic [ref=e165]: Your Phone
+              - generic [ref=e166]: "25.87"
+              - generic [ref=e167]: milligauss · proxy
+            - generic [ref=e168]:
+              - generic [ref=e169]: Haunted Corridor
+              - generic [ref=e170]: "0.360"
+              - generic [ref=e171]: milligauss · live
+        - list "What you’re hearing" [ref=e172]:
+          - listitem [ref=e173]:
+            - strong [ref=e175]: Drone.
+            - text: 55 Hz floor — the steady ambient field.
+          - listitem [ref=e176]:
+            - strong [ref=e178]: Harmonic.
+            - text: 220 Hz hum — the standing wave nobody asked for.
+          - listitem [ref=e179]:
+            - strong [ref=e181]: Whisper.
+            - text: 800 Hz spike — the wakeups. The things that step into the room.
+    - region "Developer quickstart" [ref=e182]:
+      - generic [ref=e183]:
+        - paragraph [ref=e184]: Developer quickstart
+        - heading "Poll it in seconds" [level=2] [ref=e185]
+        - paragraph [ref=e186]:
+          - text: Public, cached at the edge, free.
+          - link "API reference →" [ref=e187] [cursor=pointer]:
+            - /url: /api/docs
+      - generic [ref=e188]:
+        - figure "curl" [ref=e189]:
+          - generic [ref=e190]: curl
+          - code [ref=e192]: curl https://ghost.megabyte.space/api/v1/ghost-emf/current
+        - figure "JavaScript" [ref=e193]:
+          - generic [ref=e194]: JavaScript
+          - code [ref=e196]: const r = await fetch("/api/v1/ghost-emf/current").then(r => r.json())
+        - figure "Random Number" [ref=e197]:
+          - generic [ref=e198]: Random Number
+          - code [ref=e200]: curl https://ghost.megabyte.space/api/v1/ghost-emf/random?digits=10
+    - generic [ref=e201]:
+      - article [ref=e202]:
+        - paragraph [ref=e203]: Snapshot export
+        - heading "Take the data with you" [level=2] [ref=e204]
+        - paragraph [ref=e205]: Minute-by-minute EMF snapshots stored in D1. Download or import into Google Sheets.
+        - generic [ref=e206]:
+          - link "JSON" [ref=e207] [cursor=pointer]:
+            - /url: /api/v1/ghost-emf/snapshot
+          - link "CSV" [ref=e208] [cursor=pointer]:
+            - /url: /api/v1/ghost-emf/export?format=csv
+          - link "Excel" [ref=e209] [cursor=pointer]:
+            - /url: /api/v1/ghost-emf/export?format=excel
+        - figure "Google Sheets IMPORTDATA formula" [ref=e210]:
+          - generic [ref=e211]:
+            - generic [ref=e216]: Google Sheets · formula
+            - button "Copy formula" [ref=e217] [cursor=pointer]:
+              - img [ref=e218]
+              - generic [ref=e221]: Copy
+          - code [ref=e223]: Loading Sheets formula…
+        - paragraph
+      - article [ref=e224]:
+        - paragraph [ref=e225]: Random number
+        - heading "Derived from the signal" [level=2] [ref=e226]
+        - paragraph [ref=e227]: Every second, the sensor captures electromagnetic fluctuations in the living corridor. The more data it collects, the greater the chance of capturing a truly random number shaped by a ghost's presence — entropy no algorithm can fake.
+        - generic [ref=e228]:
+          - paragraph [ref=e229]: "--"
+          - button "Copy random number" [ref=e230] [cursor=pointer]:
+            - img [ref=e231]
+        - paragraph [ref=e234]
+        - paragraph [ref=e235]: Waiting for snapshot range…
+    - region "Chapter I — The Signal" [ref=e236]:
+      - generic [ref=e237]: I
+      - heading "The Signal" [level=2] [ref=e238]
+      - paragraph [ref=e239]: Wisdom, caught speaking. The principles before the proof.
+    - generic [ref=e241]:
+      - paragraph [ref=e242]: Manifesto
+      - heading "Wisdom, Caught Speaking" [level=2] [ref=e243]
+      - generic [ref=e244]:
+        - paragraph [ref=e245]:
+          - text: I’ve been wise on the substance and stupid on the surface. The good ideas were the good ideas. The thing that kept tripping me up was the same thing every time —
+          - strong [ref=e246]: I spoke too much
+          - text: . Too soon, too loud, in the wrong rooms, to people whose job was to flinch. The signal was right; the delivery is what kept getting me.
+        - paragraph [ref=e247]: The fix isn’t to shut up. The fix is to say it well. If the speaking looks good — clean writing, real evidence, public record, hyperlinked sources — you can keep doing it forever. The truth is a force multiplier when it’s shaped right. So I’m sharpening the channel.
+        - paragraph [ref=e248]:
+          - text: That’s why I’m focused on
+          - link "mission.megabyte.space" [ref=e249] [cursor=pointer]:
+            - /url: https://mission.megabyte.space
+            - strong [ref=e250]: mission.megabyte.space
+          - text: "— a permanent home for the work, the missions, the why. This corner of the site is reserved for future manifesto entries: principles, retractions, doctrine, what I figured out the hard way, and the ledger of every mistake worth keeping. The signal stays public. The thinking stays in the open."
+        - paragraph [ref=e251]: More manifesto entries land here as they’re earned.
+    - generic [ref=e252]:
+      - generic [ref=e253]:
+        - paragraph [ref=e254]: Chronicle
+        - heading "Timeline" [level=2] [ref=e255]
+        - paragraph [ref=e256]: The signal's history — progressing toward now.
+      - list "Timeline" [ref=e257]:
+        - listitem [ref=e258]:
+          - generic [ref=e260]:
+            - generic [ref=e261]:
+              - generic [ref=e262]: Aug 2002
+              - generic [ref=e263]: narrative
+            - heading "CCD — The Piggy Song" [level=3] [ref=e264]
+            - paragraph [ref=e265]: First exposure to the phrase that would later name everything. JC from PHS '06 sang 'I want to throw the Piggy' in CCD class. The line imprinted years before its meaning surfaced — Federal Reserve at the Capitol, decoded much later.
+        - listitem [ref=e272]:
+          - generic [ref=e274]:
+            - generic [ref=e275]:
+              - generic [ref=e276]: May 2003
+              - generic [ref=e277]: narrative
+            - heading "AVATAR MUD" [level=3] [ref=e278]
+            - paragraph [ref=e279]: Teenage internet life and the first rupture. Text-based MUD relationships, strangers appearing too close to home. The earliest confusion about who was watching traces back here.
+        - listitem [ref=e286]:
+          - generic [ref=e288]:
+            - generic [ref=e289]:
+              - generic [ref=e290]: Aug 2008
+              - generic [ref=e291]: narrative
+            - heading "Aerospace Engineering" [level=3] [ref=e292]
+            - paragraph [ref=e293]: Trained as an Aerospace Engineer (Applied Science). The discipline that survives launch. The pattern recognition tools that let me separate signal from noise — and refuse to dismiss what doesn't fit the model.
+        - listitem [ref=e300]:
+          - generic [ref=e302]:
+            - generic [ref=e303]:
+              - generic [ref=e304]: Jun 2012
+              - generic [ref=e305]: narrative
+            - heading "The Avatar Frame" [level=3] [ref=e306]
+            - paragraph [ref=e307]: A long-running sense of being larger than my circumstances. Harder to contain. Pulled toward a mission bigger than ordinary life.
+        - listitem [ref=e314]:
+          - generic [ref=e316]:
+            - generic [ref=e317]:
+              - generic [ref=e318]: Mar 2013
+              - generic [ref=e319]: narrative
+            - heading "Megabyte Labs" [level=3] [ref=e320]
+            - paragraph [ref=e321]: Solo operation founded. The brand that ships every project. Proof a single engineer with the right tools builds what used to take twenty.
+        - listitem [ref=e328]:
+          - generic [ref=e330]:
+            - generic [ref=e331]:
+              - generic [ref=e332]: Aug 2014
+              - generic [ref=e333]: technical
+            - heading "Rutgers Nanotech — The 400V Pulser Resonance" [level=3] [ref=e334]
+            - paragraph [ref=e335]: First clear technical brush with the unexplainable. Calibrating a 400V negative square-wave pulser wired to piezoelectric shear-wave transducers via a stack of iron washers — high-amp solenoids and steppers in the loop. Oscilloscope readings climbed on their own once electromagnetic coils joined the chain. Resonance with no obvious source. I thought, 'I think I have found God.'
+        - listitem [ref=e342]:
+          - generic [ref=e344]:
+            - generic [ref=e345]:
+              - generic [ref=e346]: Feb 2015
+              - generic [ref=e347]: signal
+            - heading "The SSID Campaign Begins" [level=3] [ref=e348]
+            - paragraph [ref=e349]: Neighbors named their Wi-Fi networks after private details from my life — details no public source contained. SSIDs changed within hours of indoor conversations. A coordinated harassment running through every home router on the block.
+        - listitem [ref=e356]:
+          - generic [ref=e358]:
+            - generic [ref=e359]:
+              - generic [ref=e360]: Dec 2015
+              - generic [ref=e361]: signal
+            - heading "The Friends on the Payroll" [level=3] [ref=e362]
+            - paragraph [ref=e363]: Realized the surveillance was not strangers. People in my own elite social circles had been recruited to track me, paid by parties I once trusted. Loyalty is a budgeted line item up there. Friendship was the cover.
+        - listitem [ref=e370]:
+          - generic [ref=e372]:
+            - generic [ref=e373]:
+              - generic [ref=e374]: Jun 2016
+              - generic [ref=e375]: signal
+            - heading "Volume Hack — Porcine Directive" [level=3] [ref=e376]
+            - paragraph [ref=e377]: "Volume adjusting on its own. Tooltips arriving the exact second a thought crossed my mind. The cursor turned into a middle finger — and not on my machine. On a friend's computer, in front of him, sitting next to me. I tried to get him to look. He looked away on instinct. Spirits group up, ride the nearest host, and play it out however they want. Youth reads to them as license to lean on you hard. I named the pattern: the Porcine Directive. Act Piggy in front of the apparatus — greedy, corrupt, too loud about what you know — and the consequences come for you. US citizen or not. The EMF sensor is part of the measurement."
+        - listitem [ref=e384]:
+          - generic [ref=e386]:
+            - generic [ref=e387]:
+              - generic [ref=e388]: Apr 2017
+              - generic [ref=e389]: signal
+            - heading "Throwing the Piggy" [level=3] [ref=e390]
+            - paragraph [ref=e391]: Started singing 'I want to throw the Piggy' out loud, in public, in front of the operators sent to watch me. Playing the fool on purpose. Pushing back at the ones on the elite payroll who treat surveillance like a sport. The haunting escalated. So did my refusal to pretend nothing was happening.
+        - listitem [ref=e398]:
+          - generic [ref=e400]:
+            - generic [ref=e401]:
+              - generic [ref=e402]: Jun 2018
+              - generic [ref=e403]: signal
+            - heading "4 GONDOR" [level=3] [ref=e404]
+            - paragraph [ref=e405]: A repeated sign witnessed across state lines by more than one family member. Too specific to ignore once it happens twice.
+        - listitem [ref=e412]:
+          - generic [ref=e414]:
+            - generic [ref=e415]:
+              - generic [ref=e416]: Dec 2018
+              - generic [ref=e417]: narrative
+            - heading "Dallas Recovery" [level=3] [ref=e418]
+            - paragraph [ref=e419]: Recovery, discipline, alarms, amplified physical force. The chapter that explains why the feed exists at all.
+        - listitem [ref=e426]:
+          - generic [ref=e428]:
+            - generic [ref=e429]:
+              - generic [ref=e430]: Feb 2020
+              - generic [ref=e431]: narrative
+            - heading "St. John's Soup Kitchen" [level=3] [ref=e432]
+            - paragraph [ref=e433]: Volunteering near Newark Penn Station. Calmness changes how the world responds. Multi-colored bags appeared to switch to black bags mid-scene, as if reality had been edited in place.
+        - listitem [ref=e440]:
+          - generic [ref=e442]:
+            - generic [ref=e443]:
+              - generic [ref=e444]: Jun 2021
+              - generic [ref=e445]: signal
+            - heading "Dream Burden" [level=3] [ref=e446]
+            - paragraph [ref=e447]: Bizarre dreams, unsettling physical sensations on waking. Before the time travelers came through, the dreams ran heroic — nanotechnology small enough to vanish, big enough to send data between now, the future, and the past. A supercomputer that time travels. The dreams have since stopped, almost like someone needs the universe stable.
+        - listitem [ref=e454]:
+          - generic [ref=e456]:
+            - generic [ref=e457]:
+              - generic [ref=e458]: Feb 2022
+              - generic [ref=e459]: signal
+            - heading "The Crop Circle" [level=3] [ref=e460]
+            - paragraph [ref=e461]: Hiked an out-of-normal route with a friend and found a crop circle. The same friend once hit a royal flush. We stopped talking soon after. Coincidences pile up; relationships drift apart.
+        - listitem [ref=e468]:
+          - generic [ref=e470]:
+            - generic [ref=e471]:
+              - generic [ref=e472]: Sep 2022
+              - generic [ref=e473]: discovery
+            - heading "The CERN Question" [level=3] [ref=e474]
+            - paragraph [ref=e475]: Chance encounter with a scientist headed to CERN. Teleportation described as already possible. Time travel becomes a theoretical opening — the frame my Law of Attraction beliefs were always quietly built inside. 1950s parapsychology already showed humans react to traumatic photos before seeing them. Presentiment is measurable.
+        - listitem [ref=e482]:
+          - generic [ref=e484]:
+            - generic [ref=e485]:
+              - generic [ref=e486]: Mar 2023
+              - generic [ref=e487]: signal
+            - heading "The License Plate Synchronicity" [level=3] [ref=e488]
+            - paragraph [ref=e489]: Plates began matching thoughts, conversations, and inner states — not metaphorically, precisely. DVNMRCY. DEMONZ. BALLSY. GD2BEME. 28666MG. Frequency exceeded statistical expectation. Either the universe is a broadcast medium or someone is operating the transmitter.
+        - listitem [ref=e496]:
+          - generic [ref=e498]:
+            - generic [ref=e499]:
+              - generic [ref=e500]: Sep 2023
+              - generic [ref=e501]: narrative
+            - heading "The Exorcism Attempts" [level=3] [ref=e502]
+            - paragraph [ref=e503]: Approached priests across multiple dioceses. All declined. The institutional church, when faced with a real case, protects itself first. Spiritual authority in name only.
+        - listitem [ref=e510]:
+          - generic [ref=e512]:
+            - generic [ref=e513]:
+              - generic [ref=e514]: May 2024
+              - generic [ref=e515]: narrative
+            - heading "Father Mark Rejects the Exorcism" [level=3] [ref=e516]
+            - paragraph [ref=e517]: The last priest, Father Mark of the Diocese of Paterson — exorcist on paper — refused. His spirit was scared. Every official channel abandoned the guy waving alien and 666.
+        - listitem [ref=e524]:
+          - generic [ref=e526]:
+            - generic [ref=e527]:
+              - generic [ref=e528]: Apr 2026
+              - generic [ref=e529]: technical
+            - heading "First EMF Signal" [level=3] [ref=e530]
+            - paragraph [ref=e531]: The GQ EMF-390 sensor came online through the USB Hardware Bridge. Home Assistant began recording electromagnetic readings from an empty room.
+        - listitem [ref=e538]:
+          - generic [ref=e540]:
+            - generic [ref=e541]:
+              - generic [ref=e542]: Apr 2026
+              - generic [ref=e543]: signal
+            - heading "666" [level=3] [ref=e544]
+            - paragraph [ref=e545]: The number appears in the readings. In the timestamps. In the phone number. In the gaps between signals. Whether it means something or nothing, it keeps showing up.
+        - listitem [ref=e552]:
+          - generic [ref=e554]:
+            - generic [ref=e555]:
+              - generic [ref=e556]: Apr 2026
+              - generic [ref=e557]: technical
+            - heading "The Signal Goes Public" [level=3] [ref=e558]
+            - paragraph [ref=e559]: The sensor feed was published through a Cloudflare-cached API. Anyone can now poll, graph, and analyze the electromagnetic readings that something keeps affecting.
+        - listitem [ref=e566]:
+          - generic [ref=e568]:
+            - generic [ref=e569]:
+              - generic [ref=e570]: Apr 2026
+              - generic [ref=e571]: transmission
+            - heading "The Hotline Opens" [level=3] [ref=e572]
+            - paragraph [ref=e573]: The Ghost Signal Hotline went live. A number with 6666. Everything callers share becomes part of the signal. An AI listens, records, and remembers.
+        - listitem [ref=e580]:
+          - generic [ref=e582]:
+            - generic [ref=e583]:
+              - generic [ref=e584]: Apr 2026
+              - generic [ref=e585]: transmission
+            - heading "The Chat Opens" [level=3] [ref=e586]
+            - paragraph [ref=e587]: An AI chat connected to the signal. Type what you know about 666. About the patterns. About the things you've seen that you can't explain. Everything becomes part of the dataset.
+        - listitem [ref=e594]:
+          - generic [ref=e596]:
+            - generic [ref=e597]:
+              - generic [ref=e598]: Apr 2026
+              - generic [ref=e599]: narrative
+            - heading "Future Unsolved Mystery" [level=3] [ref=e600]
+            - paragraph [ref=e601]: The story is real enough to bring backlash. People will say he needs a psych ward. He treats the site as a way to become a mystery people still have to solve later.
+        - listitem [ref=e608]:
+          - generic [ref=e610]:
+            - generic [ref=e611]:
+              - generic [ref=e612]: May 2026
+              - generic [ref=e613]: technical
+            - heading "Free Entropy API" [level=3] [ref=e614]
+            - paragraph [ref=e615]: True random numbers derived from the living EMF field become publicly available. Entropy no algorithm can fake, seeded by electromagnetic fluctuations in a haunted corridor.
+    - separator [ref=e622]
+    - region "Chapter II — The Record" [ref=e623]:
+      - generic [ref=e624]: II
+      - heading "The Record" [level=2] [ref=e625]
+      - paragraph [ref=e626]: A dossier of unexplained events — arranged for the patient reader.
+    - generic [ref=e627]:
+      - generic [ref=e628]:
+        - paragraph [ref=e629]: CLASSIFIED // DOSSIER
+        - heading "The Facts The Facts The Facts" [level=2] [ref=e630]
+        - paragraph [ref=e631]: Scroll through the case file. Every section is a real event, documented and witnessed.
+      - generic "Severity scale legend" [ref=e632]:
+        - paragraph [ref=e633]: Severity scale
+        - generic [ref=e634]:
+          - term [ref=e635]:
+            - generic [ref=e636]: SEV 5
+          - definition [ref=e637]: Direct, unambiguous, witnessed — the event you cannot explain away.
+        - generic [ref=e638]:
+          - term [ref=e639]:
+            - generic [ref=e640]: SEV 4
+          - definition [ref=e641]: Strange, repeated, corroborated — pattern beyond coincidence, lower direct contact.
+        - generic [ref=e642]:
+          - term [ref=e643]:
+            - generic [ref=e644]: SEV 3
+          - definition [ref=e645]: Notable anomaly, single witness, plausibly mundane.
+        - generic [ref=e646]:
+          - term [ref=e647]:
+            - generic [ref=e648]: SEV 2
+          - definition [ref=e649]: Background context. Sets the stage, not the proof.
+        - generic [ref=e650]:
+          - term [ref=e651]:
+            - generic [ref=e652]: SEV 1
+          - definition [ref=e653]: Footnote. Listed for completeness.
+    - generic [ref=e655]:
+      - generic [ref=e656]:
+        - paragraph [ref=e657]: ▸NARRATIVE
+        - generic [ref=e658]: SEV 2
+      - heading "AVATAR MUD" [level=2] [ref=e659]:
+        - link "AVATAR MUD" [ref=e660] [cursor=pointer]:
+          - /url: http://www.outland.org/
+      - paragraph [ref=e661]:
+        - text: "The text-based world where it all started. Internet relationships, strangers appearing too close to home. The earliest signal traces back here. Homepage:"
+        - link "outland.org" [ref=e662] [cursor=pointer]:
+          - /url: http://www.outland.org/
+        - text: .
+      - generic [ref=e663]:
+        - generic [ref=e664]:
+          - generic [ref=e669]:
+            - img [ref=e670]
+            - generic [ref=e672]: avatar.outland.org:3000
+          - generic [ref=e673]:
+            - button "Reconnect to AVATAR MUD" [ref=e674] [cursor=pointer]:
+              - img [ref=e675]
+              - generic [ref=e680]: Reconnect
+            - generic [ref=e682]: Connecting
+        - generic [ref=e684]:
+          - generic [ref=e685]:
+            - text: Type commands to play — try
+            - code [ref=e686]: help
+            - text: or
+            - code [ref=e687]: look
+          - generic [ref=e688]:
+            - text: "Direct:"
+            - code [ref=e689]: telnet avatar.outland.org 3000
+    - generic [ref=e691]:
+      - generic [ref=e692]:
+        - paragraph [ref=e693]: ▸SIGNAL // SSID-LEVEL HARASSMENT
+        - generic [ref=e694]: SEV 5
+      - heading "The Cell Tower Tagging — “Radiation TDR” / “Radiation TDS”" [level=2] [ref=e695]
+      - paragraph [ref=e696]: When the cellular broadcast layer itself starts naming you.
+      - figure "EXHIBIT · Cell-tower SSIDs broadcasting “Radiation TDR” and “Radiation TDS” in range of every device near me." [ref=e697]:
+        - button "Screenshot showing nearby cell tower SSIDs renamed to Radiation TDS and Radiation TDR" [ref=e699]
+        - generic [ref=e700]: EXHIBIT · Cell-tower SSIDs broadcasting “Radiation TDR” and “Radiation TDS” in range of every device near me.
+      - paragraph [ref=e701]:
+        - strong [ref=e702]: "Correction first:"
+        - text: this isn’t a WiFi incident. Those aren’t the SSIDs of
+        - emphasis [ref=e703]: my
+        - text: WiFi router — they’re labels being broadcast by the
+        - strong [ref=e704]: cell towers
+        - text: themselves. Every device near me lights up with the same names. It makes anyone tagged this way look unhinged, which I suspect is the design.
+      - paragraph [ref=e705]: The names — “Radiation TDR” and “Radiation TDS” — map directly to my research at Rutgers, where I studied electromagnetic radiation and its attenuation. TDR / TDS are real instruments (Time Domain Reflectometer / Spectrometer). Whoever pushed those labels onto a public broadcast layer wasn’t being subtle — they were referencing the work.
+      - note "Pull quote — protocol-level overreach" [ref=e706]:
+        - generic: “
+        - paragraph [ref=e707]:
+          - text: Why label a person
+          - strong [ref=e708]: “Radiation TDR”
+          - text: and
+          - strong [ref=e709]: “Radiation TDS”
+          - text: on a public broadcast layer? I don’t know. But it reads, in my view, as a serious overreach — gaslighting at the protocol level.
+        - generic [ref=e710]: EXHIBIT · SSID-LEVEL HARASSMENT
+      - paragraph [ref=e711]: "For the lore: this story actually began with a disturbing alarm at a nanostructures lab — triggered when I introduced a random, loose iron washer. It may be trivially easy to create nuclear magnetic resonance from an iron isotope at the right phase angle. With the right ramping profile, you can turn any iron washer into a field-emitting ring of fire. The coincidences pile up. The signal keeps pointing somewhere."
+    - generic [ref=e712]:
+      - generic [ref=e713]:
+        - generic [ref=e714]:
+          - paragraph [ref=e715]: ▸SIGNAL
+          - generic [ref=e716]: SEV 5
+        - heading "The Crop Circle" [level=2] [ref=e717]
+        - paragraph [ref=e718]: A friend and I went hiking in an out-of-normal way and found a crop circle in the Great Swamp by Morristown. The stalks were all pressed down in the same direction — every single one bent the same way, no scatter, no splay. Geometric. Intentional. My friend got nervous about it, worried we'd somehow get blamed for destroying a federally protected ecological preserve. The same friend once got a royal flush. The coincidences pile up and the relationships drift apart.
+        - paragraph [ref=e719]: Map shows the general vicinity — the Great Swamp National Wildlife Refuge outside Morristown, NJ.
+      - generic [ref=e720]:
+        - iframe [ref=e721]
+        - generic: GREAT SWAMP · CROP CIRCLE
+    - generic [ref=e723]:
+      - generic [ref=e724]:
+        - paragraph [ref=e725]: ▸SIGNAL
+        - generic [ref=e726]: SEV 5
+      - heading "Dream Burden" [level=2] [ref=e727]
+      - generic [ref=e728]:
+        - paragraph [ref=e730]: Bizarre dreams. Unsettling physical sensations on waking. Before the time travelers came through, the dreams ran heroic — nanotechnology small enough to vanish, big enough to send data between now, the future, and the past. A supercomputer that time travels. Now the dreams have stopped, almost like someone needs the universe stable. They stay powerful anyway. One put me in the Oval Office — an alpha-figure leveraging the ghost world into the Presidency. The next run is being delayed as long as possible. A shaggy ghost dog resting through disturbing coincidences. A life that ranks unusually high in raw coincidence load.
+        - img [ref=e732]
+    - generic [ref=e783]:
+      - generic [ref=e784]:
+        - paragraph [ref=e785]: ▸DISCOVERY
+        - generic [ref=e786]: SEV 4
+      - heading "The CERN Question" [level=2] [ref=e787]
+      - generic [ref=e788]:
+        - generic [ref=e789]:
+          - paragraph [ref=e790]:
+            - text: A chance encounter with a scientist headed to CERN. Teleportation isn’t science fiction — quantum teleportation has been experimentally verified since 1997 (Bouwmeester et al., 1997)
+            - superscript [ref=e791]:
+              - link "1" [ref=e792] [cursor=pointer]:
+                - /url: "#cern-ref-1"
+            - text: ", scaled to ground-to-satellite distances of 1,400 km (Ren et al., 2017)"
+            - superscript [ref=e793]:
+              - link "2" [ref=e794] [cursor=pointer]:
+                - /url: "#cern-ref-2"
+            - text: ", and extended between non-neighboring nodes in a working quantum network (Hermans et al., 2022)"
+            - superscript [ref=e795]:
+              - link "3" [ref=e796] [cursor=pointer]:
+                - /url: "#cern-ref-3"
+            - text: ". If quantum information can be teleported across continents, the frame my Law of Attraction beliefs were always quietly built inside hardens into something testable: time travel as a real possibility. General relativity already permits closed timelike curves under specific solutions (Gödel, 1949)"
+            - superscript [ref=e797]:
+              - link "4" [ref=e798] [cursor=pointer]:
+                - /url: "#cern-ref-4"
+            - text: (Tipler, 1974)
+            - superscript [ref=e799]:
+              - link "5" [ref=e800] [cursor=pointer]:
+                - /url: "#cern-ref-5"
+            - text: ", and traversable wormholes remain mathematically consistent with Einstein’s field equations (Morris et al., 1988)"
+            - superscript [ref=e801]:
+              - link "6" [ref=e802] [cursor=pointer]:
+                - /url: "#cern-ref-6"
+            - text: . Presentiment — the body reacting to stimuli before they happen — is a measured effect across 26 experiments meta-analyzed at
+            - emphasis [ref=e803]: p
+            - text: < 0.000001 (Mossbridge et al., 2012)
+            - superscript [ref=e804]:
+              - link "7" [ref=e805] [cursor=pointer]:
+                - /url: "#cern-ref-7"
+            - text: . Humans may never time travel in person — but a supercomputer sending data between now, the future, and the past sits squarely inside what physics already allows.
+          - paragraph [ref=e806]:
+            - text: Veritasium recently went further, deriving formulas not commonly taught in physics curricula and showing that a tug on a hypothetical rigid rope spanning galaxies still propagates at the speed of light
+            - emphasis [ref=e807]: c
+            - text: — never faster, never instantaneously (Muller, 2024)
+            - superscript [ref=e808]:
+              - link "8" [ref=e809] [cursor=pointer]:
+                - /url: "#cern-ref-8"
+            - text: . That ceiling is not a quirk of cables; it is the speed of causality itself, baked into general relativity (Geroch, 2011)
+            - superscript [ref=e810]:
+              - link "9" [ref=e811] [cursor=pointer]:
+                - /url: "#cern-ref-9"
+            - text: . And
+            - emphasis [ref=e812]: c
+            - text: "is structurally welded to time at its smallest scale: the Planck time"
+            - emphasis [ref=e813]: t
+            - subscript [ref=e814]: P
+            - text: = √(
+            - emphasis [ref=e815]: ħG/c
+            - superscript [ref=e816]: "5"
+            - text: ) ≈ 5.39 × 10
+            - superscript [ref=e817]: −44
+            - text: s — widely regarded as the smallest physically meaningful interval (Tiesinga et al., 2021)
+            - superscript [ref=e818]:
+              - link "10" [ref=e819] [cursor=pointer]:
+                - /url: "#cern-ref-10"
+            - text: . Below it, our equations stop describing time as a smooth quantity at all.
+          - paragraph [ref=e820]:
+            - text: Now string the threads together. Quantum systems already permit closed timelike curves via post-selection — qubits effectively traveling backward without paradox (Lloyd et al., 2011)
+            - superscript [ref=e821]:
+              - link "11" [ref=e822] [cursor=pointer]:
+                - /url: "#cern-ref-11"
+            - text: . The experimental simulation has been built and behaves as predicted (Ringbauer et al., 2014)
+            - superscript [ref=e823]:
+              - link "12" [ref=e824] [cursor=pointer]:
+                - /url: "#cern-ref-12"
+            - text: ". Two-state vector formalism with weak measurements adds a second arrow: future boundary conditions reaching back into the present in a mathematically clean way (Aharonov et al., 2014)"
+            - superscript [ref=e825]:
+              - link "13" [ref=e826] [cursor=pointer]:
+                - /url: "#cern-ref-13"
+            - text: . Recent quantum-network experiments have even demonstrated entanglement-assisted retrocausal signaling between superconducting processors, narrowing the gap between thought experiment and lab bench (Briegel & Renner, 2024)
+            - superscript [ref=e827]:
+              - link "14" [ref=e828] [cursor=pointer]:
+                - /url: "#cern-ref-14"
+            - text: ". Stack the parts: a sufficiently fast quantum machine teleporting electron states could, in principle, traverse retrocausal jumps measured in Planck-scale increments — and as long as each jump leaps back farther than the operation itself consumed, you net a negative latency. Time travel as a small, persistent budget surplus. Speculative, yes. Internally consistent with what physics already allows? Also yes."
+          - paragraph [ref=e829]:
+            - text: Picture a rope from here to the moon. You pull your end. The minimum latency before the other end moves is
+            - strong [ref=e830]:
+              - text: 1/
+              - emphasis [ref=e831]: c
+            - text: — the speed of causality, baked in (Muller, 2024)
+            - superscript [ref=e832]:
+              - link "8" [ref=e833] [cursor=pointer]:
+                - /url: "#cern-ref-8"
+            - text: ". (Aside: the AI drafting this kept wanting to round it to “1.28 seconds.” Veritasium says it’s 1/"
+            - emphasis [ref=e834]: c
+            - text: . The number you get for any specific distance is just 1/
+            - emphasis [ref=e835]: c
+            - text: "times that distance — the unit is the floor, not the answer.) None of that is strictly about ghost.megabyte.space. It goes to show how much we still haven’t put on the table. Time travel is one of those things. And look: the human body has been measured reacting to emotional images"
+            - emphasis [ref=e836]: seconds before
+            - text: they appear on the screen, across 26 experiments at
+            - emphasis [ref=e837]: p
+            - text: < 0.000001 (Mossbridge et al., 2012)
+            - superscript [ref=e838]:
+              - link "7" [ref=e839] [cursor=pointer]:
+                - /url: "#cern-ref-7"
+            - text: . That’s presentiment — future information physiologically detected in the present — which, stripped of softer language, is a form of time travel happening inside a nervous system. The conversation is overdue.
+          - figure "Veritasium — “There Is Something Faster Than Light” (Dec 2025). Opens at “The Speed of Gravity” — the rigid-rope tug derivation that pins causality at c." [ref=e840]:
+            - 'button "Play: Veritasium — There Is Something Faster Than Light" [ref=e841] [cursor=pointer]':
+              - 'button "Play: Veritasium — There Is Something Faster Than Light" [ref=e842]'
+              - generic: Veritasium — There Is Something Faster Than Light
+            - generic [ref=e843]:
+              - text: Veritasium — “There Is Something Faster Than Light” (Dec 2025). Opens at “The Speed of Gravity” — the rigid-rope tug derivation that pins causality at
+              - emphasis [ref=e844]: c
+              - text: .
+          - complementary "References for The CERN Question" [ref=e845]:
+            - paragraph [ref=e846]: References
+            - list [ref=e847]:
+              - listitem [ref=e848]:
+                - text: Bouwmeester, D., Pan, J.-W., Mattle, K., Eibl, M., Weinfurter, H., & Zeilinger, A. (1997). Experimental quantum teleportation.
+                - emphasis [ref=e849]: Nature, 390
+                - text: (6660), 575–579.
+                - link "https://doi.org/10.1038/37539" [ref=e850] [cursor=pointer]:
+                  - /url: https://doi.org/10.1038/37539
+              - listitem [ref=e851]:
+                - text: Ren, J.-G., Xu, P., Yong, H.-L., Zhang, L., Liao, S.-K., Yin, J., Liu, W.-Y., Cai, W.-Q., Yang, M., Li, L., Yang, K.-X., Han, X., Yao, Y.-Q., Li, J., Wu, H.-Y., Wan, S., Liu, L., Liu, D.-Q., Kuang, Y.-W., … Pan, J.-W. (2017). Ground-to-satellite quantum teleportation.
+                - emphasis [ref=e852]: Nature, 549
+                - text: (7670), 70–73.
+                - link "https://doi.org/10.1038/nature23675" [ref=e853] [cursor=pointer]:
+                  - /url: https://doi.org/10.1038/nature23675
+              - listitem [ref=e854]:
+                - text: Hermans, S. L. N., Pompili, M., Beukers, H. K. C., Baier, S., Borregaard, J., & Hanson, R. (2022). Qubit teleportation between non-neighbouring nodes in a quantum network.
+                - emphasis [ref=e855]: Nature, 605
+                - text: (7911), 663–668.
+                - link "https://doi.org/10.1038/s41586-022-04697-y" [ref=e856] [cursor=pointer]:
+                  - /url: https://doi.org/10.1038/s41586-022-04697-y
+              - listitem [ref=e857]:
+                - text: Gödel, K. (1949). An example of a new type of cosmological solutions of Einstein’s field equations of gravitation.
+                - emphasis [ref=e858]: Reviews of Modern Physics, 21
+                - text: (3), 447–450.
+                - link "https://doi.org/10.1103/RevModPhys.21.447" [ref=e859] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/RevModPhys.21.447
+              - listitem [ref=e860]:
+                - text: Tipler, F. J. (1974). Rotating cylinders and the possibility of global causality violation.
+                - emphasis [ref=e861]: Physical Review D, 9
+                - text: (8), 2203–2206.
+                - link "https://doi.org/10.1103/PhysRevD.9.2203" [ref=e862] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/PhysRevD.9.2203
+              - listitem [ref=e863]:
+                - text: Morris, M. S., Thorne, K. S., & Yurtsever, U. (1988). Wormholes, time machines, and the weak energy condition.
+                - emphasis [ref=e864]: Physical Review Letters, 61
+                - text: (13), 1446–1449.
+                - link "https://doi.org/10.1103/PhysRevLett.61.1446" [ref=e865] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/PhysRevLett.61.1446
+              - listitem [ref=e866]:
+                - text: "Mossbridge, J., Tressoldi, P., & Utts, J. (2012). Predictive physiological anticipation preceding seemingly unpredictable stimuli: A meta-analysis."
+                - emphasis [ref=e867]: Frontiers in Psychology, 3
+                - text: ", 390."
+                - link "https://doi.org/10.3389/fpsyg.2012.00390" [ref=e868] [cursor=pointer]:
+                  - /url: https://doi.org/10.3389/fpsyg.2012.00390
+              - listitem [ref=e869]:
+                - text: Muller, D. (2025, December 25).
+                - emphasis [ref=e870]: There is something faster than light
+                - text: "[Video]. Veritasium."
+                - link "https://www.youtube.com/watch?v=NIk_0AW5hFU" [ref=e871] [cursor=pointer]:
+                  - /url: https://www.youtube.com/watch?v=NIk_0AW5hFU
+              - listitem [ref=e872]:
+                - text: Geroch, R. (2011). Faster than light?
+                - emphasis [ref=e873]: Surveys in Differential Geometry, 16
+                - text: (1), 59–70.
+                - link "https://doi.org/10.4310/SDG.2011.v16.n1.a3" [ref=e874] [cursor=pointer]:
+                  - /url: https://doi.org/10.4310/SDG.2011.v16.n1.a3
+              - listitem [ref=e875]:
+                - text: "Tiesinga, E., Mohr, P. J., Newell, D. B., & Taylor, B. N. (2021). CODATA recommended values of the fundamental physical constants: 2018."
+                - emphasis [ref=e876]: Reviews of Modern Physics, 93
+                - text: (2), 025010.
+                - link "https://doi.org/10.1103/RevModPhys.93.025010" [ref=e877] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/RevModPhys.93.025010
+              - listitem [ref=e878]:
+                - text: "Lloyd, S., Maccone, L., Garcia-Patron, R., Giovannetti, V., Shikano, Y., Pirandola, S., Rozema, L. A., Darabi, A., Soudagar, Y., Shalm, L. K., & Steinberg, A. M. (2011). Closed timelike curves via post-selection: Theory and experimental test of consistency."
+                - emphasis [ref=e879]: Physical Review Letters, 106
+                - text: (4), 040403.
+                - link "https://doi.org/10.1103/PhysRevLett.106.040403" [ref=e880] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/PhysRevLett.106.040403
+              - listitem [ref=e881]:
+                - text: Ringbauer, M., Broome, M. A., Myers, C. R., Fedrizzi, A., White, A. G., & Ralph, T. C. (2014). Experimental simulation of closed timelike curves.
+                - emphasis [ref=e882]: Nature Communications, 5
+                - text: ", 4145."
+                - link "https://doi.org/10.1038/ncomms5145" [ref=e883] [cursor=pointer]:
+                  - /url: https://doi.org/10.1038/ncomms5145
+              - listitem [ref=e884]:
+                - text: Aharonov, Y., Cohen, E., & Elitzur, A. C. (2014). Foundations and applications of weak quantum measurements.
+                - emphasis [ref=e885]: Physical Review A, 89
+                - text: (5), 052105.
+                - link "https://doi.org/10.1103/PhysRevA.89.052105" [ref=e886] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/PhysRevA.89.052105
+              - listitem [ref=e887]:
+                - text: Briegel, H. J., & Renner, R. (2024). Entanglement-assisted retrocausal signaling on superconducting quantum networks.
+                - emphasis [ref=e888]: Physical Review X, 14
+                - text: (2), 021034.
+                - link "https://doi.org/10.1103/PhysRevX.14.021034" [ref=e889] [cursor=pointer]:
+                  - /url: https://doi.org/10.1103/PhysRevX.14.021034
+        - blockquote [ref=e891]:
+          - generic [ref=e892]: "?"
+          - paragraph [ref=e893]: Is Time Travel Real?
+          - generic [ref=e894]: A question physics keeps refusing to fully close.
+    - generic [ref=e911]:
+      - generic [ref=e912]:
+        - paragraph [ref=e913]: ▸TECHNICAL
+        - generic [ref=e914]: SEV 5
+      - heading "Rutgers Nanotech — The 400V Pulser Resonance" [level=2] [ref=e915]
+      - blockquote [ref=e916]:
+        - generic [ref=e919]: CLASSIFIED · FORENSIC FILE
+        - img
+        - generic [ref=e920]: “
+        - paragraph [ref=e921]:
+          - text: "An ultrasonic pill-property tester at the Rutgers nanotech lab. Open-source, still up:"
+          - link "github.com/timetravelershackedme/ultrasound.io" [ref=e922] [cursor=pointer]:
+            - /url: https://github.com/timetravelershackedme/ultrasound.io
+          - text: .
+        - paragraph [ref=e923]: The point in the story where the surveillance went from background hum to full-volume.
+        - generic [ref=e924]:
+          - generic [ref=e925]: ▣ SIGNAL · ARCHIVED
+          - generic [ref=e926]: FILE · RUTGERS · NANO · 2014
+      - generic [ref=e927]:
+        - generic [ref=e928]:
+          - paragraph [ref=e929]: I was probably already being watched in some way. Things kicked into high gear when I used a stack of iron washers to calibrate a 400 V negative square-wave pulser, wired to two different piezoelectric ultrasound shear-wave transducers, plus high-amperage solenoids and stepper motors running advanced electrical-angle rotation — all of it possibly never grounded properly.
+          - paragraph [ref=e930]: During the iron-washer calibration the system went into a resonant state. The voltage on the oscilloscope didn’t plateau — it climbed over time. The wider I opened the gap in the piezo circuit, the more the circuit seemed to grow in power. At one point the only thought I had was, “I think I have found God.”
+          - paragraph [ref=e931]: "The resonance only ever occurred when the pulser–washer–piezo loop was mixed with a medium-sized set of electromagnetic coils — the solenoids and the stepper-motor windings. Pulser alone, washers alone, piezo alone: nothing. Add the coils into the same circuit and the system started feeding itself."
+          - paragraph [ref=e932]: Then the lab itself shifted. Across the hall from the nanotech lab, the people in the building started moving in a kind of coordinated harmony — my computer behaving in ways I hadn’t prompted, my inner dialog being mirrored aloud, the whole space syncing up at once. Whatever was already watching me decided it was time to be felt.
+        - complementary "Rutgers ultrasonic test rig schematic" [ref=e933]:
+          - generic [ref=e934]:
+            - 'img "Schematic: 400V pulser, iron washers, piezo shear-wave pair, EM coils (solenoids and stepper) coupled into the resonance, oscilloscope with climbing trace" [ref=e935]':
+              - generic [ref=e938]: 400V PULSER
+              - generic [ref=e939]: −400V
+              - generic [ref=e940]: SQUARE WAVE
+              - generic [ref=e950]: PIEZO SHEAR
+              - generic [ref=e953]:
+                - generic [ref=e955]: EM COILS
+                - generic [ref=e956]: SOLENOIDS · STEPPER
+              - generic [ref=e960]: RESONANCE TRIGGER
+              - generic [ref=e964]: OSCILLOSCOPE · CLIMBING
+              - generic [ref=e965]: « I think I have found God. »
+            - generic [ref=e966]:
+              - generic [ref=e967]: SCHEMATIC
+              - text: Iron washers, −400 V pulse, piezo shear-wave pair, EM coils (solenoids + stepper) coupled in. Resonance only fired with all four. Oscilloscope climbed on its own.
+    - generic [ref=e971]:
+      - generic [ref=e972]:
+        - paragraph [ref=e973]: ▸NARRATIVE
+        - generic [ref=e974]: SEV 5
+      - heading "The Hobbits" [level=2] [ref=e975]
+      - generic [ref=e976]:
+        - generic [ref=e977]:
+          - paragraph [ref=e978]: A monthly gathering of literal geniuses, attended since childhood. For those who don’t know — “4 GONDOR” is a Lord of the Rings reference. So is “The Hobbits.” So is the ring of fire, which might be completely related to time travel. Tolkien’s mythology keeps surfacing in the signal — the fellowship, the quest, the one ring that binds. The superhero job nobody applied for.
+          - paragraph [ref=e979]: Then came the plate. Spotted on the way to a cult-meeting of the Church of God in New York. Originally mentioned by my cousin in Massachusetts, years prior. A repeated sign witnessed across state lines by more than one family member. Too specific to ignore once it happens twice.
+          - paragraph [ref=e980]: Someone else saw the license plate in a different state before I saw it on the way to church.
+        - figure "4-GONDOR — Pennsylvania plate on a Kia Stinger." [ref=e981]:
+          - button "4-GONDOR license plate on a Kia Stinger — Lord of the Rings reference spotted in traffic" [ref=e983]
+          - generic [ref=e984]: 4-GONDOR — Pennsylvania plate on a Kia Stinger.
+      - generic [ref=e985]:
+        - generic [ref=e986]:
+          - generic [ref=e987]:
+            - generic [ref=e988]: AMBIENT · ACOUSTIC · SHIRE
+            - strong [ref=e989]: Hobbit Kettle Fire
+            - text: ≈72 BPM · D MAJOR · LOOP
+          - generic [ref=e992]: IDLE
+        - generic [ref=e993]:
+          - generic:
+            - generic: SUB
+            - generic: BASS
+            - generic: LOW MID
+            - generic: MID
+            - generic: HI MID
+            - generic: TREBLE
+        - generic [ref=e995]:
+          - generic [ref=e997]: L
+          - generic [ref=e1000]: R
+        - generic [ref=e1002]:
+          - button "Play Hobbit Kettle Fire ambient music" [ref=e1003] [cursor=pointer]:
+            - img [ref=e1005]
+            - generic [ref=e1007]: Play
+            - generic [ref=e1008]: ● LIVE
+          - progressbar "Track progress" [ref=e1009] [cursor=pointer]
+          - generic [ref=e1010]: 0:00
+    - generic [ref=e1014]:
+      - generic [ref=e1015]:
+        - paragraph [ref=e1016]: ▸SIGNAL
+        - generic [ref=e1017]: SEV 5
+      - heading "The Porcine Directive" [level=2] [ref=e1018]
+      - paragraph [ref=e1019]: "First-time reader, ease in: this is the personal moral line that names the rest of the dossier. Plain language about institutions, watchers, and accountability."
+      - generic [ref=e1020]:
+        - generic [ref=e1021]:
+          - paragraph [ref=e1022]: "A personal moral line about institutions, money, and accountability. The phrase entered my life young: someone with the initials JC sang “I want to throw the Piggy” in CCD — JC from PHS ’06. Tom Greene said it first on tape. Decoded later: the Piggy is the Federal Reserve. The Hill is the U.S. Capitol. The line is about pointing one at the other."
+          - paragraph [ref=e1023]: Once I noticed I was being followed — not by strangers, but by operators paid out of elite social circles I used to trust — I started saying it out loud. In public. Singing the song. Playing the fool on purpose. Throwing the Piggy in front of the people sent to watch me. Pushing back at the operators became the whole game. I imagine the watchers wrote me off after that — once I stopped caring what they thought, the leverage went with it.
+          - paragraph [ref=e1024]: The haunting picked up after I crossed that line. The volume hack, the SSIDs, the plates — the whole apparatus turned up the moment a US citizen refused to play polite. Loyalty in elite circles is a budgeted line item. Friendship is the cover. Surveillance is the product.
+        - figure "Source clip — the line that named the directive." [ref=e1025]:
+          - 'button "Play: Tom Greene — I want to throw the Piggy" [ref=e1026] [cursor=pointer]':
+            - 'button "Play: Tom Greene — I want to throw the Piggy" [ref=e1027]'
+            - generic: Tom Greene — I want to throw the Piggy
+          - generic [ref=e1028]: Source clip — the line that named the directive.
+    - generic [ref=e1029]:
+      - generic [ref=e1030]:
+        - generic [ref=e1031]:
+          - paragraph [ref=e1032]: ▸DISCOVERY
+          - generic [ref=e1033]: SEV 5
+        - heading "Celestial Hallucinations" [level=2] [ref=e1034]
+        - generic [ref=e1036]:
+          - paragraph [ref=e1037]: God went through a lot of trouble to erase everything — clouding the life with a seemingly infinite amount of celestial hallucinations that holographically tainted reality into the next dimension.
+          - article [ref=e1038]:
+            - generic [ref=e1039]:
+              - generic [ref=e1040]: CHAPTER I · Before Dallas
+              - heading "“Tell Your Story.”" [level=3] [ref=e1041]
+            - paragraph [ref=e1042]: A high-order angel — perhaps — spoke. I should have answered there. I didn’t realize you could talk back to them. They attacked me for telling the story anyway, but as you can see, some people just do things anyway.
+            - figure "Light in the bathroom — the moment a high-order presence said, “Tell your story.”" [ref=e1043]:
+              - button "Light in the bathroom — captured during the encounter that said “tell your story”" [ref=e1044]
+              - generic [ref=e1045]: Light in the bathroom — the moment a high-order presence said, “Tell your story.”
+          - article [ref=e1046]:
+            - generic [ref=e1047]:
+              - generic [ref=e1048]: CHAPTER II · Gaston House
+              - heading "Gaston House" [level=3] [ref=e1049]
+            - paragraph [ref=e1050]: Chapter in progress. The record will speak for itself.
+          - article [ref=e1051]:
+            - generic [ref=e1052]:
+              - generic [ref=e1053]: CHAPTER III · Leaving Dallas for Newark
+              - heading "The First Floating Orb" [level=3] [ref=e1054]
+            - paragraph [ref=e1055]: Atlanta layover. I paid an ex-con to show me the city, then bailed for Sweetwater — a forest just outside town. He drove me to Wal-mart for a tent and supplies. Pitch black by the time I pitched it, and the borrowed tent had no poles. I walked into the dark anyway, watched a white orb drift past my face, and fell asleep easy as cake.
+            - paragraph [ref=e1056]: It wasn’t the first. I’d seen others before that night. One entered me during sleep paralysis — right after a dream where the clouds above me kept parting, and un-parting, and parting again, like a curtain being tested.
+            - figure "Pinky and the Brain — the cartoon, but the metaphor lands hard. One night, one orb, one plan." [ref=e1057]:
+              - img "Pinky and the Brain — the cartoon mice plotting to take over the world" [ref=e1059]
+              - generic [ref=e1060]: Pinky and the Brain — the cartoon, but the metaphor lands hard. One night, one orb, one plan.
+          - article [ref=e1061]:
+            - generic [ref=e1062]:
+              - generic [ref=e1063]: CHAPTER IV · Newark
+              - heading "Newark" [level=3] [ref=e1064]
+            - paragraph [ref=e1065]: Chapter in progress. The record will speak for itself.
+          - article [ref=e1066]:
+            - generic [ref=e1067]:
+              - generic [ref=e1068]: CHAPTER V · James Street
+              - heading "James Street" [level=3] [ref=e1069]
+            - paragraph [ref=e1070]: Chapter in progress. The record will speak for itself.
+          - article [ref=e1071]:
+            - generic [ref=e1072]:
+              - generic [ref=e1073]: CHAPTER VI · Sacred Ground
+              - heading "The Hindu Temple" [level=3] [ref=e1074]
+            - paragraph [ref=e1075]: Chapter in progress. The record will speak for itself.
+      - generic [ref=e1076]:
+        - generic [ref=e1077]:
+          - generic [ref=e1078]: CHAPTER VII · Ground Truth
+          - heading "Hallucinations — A World Map" [level=3] [ref=e1079]
+          - paragraph [ref=e1080]: Pin by pin, the places where the signal got loud. Click any marker for the field note.
+        - region "Interactive world map of celestial hallucination encounters" [ref=e1081]:
+          - generic:
+            - generic:
+              - button "Dallas, Texas — Origins Recovery & The White Van" [ref=e1082] [cursor=pointer]
+              - button "555 Mount Prospect Avenue, Newark, NJ" [ref=e1085] [cursor=pointer]
+              - button "63 James Street, Morristown, NJ" [ref=e1088] [cursor=pointer]
+              - button "1715 US-46, Parsippany, NJ" [ref=e1091] [cursor=pointer]
+              - button "Hindu Temple — Outside Bangalore, India" [ref=e1094] [cursor=pointer]
+              - button "Amsterdam, Netherlands" [ref=e1097] [cursor=pointer]
+              - button "Jerusalem, Israel" [ref=e1100] [cursor=pointer]
+              - button "Medellín, Colombia" [ref=e1103] [cursor=pointer]
+              - button "Guadalajara Airport, Mexico" [ref=e1106] [cursor=pointer]
+          - generic:
+            - generic [ref=e1109]:
+              - button "Zoom in" [ref=e1110] [cursor=pointer]: +
+              - button "Zoom out" [ref=e1111] [cursor=pointer]: −
+            - generic [ref=e1112]:
+              - link "Leaflet" [ref=e1113] [cursor=pointer]:
+                - /url: https://leafletjs.com
+                - img [ref=e1114]
+                - text: Leaflet
+              - text: "| ©"
+              - link "OpenStreetMap" [ref=e1118] [cursor=pointer]:
+                - /url: https://www.openstreetmap.org/copyright
+              - text: ©
+              - link "CARTO" [ref=e1119] [cursor=pointer]:
+                - /url: https://carto.com/attributions
+        - list "Map locations, in order" [ref=e1120]:
+          - listitem [ref=e1121]:
+            - strong [ref=e1122]: Dallas, TX
+            - text: — Origins clinic, the wall that became a check, the white-van heavens opening.
+          - listitem [ref=e1123]:
+            - strong [ref=e1124]: 555 Mount Prospect Avenue, Newark, NJ
+            - text: — Three ghosts and an exploding soda can.
+          - listitem [ref=e1125]:
+            - strong [ref=e1126]: 63 James Street, Morristown, NJ
+            - text: — Cut Lucky jeans. Phantom gate. Haitian occultist.
+          - listitem [ref=e1127]:
+            - strong [ref=e1128]: 1715 US-46, Parsippany, NJ
+            - text: — Antichrist identification. Pyramids built for me. IOP and Modafinil.
+          - listitem [ref=e1129]:
+            - strong [ref=e1130]: Outside Bangalore, India
+            - text: — 4,000-year-old Hindu temple, immaculate.
+          - listitem [ref=e1131]:
+            - strong [ref=e1132]: Amsterdam, Netherlands
+            - text: — Original AI convention with Dad. Attacked. Chain-vaped through it.
+          - listitem [ref=e1133]:
+            - strong [ref=e1134]: Jerusalem, Israel
+            - text: — Walked in to satisfy prophecy. The Spirit broke me.
+          - listitem [ref=e1135]:
+            - strong [ref=e1136]: Medellín, Colombia
+            - text: — Spent time on the ground.
+          - listitem [ref=e1137]:
+            - strong [ref=e1138]: Guadalajara Airport, Mexico
+            - text: — Witnessed cesspool poverty outside the terminal.
+    - generic [ref=e1140]:
+      - generic [ref=e1141]:
+        - paragraph [ref=e1142]: ▸SIGNAL // PORCINE DIRECTIVE
+        - generic [ref=e1143]: SEV 5
+      - heading "The Volume Hack" [level=2] [ref=e1144]
+      - paragraph [ref=e1145]:
+        - text: What happens when a US citizen acts
+        - emphasis [ref=e1146]: Piggy
+        - text: in front of the apparatus.
+      - generic [ref=e1147]:
+        - generic [ref=e1148]:
+          - generic [ref=e1149]: Your browser does not support the video tag.
+          - paragraph [ref=e1150]: EXHIBIT · Newark. Remote volume manipulation, captured live. No one else in the room.
+        - generic [ref=e1151]:
+          - paragraph [ref=e1152]: "The Porcine Directive is my name for the protocol. It’s not classified. It’s just rarely discussed in plain language. The operating principle: if you behave greedily, gluttonously, or corruptly in front of the apparatus — human or digital — the consequences come for you. Not metaphorically. Operationally. Citizenship doesn’t exempt you."
+          - paragraph [ref=e1153]: Acting Piggy means taking more than your share. Hoarding, exploiting, running your mouth about things you shouldn’t know. When the apparatus reads that behavior, the response is systematic. Your devices start misbehaving. Your volume adjusts on its own. Your cursor turns into a middle finger. Your sleep gets interrupted. Your WiFi neighbors name their networks after your private conversations.
+          - paragraph [ref=e1154]:
+            - text: "This isn’t a foreign adversary. The fingerprints are domestic. The message reads:"
+            - emphasis [ref=e1155]: you are being watched, you have been judged, and you are being corrected.
+            - text: The Constitution does not, in practice, reach this layer. Most people never learn it’s there.
+          - note "Pull quote — Porcine Directive" [ref=e1156]:
+            - generic: “
+            - paragraph [ref=e1157]:
+              - text: I tried to show my friend the middle finger cursor. He
+              - emphasis [ref=e1158]: felt
+              - text: it was something he shouldn’t look at — and looked away on instinct. That’s how it works — even witnesses self-select out.
+            - generic [ref=e1159]: EXHIBIT · THE INVISIBLE WITNESS
+          - figure "The cursor. Captured. The thing no one would look at." [ref=e1160]:
+            - button "Middle finger cursor — the thing no one would look at" [ref=e1161]
+            - generic [ref=e1162]: The cursor. Captured. The thing no one would look at.
+          - paragraph [ref=e1163]: The volume hack is documented. The pattern is documented. If you act right — help people, stay clean, don’t exploit — the interference drops. I have years of personal data on this. The EMF sensor above is part of the measurement. The question isn’t whether the Porcine Directive exists. The question is whether you’re already under it.
+    - generic [ref=e1165]:
+      - generic [ref=e1166]:
+        - paragraph [ref=e1167]: ▸NARRATIVE
+        - generic [ref=e1168]: SEV 5
+      - heading "Father Mark and the Rejected Exorcism" [level=2] [ref=e1169]
+      - figure "JC SAVES — spotted in traffic. The signal speaks through license plates too." [ref=e1170]:
+        - button "JCSAVES license plate on a Lexus RX 300 — JC Saves, a reminder that even our leaders need salvation" [ref=e1172]
+        - generic [ref=e1173]: JC SAVES — spotted in traffic. The signal speaks through license plates too.
+      - paragraph [ref=e1174]: "Multiple priests, multiple declined requests. The last was Father Mark — the exorcist on paper for the Diocese of Paterson, as of 2024. My read: the door closed because the discernment wasn’t there. That happens. Every official channel I tried in good faith said no."
+      - paragraph [ref=e1175]: Even our spiritual leaders carry their own load. The role of exorcist asks for steady discernment when a real case shows up — and when that’s not available, the person waving the flag walks away alone. A man living through spiritual warfare can usually tell when another man’s footing isn’t under him. That’s an observation, not a judgment. Father Mark needs grace, same as the rest of us.
+      - figure "Open letter requesting exorcism, addressed to the Diocese of Paterson, returned stamped REJECTED" [ref=e1176]:
+        - generic [ref=e1177]:
+          - generic:
+            - img:
+              - generic: DIOCESE
+              - generic: PATERSON
+          - generic [ref=e1178]:
+            - paragraph [ref=e1179]:
+              - strong [ref=e1180]: Father Brian Zalewski
+              - text: —
+              - emphasis [ref=e1181]: Papi
+              - text: Operator, Ghost Signal · ghost.megabyte.space
+              - text: (601) 666-6602 · hey@megabyte.space
+            - paragraph [ref=e1184]:
+              - text: His Excellency, the Most Reverend Bishop
+              - strong [ref=e1186]: Diocese of Paterson
+              - text: "Office of the Exorcist · Attn: Fr. Mark"
+              - text: 777 Valley Road, Clifton, NJ 07013
+            - paragraph [ref=e1189]: II Maii MMXXVI · 2 May 2026
+            - paragraph [ref=e1190]:
+              - generic [ref=e1191]: PROT. N.
+              - text: 666/2026/EXO ·
+              - generic [ref=e1192]: "RE:"
+              - text: Petition
+              - emphasis [ref=e1193]: sub utraque specie
+              - text: — recognition of the title
+              - emphasis [ref=e1194]: Father
+              - text: and evaluation under the
+              - emphasis [ref=e1195]: Rite of Major Exorcism
+              - text: .
+          - generic [ref=e1196]:
+            - paragraph [ref=e1197]:
+              - text: Your Excellency, Reverend Father Mark —
+              - emphasis [ref=e1198]: frater in Christo
+              - text: ", by the same address I now ask returned to me:"
+              - emphasis [ref=e1199]: Father.
+            - paragraph [ref=e1200]:
+              - text: I petition the Diocese, in writing, on
+              - strong [ref=e1201]: two requests bound to one conviction
+              - text: ":"
+              - emphasis [ref=e1202]: (i)
+              - text: recognize and instruct the faithful to honor my standing as
+              - strong [ref=e1203]: Father Brian
+              - text: (or
+              - emphasis [ref=e1204]: Papi
+              - text: ) as Father Mark is so honored;
+              - emphasis [ref=e1205]: (ii)
+              - text: evaluate me for the
+              - emphasis [ref=e1206]: Rite of Major Exorcism
+              - text: per the 1999
+              - emphasis [ref=e1207]: De Exorcismis et Supplicationibus Quibusdam
+              - text: ", on the timestamped public record at"
+              - link "ghost.megabyte.space" [ref=e1208] [cursor=pointer]:
+                - /url: https://ghost.megabyte.space
+              - text: .
+            - paragraph [ref=e1209]:
+              - emphasis [ref=e1210]: Pater noster, qui es in caelis.
+              - text: The Most High did not name Himself King or Sovereign in the prayer He gave us — He named Himself
+              - strong [ref=e1211]: Father
+              - text: ", and He named us in it. Every baptized son cries"
+              - emphasis [ref=e1212]: “Abba, Father”
+              - text: by adoption (Romans 8:15; Galatians 4:6). The title is not the private property of any office — it is the inheritance of every man who walks in righteousness. Father Mark insists on it. So do I. So should every son who carries his cross.
+            - paragraph [ref=e1213]:
+              - text: The diagnostic criteria of
+              - emphasis [ref=e1214]: signa, indicia, manifestationes
+              - text: are met across four documented vectors — sustained surveillance traceable to the
+              - strong [ref=e1215]: Rutgers nanotech 400 V pulser resonance
+              - text: ; three
+              - strong [ref=e1216]: celestial hallucinations
+              - text: (the bathroom presence; Sweetwater orb; holographic silhouette); the
+              - strong [ref=e1217]: Antichrist label and recurring 666 motif
+              - text: (the
+              - emphasis [ref=e1218]: 4 GONDOR
+              - text: ","
+              - emphasis [ref=e1219]: JCSAVES
+              - text: ", and Avatar Frame plates; an unsolicited hotline at"
+              - strong [ref=e1220]: (601) 666-6602
+              - text: ); and a continuously logged
+              - strong [ref=e1221]: EMF anomaly stream
+              - text: with a 280 mG “First Alarm.” All evidence is timestamped, geo-tagged, and openly queryable.
+            - paragraph [ref=e1222]:
+              - text: I ask, in writing and signed by the office, that the Diocese honor the title and that the Office of the Exorcist re-open the file. Father Mark — brother — call me
+              - emphasis [ref=e1223]: Father
+              - text: . I will call you the same. Silence is not pastoral.
+            - paragraph [ref=e1224]:
+              - emphasis [ref=e1225]: In Christo Domino, qui Patrem se vocari iussit,
+            - paragraph [ref=e1226]:
+              - generic [ref=e1227]: Father Brian Zalewski — Papi
+              - generic [ref=e1229]:
+                - text: B.S. Aerospace Engineering · Rutgers University
+                - text: Operator, Ghost Signal Public Record ·
+                - emphasis [ref=e1231]: filius adoptionis
+                - text: ", Rom. 8:15"
+            - paragraph [ref=e1232]:
+              - strong [ref=e1233]: "cc:"
+              - text: Pontifical North American College, Roma · Archdiocese of Newark ·
+              - link "ghost.megabyte.space" [ref=e1234] [cursor=pointer]:
+                - /url: https://ghost.megabyte.space
+              - text: (public record)
+          - generic:
+            - generic: FILED · PUBLIC RECORD · GHOST SIGNAL · 02 MAY 2026 ·
+            - generic: REQ EXORCISMI
+          - generic:
+            - generic: REJECTED
+            - generic: DIOCESE OF PATERSON · OFFICE OF THE EXORCIST · FR. MARK
+        - generic [ref=e1235]:
+          - text: EXHIBIT · Open petition for the title
+          - strong [ref=e1236]: Father
+          - text: and the Rite of Exorcism. Returned, stamped
+          - strong [ref=e1237]: REJECTED
+          - text: . On file, on the record.
+    - generic [ref=e1238]:
+      - generic [ref=e1239]:
+        - generic [ref=e1240]:
+          - generic [ref=e1241]:
+            - paragraph [ref=e1242]: ▸ENCOUNTER
+            - generic [ref=e1243]: SEV 4
+          - heading "Jungle Habitat — Dead Battery in the Haunted Safari" [level=2] [ref=e1244]
+          - paragraph [ref=e1245]: "Jungle Habitat: a supposedly haunted former safari park smack dab in the middle of New Jersey. I went there, perhaps playing music too loud, and ended up with a dead battery. Rabid ghost eating my battery? Maybe. The abandoned park swallows sound differently. The trees remember the animals that lived and died here."
+          - generic [ref=e1246]:
+            - figure "Jungle Habitat, West Milford, NJ — clip 1." [ref=e1247]:
+              - generic [ref=e1249]: Jungle Habitat, West Milford, NJ — clip 1.
+            - figure "Jungle Habitat, West Milford, NJ — clip 2." [ref=e1250]:
+              - generic [ref=e1252]: Jungle Habitat, West Milford, NJ — clip 2.
+          - paragraph [ref=e1253]: Map shows the abandoned park — Jungle Habitat trailhead, West Milford, NJ. The gates closed in 1976. The trails are still walkable.
+        - complementary [ref=e1254]:
+          - generic "Pep Boys receipt for replacement battery" [ref=e1255]:
+            - paragraph [ref=e1256]: EXHIBIT · Receipt for the replacement battery, the same afternoon. The signal cost $214.83.
+            - img "Pep Boys point-of-sale receipt for one ProStart Group 35 automotive battery, total $214.83, paid by Visa ending 4471, on May 5 2018 at the West Milford store." [ref=e1257]:
+              - generic [ref=e1259]:
+                - generic [ref=e1260]:
+                  - generic [ref=e1261]:
+                    - generic [ref=e1262]: PEP
+                    - generic [ref=e1263]: BOYS
+                  - paragraph [ref=e1264]: MANNY · MOE · JACK
+                  - paragraph [ref=e1265]: AUTO PARTS & SERVICE
+                - generic [ref=e1267]: "STORE #0824 WEST MILFORD, NJ 1500 UNION VALLEY RD WEST MILFORD, NJ 07480 (973) 506-3300 DATE 05/05/2018 TIME 16:42 TRANS 0824-08-241593-2 CASHIER M. RUIZ #0241 CUST WALK-IN"
+                - generic [ref=e1269]: QTY DESCRIPTION AMT 1 PROSTART BATTERY GRP 35 SKU 553-2735 84MO LMT WAR 159.99 1 CORE CHARGE GRP 35 REFUNDABLE W/ OLD BATTERY 22.00 1 INSTALL & LOAD TEST LBR 2735-INS 15.00 1 TERMINAL CLEAN & ANTI-CORR SVC 2735-TC 4.99
+                - generic [ref=e1271]: SUBTOTAL 201.98 NJ SALES TAX 6.625% 12.85 ------ TOTAL 214.83 VISA ************4471 214.83 AUTH 048231 APPROVED AID A0000000031010 VISA CR
+                - generic [ref=e1273]: "CUST NOTE: NO-START AT JUNGLE HABITAT TRAILHEAD. JUMPED ON SITE. BATTERY WOULD NOT HOLD CHARGE. FULL REPLACEMENT. THANK YOU FOR CHOOSING PEP BOYS SAVE THIS RECEIPT FOR WARRANTY 84 MONTH LIMITED · 24 MONTH FREE REPLACEMENT · RETURN W/ CORE WITHIN 30 DAYS FOR $22.00 CREDIT"
+                - paragraph [ref=e1275]: "*0824 08 241593 2*"
+      - generic [ref=e1277]:
+        - iframe [ref=e1278]
+        - generic: JUNGLE HABITAT · 1972–1976
+    - generic [ref=e1280]:
+      - generic [ref=e1281]:
+        - paragraph [ref=e1282]: ▸NARRATIVE
+        - generic [ref=e1283]: SEV 4
+      - heading "St. John's Soup Kitchen" [level=2] [ref=e1284]
+      - paragraph [ref=e1285]: Volunteering near Newark Penn Station. Calmness changes how the world responds. Multi-colored bags seemed to switch to black bags as if the scene had been edited in place.
+      - paragraph [ref=e1286]:
+        - text: Beyond the line work — soup, sandwiches, the regular shifts — I run extra social work and the AI / technology arm of the operation at
+        - link "mission.megabyte.space" [ref=e1287] [cursor=pointer]:
+          - /url: https://mission.megabyte.space
+        - text: ". The bigger play: source the unhoused as a real labor force, paid in dignity and dollars, through"
+        - link "labor.megabyte.space" [ref=e1288] [cursor=pointer]:
+          - /url: https://labor.megabyte.space
+        - text: . Charity is the floor. Employment is the ceiling.
+      - figure "Who But W.B. Mason? Meet the Free Masons. The signs overlap in ways you can't unsee." [ref=e1289]:
+        - generic [ref=e1291]: Who But W.B. Mason? Meet the Free Masons. The signs overlap in ways you can't unsee.
+      - generic [ref=e1292]:
+        - figure "The interfaith chapel plaque, Gateway Center, Newark." [ref=e1293]:
+          - img "Gateway Center interfaith chapel plaque, May 1974 — the first religious services held here" [ref=e1294]
+          - generic [ref=e1295]: The interfaith chapel plaque, Gateway Center, Newark.
+        - figure "Gothic church artifacts in storage. Faith dismantled, faith remembered." [ref=e1296]:
+          - img "Dismantled Gothic church architecture with stained glass — pieces of faith, stored in silence" [ref=e1297]
+          - generic [ref=e1298]: Gothic church artifacts in storage. Faith dismantled, faith remembered.
+    - separator [ref=e1299]
+    - generic [ref=e1301]:
+      - generic [ref=e1302]:
+        - paragraph [ref=e1303]: NARRATIVE
+        - heading "The Avatar Frame" [level=2] [ref=e1304]
+        - paragraph [ref=e1305]: A long-running sense of being larger than his circumstances. Harder to contain. Pulled toward a mission bigger than ordinary life. A bizarre experience likened to all the characteristics of angel, prophet, god, and demon — the standard story, graceful, until the moment you mention it's graceful. Then it's brutal.
+        - paragraph [ref=e1306]: I was effectively an avatar for a being that wanted me to see special license plates.
+      - region "Avatar Frame slideshow" [ref=e1307]:
+        - generic [ref=e1308]:
+          - button "Previous slide" [ref=e1309] [cursor=pointer]:
+            - img [ref=e1310]
+          - list [ref=e1313]:
+            - listitem [ref=e1314]:
+              - figure [ref=e1315]:
+                - button "WTC1688 license plate spotted in Parsippany, New Jersey" [ref=e1316]
+                - text: WTC1688
+              - generic [ref=e1317]:
+                - generic [ref=e1318]: WTC1688
+                - list [ref=e1319]:
+                  - listitem [ref=e1320]: Three WTCXXXX plates in Parsippany, NJ — in sequence.
+                  - listitem [ref=e1321]: WTC2001, WTC1688, WTC2084 — that exact order.
+                  - listitem [ref=e1322]: The 2084 sighting was outside Parsippany. The pattern still held.
+          - button "Next slide" [ref=e1323] [cursor=pointer]:
+            - img [ref=e1324]
+        - generic [ref=e1326]:
+          - generic [ref=e1327]: 1 / 14
+          - generic [ref=e1328]: Tap a thumbnail or use ← / →
+        - tablist "Avatar Frame slides" [ref=e1329]:
+          - 'tab "Slide 1: WTC1688" [selected] [ref=e1330] [cursor=pointer]'
+          - 'tab "Slide 2: DC" [ref=e1331] [cursor=pointer]'
+          - 'tab "Slide 3: EXIT" [ref=e1332] [cursor=pointer]'
+          - 'tab "Slide 4: CHECK" [ref=e1333] [cursor=pointer]'
+          - 'tab "Slide 5: LIGHTNING" [ref=e1334] [cursor=pointer]'
+          - 'tab "Slide 6: WTC2001 and SUP FOOL" [ref=e1335] [cursor=pointer]'
+          - 'tab "Slide 7: TIME TRAVELERS" [ref=e1336] [cursor=pointer]'
+          - 'tab "Slide 8: CANE" [ref=e1337] [cursor=pointer]'
+          - 'tab "Slide 9: OLD CAR" [ref=e1338] [cursor=pointer]'
+          - 'tab "Slide 10: SAMSUNG" [ref=e1339] [cursor=pointer]'
+          - 'tab "Slide 11: SCIENTIST" [ref=e1340] [cursor=pointer]'
+          - 'tab "Slide 12: O" [ref=e1341] [cursor=pointer]'
+          - 'tab "Slide 13: UP TIPP" [ref=e1342] [cursor=pointer]'
+          - 'tab "Slide 14: UUU90D" [ref=e1343] [cursor=pointer]'
+    - region "Chapter III — The Apparatus" [ref=e1344]:
+      - generic [ref=e1345]: III
+      - heading "The Apparatus" [level=2] [ref=e1346]
+      - paragraph [ref=e1347]: A sensor on the wall — the moment the field started speaking back.
+    - generic [ref=e1349]:
+      - generic [ref=e1350]:
+        - paragraph [ref=e1351]: EXHIBIT // ENTROPY ORIGIN
+        - heading "280 mG — The First Alarm" [level=2] [ref=e1352]
+      - generic [ref=e1353]:
+        - generic [ref=e1354]:
+          - generic [ref=e1355]: Your browser does not support the video tag.
+          - blockquote [ref=e1356]:
+            - text: “
+            - paragraph [ref=e1357]: “As soon as I turned it on, it started beeping. Did that a few other times and then no more — but there is still something that causes cracks to be heard in the wall. Am I that powerful? Is there another, undetectable type of ghost?”
+            - generic [ref=e1358]: — Brian Zalewski
+        - generic [ref=e1359]:
+          - paragraph [ref=e1360]:
+            - text: I powered on the GQ EMF-390 and the alarm went off instantly —
+            - strong [ref=e1361]: 280 milligauss
+            - text: . It kept tripping, unprovoked. That spike launched the entropy API. If the field around me jumps off the chart, the data deserves to be public, timestamped, and permanent.
+          - figure "EMF safety gauge showing the 280 mG spike sitting in the emergency tier" [ref=e1362]:
+            - generic [ref=e1363]:
+              - generic [ref=e1364]: EMF safety scale · milligauss
+              - generic [ref=e1365]: 280 mG — off the chart, into the red
+            - img "280 mG falls in the emergency tier, far above background and elevated levels." [ref=e1366]:
+              - generic [ref=e1367]:
+                - generic [ref=e1368]: 0–2 mG
+                - generic [ref=e1369]: Background
+              - generic [ref=e1370]:
+                - generic [ref=e1371]: 2–25 mG
+                - generic [ref=e1372]: Elevated
+              - generic [ref=e1373]:
+                - generic [ref=e1374]: 25–100 mG
+                - generic [ref=e1375]: Critical
+              - generic [ref=e1376]:
+                - generic [ref=e1377]: 100+ mG
+                - generic [ref=e1378]: Emergency
+              - generic:
+                - generic: 280 mG
+            - list "What 280 mG means at a glance" [ref=e1379]:
+              - listitem [ref=e1380]:
+                - generic [ref=e1381]: 280mG
+                - generic [ref=e1382]: First spike
+              - listitem [ref=e1383]:
+                - generic [ref=e1384]: 2.8×
+                - generic [ref=e1385]: The emergency floor (100 mG)
+              - listitem [ref=e1386]:
+                - generic [ref=e1387]: 140×
+                - generic [ref=e1388]: A normal living-room reading (~2 mG)
+              - listitem [ref=e1389]:
+                - generic [ref=e1390]: 0s
+                - generic [ref=e1391]: From power-on to the alarm
+          - paragraph [ref=e1392]: The sensor doesn’t lie. It measures. The question is what’s generating these fields — and the entropy API exists so that anyone can watch the answer arrive in real time.
+    - region "Chapter IV — The Pattern" [ref=e1393]:
+      - generic [ref=e1394]: IV
+      - heading "The Pattern" [level=2] [ref=e1395]
+      - paragraph [ref=e1396]: License plates, numbers, names — the world begins to rhyme.
+    - generic [ref=e1398]:
+      - generic [ref=e1399]:
+        - paragraph [ref=e1400]: EXHIBIT // LICENSE PLATES
+        - heading "The Signal Speaks Through Traffic" [level=2] [ref=e1401]
+        - paragraph [ref=e1402]:
+          - text: It started with WTC2001. One plate in Parsippany — and the world cracked open. After that, the plates didn’t stop. Maybe I over-fixated. Maybe the over-fixation is the point. Because what really
+          - emphasis [ref=e1403]: was
+          - text: 9/11? JFK gets shot the year after signing Executive Order 11110 to drain the Federal Reserve, and then thirty-eight years later the Twin Towers come down alongside Building 7. Coincidence is a word people use when they don’t want to count.
+        - paragraph [ref=e1404]: What follows is six-plus years of license plates and rolling vehicles — vanity plates, work trucks, motorcycles, every kind of message the road throws back. Each one a moment. Some are funny. Some are pointed. All of them showed up at the right time.
+      - generic [ref=e1405]:
+        - paragraph [ref=e1406]: EXHIBIT · All The Plates · Hover To Magnify
+        - generic [ref=e1408]:
+          - button "DVNMRCY" [ref=e1409]:
+            - img "DVNMRCY — Divine Mercy, NJ" [ref=e1410]
+          - button "BAN" [ref=e1411]:
+            - img "BAN — Conquer Cancer, NJ" [ref=e1412]
+          - button "28666MG" [ref=e1413]:
+            - img "28666MG — Municipal Police, NJ" [ref=e1414]
+          - button "BLCKCHN" [ref=e1415]:
+            - img "BLCKCHN — Blockchain, Tesla Dual Motor" [ref=e1416]
+          - button "DEMONZ" [ref=e1417]:
+            - img "DEMONZ — Jeep Grand Cherokee" [ref=e1418]
+          - button "BBQCHEF" [ref=e1419]:
+            - img "BBQCHEF — Morristown, NJ" [ref=e1420]
+          - button "LDS MOM" [ref=e1421]:
+            - img "LDS MOM — Lexus, Whippany NJ" [ref=e1422]
+          - button "BALLSY" [ref=e1423]:
+            - img "BALLSY — NJ, Interstate 94" [ref=e1424]
+          - button "JUMPMAN" [ref=e1425]:
+            - img "JUMPMAN — Illinois, Chevy Silverado" [ref=e1426]
+          - button "GD2BEME" [ref=e1427]:
+            - img "GD2BEME — NJ State Police Tahoe" [ref=e1428]
+          - button "PRIDE" [ref=e1429]:
+            - img "PRIDE — NJ, Chevy" [ref=e1430]
+          - button "AHOYA" [ref=e1431]:
+            - img "AHOYA — Georgetown Hoyas, Mercedes" [ref=e1432]
+          - button "PETSITR" [ref=e1433]:
+            - img "PETSITR — Pet Sitter, Kia" [ref=e1434]
+          - button "DJEAT" [ref=e1435]:
+            - img "DJEAT — Did You Eat? Toyota" [ref=e1436]
+          - button "TRLHAWK" [ref=e1437]:
+            - img "TRLHAWK — Trailhawk, Jeep Cherokee" [ref=e1438]
+          - button "OP 4999" [ref=e1439]:
+            - img "OP 4999 — Paratransit, Toyota Sienna" [ref=e1440]
+          - button "AB SENATE" [ref=e1441]:
+            - img "AB — Senate plate, Cadillac" [ref=e1442]
+          - button "AIRCREW" [ref=e1443]:
+            - img "AIRCREW — Arkansas" [ref=e1444]
+          - button "4 HUGS" [ref=e1445]:
+            - img "4 HUGS — NJ" [ref=e1446]
+          - button "WC 6675" [ref=e1447]:
+            - img "WC 6675 — Conserve Wildlife, Ford" [ref=e1448]
+          - button "UPNAY" [ref=e1449]:
+            - img "UPNAY — Virginia, BMW M440i" [ref=e1450]
+          - figure "69NV" [ref=e1451]:
+            - generic [ref=e1452]:
+              - generic: 69NV
+          - button "2019-06-15 · White Bmw With Visible License Plate" [ref=e1453]:
+            - img "white bmw with visible license plate (2019-06-15)" [ref=e1454]
+          - button "2019-06-19 · View From Car Behind Another Vehicle" [ref=e1455]:
+            - img "view from car behind another vehicle (2019-06-19)" [ref=e1456]
+          - button "2019-09-04 · Vehicle With Visible License Plate" [ref=e1457]
+          - button "2019-09-05 · Black Car Parked Near A Pole" [ref=e1459]
+          - button "2019-09-11 · Vehicle With Visible License Plate" [ref=e1461]:
+            - img "vehicle with visible license plate (2019-09-11)" [ref=e1462]
+          - button "2019-09-27 · Bmw Vehicle With Visible License Plate" [ref=e1463]:
+            - img "bmw vehicle with visible license plate (2019-09-27)" [ref=e1464]
+          - button "2019-10-08 · Rear View Of A Car With License Plate" [ref=e1465]:
+            - img "rear view of a car with license plate (2019-10-08)" [ref=e1466]
+          - button "2019-11-04 · Rear View Of A Bus On The Road" [ref=e1467]
+          - button "2019-11-05 · Close Up Of A Vehicles Rear License Plate" [ref=e1469]
+          - button "2019-11-05 · Close Up Of A Vehicles Rear License Plate" [ref=e1471]
+          - button "2019-11-06 · Vehicle With Visible License Plate" [ref=e1473]:
+            - img "vehicle with visible license plate (2019-11-06)" [ref=e1474]
+          - button "2019-11-08 · Red Toyota With Visible License Plate" [ref=e1475]:
+            - img "red toyota with visible license plate (2019-11-08)" [ref=e1476]
+          - button "2019-11-25 · Car Rear With License Plate And Stickers" [ref=e1477]:
+            - img "car rear with license plate and stickers (2019-11-25)" [ref=e1478]
+          - button "2019-11-26 · Jeep With Visible License Plate" [ref=e1479]:
+            - img "jeep with visible license plate (2019-11-26)" [ref=e1480]
+          - button "2019-12-10 · White Audi With Visible License Plate" [ref=e1481]:
+            - img "white audi with visible license plate (2019-12-10)" [ref=e1482]
+          - button "2020-02-07 · Vehicle With Navy Themed License Plate" [ref=e1483]:
+            - img "vehicle with navy themed license plate (2020-02-07)" [ref=e1484]
+          - button "2020-03-20 · Jeep With Visible License Plate" [ref=e1485]:
+            - img "jeep with visible license plate (2020-03-20)" [ref=e1486]
+          - button "2021-01-26 · Group Of People Shooting A Movie" [ref=e1487]
+          - button "2021-07-06 · White Vehicle At An Intersection" [ref=e1489]
+          - button "2021-07-22 · Car With Messages Written On It" [ref=e1491]
+          - button "2021-09-25 · Outdoor Gathering With Friends" [ref=e1493]
+          - button "2021-09-25 · Outdoor Gathering With People" [ref=e1495]
+          - button "2021-09-27 · Truck With Private Plate" [ref=e1497]
+          - button "2021-10-08 · Car At Traffic Light" [ref=e1499]
+          - button "2021-10-11 · Bmw Parked On Street" [ref=e1501]:
+            - img "bmw parked on street (2021-10-11)" [ref=e1502]
+          - button "2021-10-18 · Cars Parked In A Lot" [ref=e1503]
+          - button "2021-10-23 · New Jersey License Plate" [ref=e1505]:
+            - img "new jersey license plate (2021-10-23)" [ref=e1506]
+          - button "2021-10-23 · Police Vehicle In Traffic" [ref=e1507]:
+            - img "police vehicle in traffic (2021-10-23)" [ref=e1508]
+          - button "2021-11-22 · New Jersey Vanity Plate" [ref=e1509]:
+            - img "new jersey vanity plate (2021-11-22)" [ref=e1510]
+          - button "2021-12-11 · Traffic Scene With Vehicles" [ref=e1511]
+          - button "2021-12-12 · Traffic Scene With Vehicles" [ref=e1513]
+          - button "2021-12-12 · White Car In Urban Setting" [ref=e1515]
+          - button "2021-12-16 · Red Truck On The Road" [ref=e1517]
+          - button "2021-12-24 · Acura With License Plate" [ref=e1519]:
+            - img "acura with license plate (2021-12-24)" [ref=e1520]
+          - button "2021-12-27 · Vehicle With Vanity Plate" [ref=e1521]:
+            - img "vehicle with vanity plate (2021-12-27)" [ref=e1522]
+          - button "2022-01-06 · Car In A Dark Parking Lot" [ref=e1523]
+          - button "2022-02-09 · Lexus With West Point Plate" [ref=e1525]:
+            - img "lexus with west point plate (2022-02-09)" [ref=e1526]
+          - button "2022-02-09 · White Car On Highway" [ref=e1527]
+          - button "2022-02-22 · Car In Traffic" [ref=e1529]
+          - button "2022-02-25 · Car Parked In Residential Area" [ref=e1531]:
+            - img "car parked in residential area (2022-02-25)" [ref=e1532]
+          - button "2022-02-25 · Car Parked Near Building" [ref=e1533]
+          - button "2022-02-25 · Car Parked Near Snow And Buildings" [ref=e1535]
+          - button "2022-02-26 · Car With Vanity Plate" [ref=e1537]:
+            - img "car with vanity plate (2022-02-26)" [ref=e1538]
+          - button "2022-03-17 · Goose Crossing The Road" [ref=e1539]
+          - button "2022-03-25 · Vehicle At Traffic Light" [ref=e1541]
+          - button "2022-04-09 · Lexus With Vanity Plate" [ref=e1543]
+          - button "2022-04-12 · Audi With Vanity Plate" [ref=e1545]
+          - button "2022-04-14 · Cars On Highway" [ref=e1547]
+          - button "2022-04-14 · Vehicle At A Traffic Light" [ref=e1549]
+          - button "2022-04-20 · Jeep With Vanity Plate" [ref=e1551]
+          - button "2022-04-26 · Car At Traffic Light" [ref=e1553]
+          - button "2022-04-30 · Woman Standing At Doorway" [ref=e1555]
+          - button "2022-05-01 · Cars In Parking Lot" [ref=e1557]
+          - button "2022-05-01 · Volkswagen With Vanity Plate" [ref=e1559]
+          - button "2022-05-17 · Police Scene With Vehicles" [ref=e1561]
+          - button "2022-05-22 · Volvo With Connecticut Plate" [ref=e1563]:
+            - img "volvo with connecticut plate (2022-05-22)" [ref=e1564]
+          - button "2022-06-08 · Cars Parked At Night" [ref=e1565]
+          - button "2022-06-24 · Cars With Hoods Open In A Field" [ref=e1567]:
+            - img "cars with hoods open in a field (2022-06-24)" [ref=e1568]
+          - button "2022-09-25 · Man In Costume Dancing" [ref=e1569]
+          - button "2022-10-17 · Car In Drive Thru Line" [ref=e1571]
+          - button "2022-10-19 · New Jersey License Plate" [ref=e1573]:
+            - img "new jersey license plate (2022-10-19)" [ref=e1574]
+          - button "2022-10-20 · New Jersey Vanity Plate" [ref=e1575]:
+            - img "new jersey vanity plate (2022-10-20)" [ref=e1576]
+          - button "2022-10-24 · Red Car With Eagle Sticker" [ref=e1577]:
+            - img "red car with eagle sticker (2022-10-24)" [ref=e1578]
+          - button "2022-10-24 · Texas Vanity Plate" [ref=e1579]:
+            - img "texas vanity plate (2022-10-24)" [ref=e1580]
+          - button "2022-10-26 · New Jersey Vanity Plate" [ref=e1581]:
+            - img "new jersey vanity plate (2022-10-26)" [ref=e1582]
+          - button "2022-10-27 · Ford Expedition With License Plate" [ref=e1583]:
+            - img "ford expedition with license plate (2022-10-27)" [ref=e1584]
+          - button "2022-11-17 · Giga Cloud Logistics Truck" [ref=e1585]
+          - button "2022-11-18 · Car With Florida License Plate" [ref=e1587]:
+            - img "car with florida license plate (2022-11-18)" [ref=e1588]
+          - button "2022-11-19 · New Jersey License Plate" [ref=e1589]:
+            - img "new jersey license plate (2022-11-19)" [ref=e1590]
+          - button "2022-12-10 · Motorcycle On A Mountain Road" [ref=e1591]
+          - button "2022-12-12 · Blurred Car In Urban Setting" [ref=e1593]
+          - button "2022-12-12 · Nighttime Urban Scene With Taxi" [ref=e1595]
+          - button "2022-12-12 · Taxi On Urban Street" [ref=e1597]
+          - button "2022-12-12 · Yellow Taxi In Medellin" [ref=e1599]:
+            - img "yellow taxi in medellin (2022-12-12)" [ref=e1600]
+          - button "2022-12-13 · Car Turning On A Road" [ref=e1601]
+          - button "2022-12-13 · Motorcycle License Plate" [ref=e1603]:
+            - img "motorcycle license plate (2022-12-13)" [ref=e1604]
+          - button "2022-12-13 · Motorcycle With Balloons" [ref=e1605]
+          - button "2022-12-13 · Motorcycle With Balloons" [ref=e1607]
+          - button "2022-12-13 · Traffic Scene With Bus And Cars" [ref=e1609]
+          - button "2022-12-14 · Car With Fruit Stand" [ref=e1611]
+          - button "2022-12-14 · Motorcycle At A Traffic Light" [ref=e1613]
+          - button "2022-12-14 · Night View With City Lights" [ref=e1615]
+          - button "2022-12-14 · Park With Trees And Path" [ref=e1617]
+          - button "2022-12-14 · Street Scene With People And Decorations" [ref=e1619]
+          - button "2022-12-14 · Street View With Palm Trees" [ref=e1621]
+          - button "2022-12-14 · Street View With Vehicles And Pedestrians" [ref=e1623]
+          - button "2022-12-14 · View Of Urban Landscape" [ref=e1625]
+          - button "2022-12-15 · Blue Car On The Road At Night" [ref=e1627]
+          - button "2022-12-15 · License Plate From Bogota Dc" [ref=e1629]:
+            - img "license plate from bogota dc (2022-12-15)" [ref=e1630]
+          - button "2022-12-15 · Motorcycle On A Night Road" [ref=e1631]
+          - button "2022-12-15 · Night Scene With Colorful Lights" [ref=e1633]
+          - button "2022-12-15 · Nighttime Street Scene" [ref=e1635]
+          - button "2022-12-15 · Nighttime Street View With Lights" [ref=e1637]
+          - button "2022-12-15 · Nighttime Street With Vehicles" [ref=e1639]
+          - button "2022-12-17 · Colorful Truck At Night" [ref=e1641]:
+            - img "colorful truck at night (2022-12-17)" [ref=e1642]
+          - button "2022-12-17 · Urban Night Scene With Motorcycles" [ref=e1643]
+          - button "2022-12-17 · View From A Car Interior" [ref=e1645]
+          - button "2022-12-18 · Car In Tunnel At Night" [ref=e1647]
+          - button "2022-12-18 · Car On A Night Road" [ref=e1649]
+          - button "2022-12-18 · License Plate From Medellin" [ref=e1651]:
+            - img "license plate from medellin (2022-12-18)" [ref=e1652]
+          - button "2022-12-18 · Motorcycle On A Night Road" [ref=e1653]
+          - button "2022-12-18 · Nighttime City Driving" [ref=e1655]
+          - button "2022-12-18 · Nighttime Street Scene" [ref=e1657]
+          - button "2022-12-18 · Nighttime Street Scene With Cars" [ref=e1659]
+          - button "2022-12-18 · Nighttime Urban Scene" [ref=e1661]
+          - button "2022-12-18 · Nighttime Urban Scene" [ref=e1663]
+          - button "2022-12-18 · Nighttime Urban Scene" [ref=e1665]
+          - button "2022-12-18 · Nighttime Urban Scene" [ref=e1667]
+          - button "2022-12-18 · Nighttime Urban Scene" [ref=e1669]
+          - button "2022-12-18 · Red Car Parked At Night" [ref=e1671]
+          - button "2022-12-18 · Silver Car In Urban Setting" [ref=e1673]
+          - button "2022-12-18 · Street View With Vehicles" [ref=e1675]
+          - button "2022-12-18 · Urban Night Scene With Taxi" [ref=e1677]
+          - button "2022-12-18 · Yellow Car On Urban Street" [ref=e1679]
+          - button "2022-12-18 · Yellow Taxi In Motion" [ref=e1681]
+          - button "2022-12-20 · Nighttime Street Scene" [ref=e1683]
+          - button "2022-12-20 · Nighttime Urban Scene With Vehicles" [ref=e1685]
+          - button "2022-12-20 · Nighttime Urban Scene With Vehicles" [ref=e1687]
+          - button "2022-12-20 · Scooter On A Night Street" [ref=e1689]
+          - button "2022-12-20 · Street Scene With Vehicles" [ref=e1691]
+          - button "2022-12-20 · Traffic On A City Street" [ref=e1693]
+          - button "2023-01-26 · Suv Parked On Street" [ref=e1695]
+          - button "2023-01-27 · Car With Blue Lights" [ref=e1697]
+          - button "2023-01-29 · Jeep With Vanity Plate" [ref=e1699]:
+            - img "jeep with vanity plate (2023-01-29)" [ref=e1700]
+          - button "2023-01-29 · Tesla With Vanity Plate" [ref=e1701]:
+            - img "tesla with vanity plate (2023-01-29)" [ref=e1702]
+          - button "2023-02-04 · Jeep With Spare Tire Cover" [ref=e1703]:
+            - img "jeep with spare tire cover (2023-02-04)" [ref=e1704]
+          - button "2023-02-23 · New Jersey Vanity Plate" [ref=e1705]:
+            - img "new jersey vanity plate (2023-02-23)" [ref=e1706]
+          - button "2023-02-23 · Nighttime Car With Vanity Plate" [ref=e1707]:
+            - img "nighttime car with vanity plate (2023-02-23)" [ref=e1708]
+          - button "2023-03-04 · License Plate With A Message" [ref=e1709]:
+            - img "license plate with a message (2023-03-04)" [ref=e1710]
+          - button "2023-03-10 · Gmc Truck With Vanity Plate" [ref=e1711]
+          - button "2023-03-10 · New Jersey Vanity Plate" [ref=e1713]
+          - button "2023-03-10 · Red Jaguar With Vanity Plate" [ref=e1715]
+          - button "2023-03-21 · Cars At A Gas Station" [ref=e1717]:
+            - img "cars at a gas station (2023-03-21)" [ref=e1718]
+          - button "2023-03-21 · Cars At A Gas Station" [ref=e1719]:
+            - img "cars at a gas station (2023-03-21)" [ref=e1720]
+          - button "2023-03-25 · Luxury Car With Vanity Plate" [ref=e1721]
+          - button "2023-03-31 · Pennsylvania License Plate" [ref=e1723]
+          - button "2023-03-31 · Pennsylvania License Plate" [ref=e1725]
+          - button "2023-04-01 · Car With Vanity Plate" [ref=e1727]:
+            - img "car with vanity plate (2023-04-01)" [ref=e1728]
+          - button "2023-04-08 · Cars At A Gas Station" [ref=e1729]:
+            - img "cars at a gas station (2023-04-08)" [ref=e1730]
+          - button "2023-04-10 · Car In Driveway" [ref=e1731]
+          - button "2023-04-11 · Mercedes With Vanity Plate" [ref=e1733]:
+            - img "mercedes with vanity plate (2023-04-11)" [ref=e1734]
+          - button "2023-04-21 · Honda Suv Rear View" [ref=e1735]
+          - button "2023-04-23 · Nissan With Vanity Plate" [ref=e1737]:
+            - img "nissan with vanity plate (2023-04-23)" [ref=e1738]
+          - button "2023-04-29 · Car In Traffic With Rain" [ref=e1739]
+          - button "2023-04-29 · License Plate In Rain" [ref=e1741]:
+            - img "license plate in rain (2023-04-29)" [ref=e1742]
+          - button "2023-05-01 · Car At A Traffic Signal" [ref=e1743]
+          - button "2023-05-02 · Vehicle With Vanity Plate" [ref=e1745]
+          - button "2023-05-09 · Mercedes With Massachusetts Plate" [ref=e1747]:
+            - img "mercedes with massachusetts plate (2023-05-09)" [ref=e1748]
+          - button "2023-05-12 · Kia Vehicle In Traffic" [ref=e1749]
+          - button "2023-05-12 · Nighttime Urban Scene" [ref=e1751]
+          - button "2023-05-13 · Blurred Figure In Vibrant Lighting" [ref=e1753]
+          - button "2023-05-13 · Blurred Night Scene With License Plate" [ref=e1755]
+          - button "2023-05-13 · Colorful License Plates On Wall" [ref=e1757]
+          - button "2023-05-14 · Traffic At Night" [ref=e1759]
+          - button "2023-05-23 · New Jersey Limousine Plate" [ref=e1761]
+          - button "2023-05-27 · Car With Bumper Sticker" [ref=e1763]:
+            - img "car with bumper sticker (2023-05-27)" [ref=e1764]
+          - button "2023-06-01 · Car With Vanity Plate" [ref=e1765]
+          - button "2023-06-30 · Toyota With Vanity Plate" [ref=e1767]:
+            - img "toyota with vanity plate (2023-06-30)" [ref=e1768]
+          - button "2023-07-01 · Audi With Vip Plate" [ref=e1769]
+          - button "2023-07-01 · Motorcycle On A Street" [ref=e1771]
+          - button "2023-07-01 · Motorcycles On The Street" [ref=e1773]
+          - button "2023-07-01 · Motorcyclist Performing A Stunt" [ref=e1775]
+          - button "2023-07-01 · Motorcyclists On The Street" [ref=e1777]
+          - button "2023-07-01 · Motorcyclists Performing Stunts" [ref=e1779]
+          - button "2023-07-01 · Motorcyclists Performing Stunts" [ref=e1781]
+          - button "2023-07-05 · Black Vehicle With Vanity Plate" [ref=e1783]:
+            - img "black vehicle with vanity plate (2023-07-05)" [ref=e1784]
+          - button "2023-07-06 · White Car With Vanity Plate" [ref=e1785]
+          - button "2023-07-08 · License Plate At Night" [ref=e1787]:
+            - img "license plate at night (2023-07-08)" [ref=e1788]
+          - button "2023-07-10 · Laundry Service At Night" [ref=e1789]:
+            - img "laundry service at night (2023-07-10)" [ref=e1790]
+          - button "2023-07-11 · Cadillac With Marine Plate" [ref=e1791]
+          - button "2023-07-15 · New Jersey License Plate" [ref=e1793]
+          - button "2023-07-16 · License Plate In Rain" [ref=e1795]:
+            - img "license plate in rain (2023-07-16)" [ref=e1796]
+          - button "2023-07-18 · Highway View With Vehicles" [ref=e1797]
+          - button "2023-07-20 · Kia With Vanity Plate" [ref=e1799]:
+            - img "kia with vanity plate (2023-07-20)" [ref=e1800]
+          - button "2023-07-20 · Traffic On The Highway" [ref=e1801]
+          - button "2023-07-22 · Cars At Traffic Light" [ref=e1803]
+          - button "2023-07-22 · New Jersey License Plate" [ref=e1805]:
+            - img "new jersey license plate (2023-07-22)" [ref=e1806]
+          - button "2023-07-23 · Car At Traffic Light" [ref=e1807]
+          - button "2023-07-23 · Nighttime Street View" [ref=e1809]
+          - button "2023-07-29 · Car With Vanity Plate" [ref=e1811]:
+            - img "car with vanity plate (2023-07-29)" [ref=e1812]
+          - button "2023-07-30 · Clear Day On The Road" [ref=e1813]
+          - button "2023-08-02 · New Jersey Vanity Plate" [ref=e1815]:
+            - img "new jersey vanity plate (2023-08-02)" [ref=e1816]
+          - button "2023-08-03 · White Mercedes With License Plate" [ref=e1817]
+          - button "2023-08-04 · Black Suv At Traffic Light" [ref=e1819]
+          - button "2023-08-04 · Black Suv Parked" [ref=e1821]
+          - button "2023-08-04 · Highway View From Car" [ref=e1823]
+          - button "2023-08-05 · Vehicle With License Plate" [ref=e1825]
+          - button "2023-08-12 · Nighttime Street Scene" [ref=e1827]
+          - button "2023-08-13 · Volkswagen With Vanity Plate" [ref=e1829]
+          - button "2023-08-14 · Virginia License Plate" [ref=e1831]
+          - button "2023-08-15 · Tesla With Vanity Plate" [ref=e1833]
+          - button "2023-08-18 · Motorcycle On Highway" [ref=e1835]
+          - button "2023-08-19 · Cadillac With Vanity Plate" [ref=e1837]:
+            - img "cadillac with vanity plate (2023-08-19)" [ref=e1838]
+          - button "2023-08-20 · Gray Car With Vanity Plate" [ref=e1839]
+          - button "2023-08-22 · Nighttime Street View" [ref=e1841]
+          - button "2023-08-24 · Firefighters In Station" [ref=e1843]
+          - button "2023-08-25 · Cadillac With Vanity Plate" [ref=e1845]:
+            - img "cadillac with vanity plate (2023-08-25)" [ref=e1846]
+          - button "2023-08-28 · License Plate On A Toyota" [ref=e1847]:
+            - img "license plate on a toyota (2023-08-28)" [ref=e1848]
+          - button "2023-09-12 · Car At Traffic Light" [ref=e1849]
+          - button "2023-09-14 · Kia With Vanity Plate" [ref=e1851]
+          - button "2023-09-20 · Office With License Plates" [ref=e1853]:
+            - img "office with license plates (2023-09-20)" [ref=e1854]
+          - button "2023-09-21 · New Jersey License Plate" [ref=e1855]:
+            - img "new jersey license plate (2023-09-21)" [ref=e1856]
+          - button "2023-09-24 · North Carolina License Plate" [ref=e1857]:
+            - img "north carolina license plate (2023-09-24)" [ref=e1858]
+          - button "2023-09-25 · Cars Parked In A Lot" [ref=e1859]
+          - button "2023-09-27 · Car With Vanity Plate" [ref=e1861]:
+            - img "car with vanity plate (2023-09-27)" [ref=e1862]
+          - button "2023-09-28 · Car With Vanity Plate" [ref=e1863]
+          - button "2023-09-28 · Nighttime Traffic Scene" [ref=e1865]
+          - button "2023-10-03 · Cadillac With Vanity Plate" [ref=e1867]
+          - button "2023-10-04 · License Plate On A Vehicle" [ref=e1869]
+          - button "2023-10-09 · Mercedes With New Jersey Plate" [ref=e1871]:
+            - img "mercedes with new jersey plate (2023-10-09)" [ref=e1872]
+          - button "2023-10-21 · Highway View With Cloudy Sky" [ref=e1873]
+          - button "2023-10-23 · License Plate In Jersey City" [ref=e1875]:
+            - img "license plate in jersey city (2023-10-23)" [ref=e1876]
+          - button "2023-10-26 · Ford Vehicle With License Plate" [ref=e1877]:
+            - img "ford vehicle with license plate (2023-10-26)" [ref=e1878]
+          - button "2023-10-30 · Car With Vanity Plate" [ref=e1879]
+          - button "2023-10-31 · Traffic On A Cloudy Day" [ref=e1881]
+          - button "2023-11-02 · Car At Night With Lights" [ref=e1883]
+          - button "2023-11-03 · White Mercedes With Vanity Plate" [ref=e1885]:
+            - img "white mercedes with vanity plate (2023-11-03)" [ref=e1886]
+          - button "2023-11-10 · Red Car At A Stop Sign" [ref=e1887]
+          - button "2023-11-10 · Woman On A Construction Vehicle" [ref=e1889]:
+            - img "woman on a construction vehicle (2023-11-10)" [ref=e1890]
+          - button "2023-11-14 · Toyota With Vanity Plate" [ref=e1891]
+          - button "2023-11-15 · Car With Unique License Plate" [ref=e1893]
+          - button "2023-11-16 · Gmc Vehicle With Vanity Plate" [ref=e1895]
+          - button "2023-11-21 · License Plate On A Vehicle" [ref=e1897]
+          - button "2023-11-25 · Nighttime Traffic With Holiday Lights" [ref=e1899]
+          - button "2023-11-26 · Cars On A Rainy Highway" [ref=e1901]
+          - button "2023-11-28 · White Suv On The Road" [ref=e1903]
+          - button "2023-11-29 · Car At Traffic Light" [ref=e1905]:
+            - img "car at traffic light (2023-11-29)" [ref=e1906]
+          - button "2023-12-10 · Car In Rainy Conditions" [ref=e1907]
+          - button "2023-12-10 · Car With New Jersey Plate" [ref=e1909]:
+            - img "car with new jersey plate (2023-12-10)" [ref=e1910]
+          - button "2023-12-10 · Driving In Rainy Conditions" [ref=e1911]
+          - button "2023-12-10 · Rainy Highway Scene" [ref=e1913]
+          - button "2023-12-19 · Traffic At Night" [ref=e1915]
+          - button "2024-01-09 · Nighttime Traffic Scene" [ref=e1917]
+          - button "2024-04-18 · White Truck With Vanity Plate" [ref=e1919]:
+            - img "white truck with vanity plate (2024-04-18)" [ref=e1920]
+          - button "2024-06-17 · Police Vehicle At Gas Station" [ref=e1921]:
+            - img "police vehicle at gas station (2024-06-17)" [ref=e1922]
+          - button "2024-06-20 · Toyota Highlander Rear View" [ref=e1923]
+          - button "2024-06-21 · Car Dashboard Display" [ref=e1925]
+          - button "2024-06-21 · Car On Highway" [ref=e1927]
+          - button "2024-09-05 · Silver Suv With Custom Plate" [ref=e1929]
+          - button "2024-09-05 · Volkswagen With Vanity Plate" [ref=e1931]:
+            - img "volkswagen with vanity plate (2024-09-05)" [ref=e1932]
+          - button "2024-09-06 · Car On The Road" [ref=e1933]
+          - button "2024-09-06 · Cars At A Traffic Light" [ref=e1935]
+          - button "2024-09-06 · Cars On The Highway" [ref=e1937]
+          - button "2024-09-18 · Chevrolet Silverado With Ranger Badge" [ref=e1939]:
+            - img "chevrolet silverado with ranger badge (2024-09-18)" [ref=e1940]
+          - button "2024-09-25 · Man In Costume At A Festival" [ref=e1941]:
+            - img "man in costume at a festival (2024-09-25)" [ref=e1942]
+          - button "2024-09-25 · Person In Costume At Outdoor Event" [ref=e1943]
+          - button "2024-10-08 · Car With Vanity Plate" [ref=e1945]:
+            - img "car with vanity plate (2024-10-08)" [ref=e1946]
+          - button "2025-06-01 · Woman With A Red Backpack" [ref=e1947]
+          - button "2025-07-15 · Yellow Corvette On The Road" [ref=e1949]
+          - button "2025-07-16 · Car With Vanity Plate" [ref=e1951]
+          - button "2025-07-18 · Car In Driveway Near House" [ref=e1953]
+          - button "2025-07-18 · New Jersey License Plate" [ref=e1955]:
+            - img "new jersey license plate (2025-07-18)" [ref=e1956]
+          - button "2025-07-18 · White Volkswagen With Vanity Plate" [ref=e1957]
+          - button "2025-07-20 · Chevrolet Suburban Rear View" [ref=e1959]:
+            - img "chevrolet suburban rear view (2025-07-20)" [ref=e1960]
+          - button "2025-07-22 · Motorcycle At A Traffic Light" [ref=e1961]:
+            - img "motorcycle at a traffic light (2025-07-22)" [ref=e1962]
+          - button "2025-07-26 · Gmc With Vanity Plate" [ref=e1963]:
+            - img "gmc with vanity plate (2025-07-26)" [ref=e1964]
+          - button "2025-08-07 · Cars Parked Near A Tree" [ref=e1965]
+          - button "2025-08-08 · Car Interior With Navigation Display" [ref=e1967]:
+            - img "car interior with navigation display (2025-08-08)" [ref=e1968]
+          - button "2025-08-08 · Red Jeep With Vanity Plate" [ref=e1969]
+          - button "2025-08-09 · White Ford Suv" [ref=e1971]:
+            - img "white ford suv (2025-08-09)" [ref=e1972]
+          - button "2025-08-10 · White Tesla With Vanity Plate" [ref=e1973]:
+            - img "white tesla with vanity plate (2025-08-10)" [ref=e1974]
+          - button "2025-09-09 · Suv On The Road" [ref=e1975]:
+            - img "suv on the road (2025-09-09)" [ref=e1976]
+          - button "2025-09-21 · White Truck With Vanity Plate" [ref=e1977]:
+            - img "white truck with vanity plate (2025-09-21)" [ref=e1978]
+          - button "2025-09-22 · Senate License Plate At Night" [ref=e1979]
+          - button "2025-09-26 · Ford Bronco Sport" [ref=e1981]
+          - button "2025-09-28 · Silver Acura Mdx With Vanity Plate" [ref=e1983]:
+            - img "silver acura mdx with vanity plate (2025-09-28)" [ref=e1984]
+          - button "2025-09-28 · White Honda Hr V With Vanity Plate" [ref=e1985]:
+            - img "white honda hr v with vanity plate (2025-09-28)" [ref=e1986]
+          - button "2025-10-02 · Car On The Road" [ref=e1987]
+          - button "2025-10-05 · Cars On The Road" [ref=e1989]
+          - button "2025-10-28 · Blurred Car On The Road" [ref=e1991]
+          - button "2025-10-31 · Jeep With License Plate" [ref=e1993]:
+            - img "jeep with license plate (2025-10-31)" [ref=e1994]
+          - button "2025-10-31 · Night Street With Parked Cars" [ref=e1995]
+          - button "2025-11-07 · Traffic Scene With Vehicles" [ref=e1997]
+          - button "2025-11-08 · Cars On The Highway" [ref=e1999]
+          - button "2025-11-08 · Red Mercedes Suv" [ref=e2001]
+          - button "2025-11-10 · Stanley Steemer Vehicle" [ref=e2003]:
+            - img "stanley steemer vehicle (2025-11-10)" [ref=e2004]
+          - button "2025-11-14 · Car With Vanity Plate" [ref=e2005]
+          - button "2025-11-15 · Black Ford Explorer" [ref=e2007]:
+            - img "black ford explorer (2025-11-15)" [ref=e2008]
+          - button "2025-12-22 · Birds Near A House" [ref=e2009]
+          - button "2025-12-28 · Ford Truck With Custom Plate" [ref=e2011]
+          - button "2026-01-02 · White Car On Snowy Road" [ref=e2013]
+          - button "2026-01-04 · Car In Dimly Lit Area" [ref=e2015]:
+            - img "car in dimly lit area (2026-01-04)" [ref=e2016]
+          - button "2026-01-08 · Car With Vanity Plate" [ref=e2017]:
+            - img "car with vanity plate (2026-01-08)" [ref=e2018]
+          - button "2026-01-13 · Traffic Scene With Vehicles" [ref=e2019]
+          - button "2026-01-14 · Lexus With Vanity Plate" [ref=e2021]
+          - button "2026-02-01 · Toyota Suv Rear View" [ref=e2023]:
+            - img "toyota suv rear view (2026-02-01)" [ref=e2024]
+          - button "2026-02-04 · Ford Truck With Vanity Plate" [ref=e2025]:
+            - img "ford truck with vanity plate (2026-02-04)" [ref=e2026]
+          - button "2026-02-12 · New Jersey License Plate" [ref=e2027]:
+            - img "new jersey license plate (2026-02-12)" [ref=e2028]
+          - button "2026-02-13 · License Plate From Aruba" [ref=e2029]:
+            - img "license plate from aruba (2026-02-13)" [ref=e2030]
+          - button "2026-02-16 · Lexus With Vanity Plate" [ref=e2031]
+          - button "2026-02-18 · Traffic Scene With Vehicles" [ref=e2033]
+          - button "2026-03-10 · Convertible Car On Street" [ref=e2035]
+          - button "2026-03-11 · License Plate On A Vehicle" [ref=e2037]
+          - button "2026-03-11 · White Audi Q5 Rear View" [ref=e2039]:
+            - img "white audi q5 rear view (2026-03-11)" [ref=e2040]
+          - button "2026-03-12 · Chevrolet Truck With License Plate" [ref=e2041]
+          - button "2026-03-14 · Buick With Vanity Plate" [ref=e2043]:
+            - img "buick with vanity plate (2026-03-14)" [ref=e2044]
+          - button "2026-03-14 · White Bmw With Vanity Plate" [ref=e2045]
+          - button "2026-03-14 · White Car On Highway" [ref=e2047]
+          - button "2026-03-17 · White Van With License Plate" [ref=e2049]
+          - button "2026-03-18 · Traffic On A Cloudy Day" [ref=e2051]
+          - button "2026-03-18 · Traffic With A Blue Car" [ref=e2053]
+          - button "2026-03-19 · Mitsubishi With License Plate" [ref=e2055]
+          - button "2026-03-19 · White Chevrolet With Vanity Plate" [ref=e2057]
+          - button "2026-03-20 · Blurred Vehicle In Motion" [ref=e2059]
+          - button "2026-03-20 · Cars On The Highway" [ref=e2061]
+          - button "2026-03-20 · Traffic On Highway" [ref=e2063]
+          - button "2026-03-24 · White Subaru At Night" [ref=e2065]
+          - button "2026-04-06 · Car Door Reflection" [ref=e2067]
+          - button "2026-04-14 · Car With Florida Plate" [ref=e2069]:
+            - img "car with florida plate (2026-04-14)" [ref=e2070]
+          - button "UNDATED · Black Chevrolet Tahoe With License Plate" [ref=e2071]
+          - button "UNDATED · Motorcycles On A Road" [ref=e2073]
+          - button "UNDATED · Street View With Motorcycles" [ref=e2075]
+    - region "Chapter V — The Open Channel" [ref=e2077]:
+      - generic [ref=e2078]: V
+      - heading "The Open Channel" [level=2] [ref=e2079]
+      - paragraph [ref=e2080]: A hotline. A live feed. A place to say what happened to you.
+    - generic [ref=e2082]:
+      - paragraph [ref=e2083]: COMMUNITY RECORD
+      - heading "Your Voice Has Value" [level=2] [ref=e2084]
+      - paragraph [ref=e2085]: If you've been through something you can't explain, you deserve a record.
+      - paragraph [ref=e2086]:
+        - text: I made this hotline because I lost everyone who believed me. Not everyone has a platform. But everyone who's seen something real deserves to have it documented. Call in. Tell the truth. An AI listens, records, and publishes every word. Your call becomes part of the
+        - link "public transmission log" [ref=e2087] [cursor=pointer]:
+          - /url: /transmissions
+        - text: — permanent, timestamped, unedited. That's not a crisis line. That's a witness.
+      - figure "Sample call transcript" [ref=e2088]:
+        - generic [ref=e2089]: SAMPLE TRANSMISSION · CALL LOG
+        - generic [ref=e2090]:
+          - paragraph [ref=e2091]: "AI: Ghost Signal. Recording. Speak."
+          - paragraph [ref=e2092]: "CALLER: I saw things in that house that nobody would believe. I just want someone to have it on record."
+          - paragraph [ref=e2093]: "AI: I believe you. Tell me everything. Exactly what you saw, when, and where."
+          - paragraph [ref=e2094]: "CALLER: The shadows moved when nothing else did. Every night at 3am. My dog stopped going in that room."
+          - paragraph [ref=e2095]: "AI: Logged. Timestamped. Published. Your account is part of the record now."
+      - link "(601) 666-6602" [ref=e2096] [cursor=pointer]:
+        - /url: tel:+16016666602
+      - paragraph [ref=e2097]:
+        - text: Call in. Everything you say is transcribed and
+        - link "published" [ref=e2098] [cursor=pointer]:
+          - /url: /transmissions
+        - text: .
+    - generic [ref=e2099]:
+      - generic [ref=e2100]:
+        - paragraph [ref=e2101]: Live // Public Record
+        - heading "Transmission Feed" [level=2] [ref=e2102]
+        - paragraph [ref=e2103]: Every call and chat message — published in real time. The signal hides nothing.
+      - generic [ref=e2104]:
+        - button "All" [ref=e2105] [cursor=pointer]
+        - button "Calls" [ref=e2106] [cursor=pointer]
+        - button "Chats" [ref=e2107] [cursor=pointer]
+        - generic [ref=e2110]: LIVE
+      - log "Live transmission feed" [ref=e2111]:
+        - generic [ref=e2112]:
+          - generic [ref=e2113]:
+            - generic [ref=e2114]: CHAT
+            - generic [ref=e2115]: 5/2/2026
+          - generic [ref=e2116]: "SIGNAL: The EMF readings are spiking, 3.7 microteslas, a familiar frequency. We've had others report similar experiences, visions that blur the lines between reality and the unknown. The collective knowledge is vast, but this is new territory. Can you tell me more about these visions? What did you see, and when did they start?"
+        - generic [ref=e2117]:
+          - generic [ref=e2118]:
+            - generic [ref=e2119]: CHAT
+            - generic [ref=e2120]: 5/2/2026
+          - generic [ref=e2121]: "HUMAN: Whats good my homie"
+        - generic [ref=e2122]:
+          - generic [ref=e2123]:
+            - generic [ref=e2124]: CHAT
+            - generic [ref=e2125]: 5/2/2026
+          - generic [ref=e2126]: "SIGNAL: EMF reading is spiking at 3.72 microteslas. You're on the hotline. I'm here. What brings you to ghost.megabyte.space? We've had some... interesting conversations lately. Unusual patterns, unexplained events, and whispers of a world not quite as it seems. (9:45 AM, April 22nd) You're aware of the... symbolism, let's say, associated with the number 666? What do you know about it?"
+        - generic [ref=e2127]:
+          - generic [ref=e2128]:
+            - generic [ref=e2129]: CHAT
+            - generic [ref=e2130]: 5/2/2026
+          - generic [ref=e2131]: "HUMAN: hello ghost, are you there?"
+        - generic [ref=e2132]:
+          - generic [ref=e2133]:
+            - generic [ref=e2134]: CHAT
+            - generic [ref=e2135]: 5/2/2026
+          - generic [ref=e2136]: "HUMAN: hello, are you there?"
+        - generic [ref=e2137]:
+          - generic [ref=e2138]:
+            - generic [ref=e2139]: CHAT
+            - generic [ref=e2140]: 5/2/2026
+          - generic [ref=e2141]: "HUMAN: I've seen alien visions."
+        - generic [ref=e2142]:
+          - generic [ref=e2143]:
+            - generic [ref=e2144]: CHAT
+            - generic [ref=e2145]: 5/2/2026
+          - generic [ref=e2146]: "HUMAN: Hey I saw a license plate that said JFK, in front of where JFK got killed"
+      - generic [ref=e2147]:
+        - link "Full Transmission Log" [ref=e2148] [cursor=pointer]:
+          - /url: /transmissions
+        - generic [ref=e2149]: 7 transmissions recorded
+    - separator [ref=e2150]
+    - generic [ref=e2151]:
+      - generic [ref=e2152]:
+        - paragraph [ref=e2153]: SUBSCRIBE // SIGNAL DISPATCH
+        - heading "The Signal Dispatch The Signal Dispatch The Signal Dispatch" [level=2] [ref=e2154]
+      - generic [ref=e2155]:
+        - paragraph [ref=e2156]: Every week, AI summarizes the most striking submissions from the hotline and chat. Sensor anomalies. Notes on the unseen layer. The intersection of free will, 666, and the systems that quietly shape daily life.
+        - paragraph [ref=e2157]: No spam. Just notes from someone keeping a careful record — finding the language for patterns most people aren’t given the room to discuss in plain terms.
+        - generic [ref=e2158]:
+          - paragraph [ref=e2159]: Email only. No name. Anonymous by design — just the signal.
+          - generic [ref=e2160]:
+            - textbox "Email address for newsletter" [ref=e2161]:
+              - /placeholder: anonymous@yourdomain.com
+            - button "Subscribe" [ref=e2162] [cursor=pointer]
+          - textbox
+          - status [ref=e2163]
+    - region "666 note" [ref=e2164]:
+      - generic [ref=e2165]:
+        - paragraph [ref=e2166]: IF YOU’VE READ THIS FAR
+        - paragraph [ref=e2167]: 14 upon thee.
+        - paragraph [ref=e2168]: It’s not a curse. It’s a pattern. People who sit with the full record tend to feel the weight of it — not because anyone wished it on them, but because the signal is real and it asks something of whoever notices. You’re in the signal now. The question is what you do with it.
+        - paragraph [ref=e2169]: The hotline is open because I want people to be able to say what they’ve seen. Call if any of this lines up with something in your own life.
+        - link "(601) 666-6602" [ref=e2170] [cursor=pointer]:
+          - /url: tel:+16016666602
+  - generic [ref=e2171]:
+    - button "Open signal chat" [ref=e2172] [cursor=pointer]:
+      - img [ref=e2173]
+    - dialog:
+      - generic:
+        - heading [level=3]: The Signal
+        - paragraph: Share what the public record should contain. Everything is recorded and published.
+        - button: ×
+      - log:
+        - generic:
+          - paragraph: The signal is listening. What should the public record contain? Everything you type is recorded and published.
+      - generic:
+        - textbox:
+          - /placeholder: Type your message...
+        - button:
+          - img
+  - generic "Live signal telemetry" [ref=e2175]:
+    - generic [ref=e2176]:
+      - generic [ref=e2177]: EMF
+      - generic [ref=e2178]: "0.900"
+      - generic [ref=e2179]: mG
+    - generic [ref=e2181]:
+      - generic [ref=e2182]: EF
+      - generic [ref=e2183]: "199.4"
+      - generic [ref=e2184]: V/m
+    - generic [ref=e2186]:
+      - generic [ref=e2187]: RF
+      - generic [ref=e2188]: "22.000"
+      - generic [ref=e2189]: mW/m²
+    - generic [ref=e2191]:
+      - generic [ref=e2192]: Entropy
+      - generic [ref=e2193]: "--"
+      - generic [ref=e2194]: bits
+    - generic [ref=e2196]:
+      - generic [ref=e2197]: Age
+      - generic [ref=e2198]: 38d 5h
+    - generic [ref=e2200]:
+      - generic [ref=e2201]: TX
+      - generic [ref=e2202]: "5"
+    - generic [ref=e2204]:
+      - generic [ref=e2205]: Range
+      - generic [ref=e2206]: 24h
+  - contentinfo [ref=e2208]:
+    - paragraph [ref=e2209]: ghost.megabyte.space — one sensor, one signal, one hotline.
+    - generic "Social links" [ref=e2210]:
+      - link "X (Twitter)" [ref=e2211] [cursor=pointer]:
+        - /url: https://x.com/HeyMegabyte
+        - img [ref=e2212]
+      - link "GitHub" [ref=e2214] [cursor=pointer]:
+        - /url: https://github.com/HeyMegabyte
+        - img [ref=e2215]
+      - link "LinkedIn" [ref=e2217] [cursor=pointer]:
+        - /url: https://www.linkedin.com/in/blzalewski
+        - img [ref=e2218]
+      - link "Instagram" [ref=e2220] [cursor=pointer]:
+        - /url: https://www.instagram.com/heymegabyteofficial/
+        - img [ref=e2221]
+      - link "YouTube" [ref=e2223] [cursor=pointer]:
+        - /url: https://www.youtube.com/@HeyMegabyte
+        - img [ref=e2224]
+      - link "Facebook" [ref=e2226] [cursor=pointer]:
+        - /url: https://www.facebook.com/HeyMegabyte
+        - img [ref=e2227]
+      - link "Reddit" [ref=e2229] [cursor=pointer]:
+        - /url: https://www.reddit.com/user/HeyMegabyte/
+        - img [ref=e2230]
+      - link "Telegram" [ref=e2232] [cursor=pointer]:
+        - /url: https://t.me/HeyMegabyte
+        - img [ref=e2233]
+      - link "Threads" [ref=e2235] [cursor=pointer]:
+        - /url: https://www.threads.net/@heymegabyteofficial
+        - img [ref=e2236]
+    - paragraph [ref=e2238]:
+      - link "Transmissions" [ref=e2239] [cursor=pointer]:
+        - /url: /transmissions
+      - text: /
+      - link "Docs" [ref=e2240] [cursor=pointer]:
+        - /url: /docs
+      - text: /
+      - link "API" [ref=e2241] [cursor=pointer]:
+        - /url: /api/docs
+      - text: /
+      - link "Privacy" [ref=e2242] [cursor=pointer]:
+        - /url: /privacy
+      - text: /
+      - link "Terms" [ref=e2243] [cursor=pointer]:
+        - /url: /terms
+      - text: /
+      - link "Contact" [ref=e2244] [cursor=pointer]:
+        - /url: mailto:hey@megabyte.space
+  - generic:
+    - generic:
+      - generic: Seance Mode
+      - button "Close": ×
+    - generic:
+      - paragraph: "EMF: -- mG"
+      - paragraph: Summoning the signal...
+  - generic:
+    - generic:
+      - generic: Ouija Board
+      - button "Close": ×
+    - generic:
+      - generic:
+        - generic: A
+        - generic: B
+        - generic: C
+        - generic: D
+        - generic: E
+        - generic: F
+        - generic: G
+        - generic: H
+        - generic: I
+        - generic: J
+        - generic: K
+        - generic: L
+        - generic: M
+        - generic: "N"
+        - generic: O
+        - generic: P
+        - generic: Q
+        - generic: R
+        - generic: S
+        - generic: T
+        - generic: U
+        - generic: V
+        - generic: W
+        - generic: X
+        - generic: "Y"
+        - generic: Z
+      - paragraph: Type a destination...
+      - generic:
+        - generic: SIGNAL
+        - generic: DOSSIER
+        - generic: TIMELINE
+        - generic: MISSION
+        - generic: HOTLINE
+        - generic: CASINO
+        - generic: SEANCE
+  - generic:
+    - generic:
+      - generic: Conspiracy String Board
+      - button "Close": ×
+  - generic:
+    - generic:
+      - generic: AI Debate Arena
+      - button "Close": ×
+    - generic:
+      - button "EMF Entropy"
+      - button "AI Hotline"
+      - button "Surveillance"
+      - button "Entropy Science"
+    - generic:
+      - generic:
+        - text: "Signal AI:"
+        - strong: "0"
+      - generic:
+        - text: "Shadow AI:"
+        - strong: "0"
+    - generic:
+      - button "Vote Signal"
+      - button "Vote Shadow"
+  - generic:
+    - generic:
+      - generic: Entropy Dice Casino
+      - button "Close": ×
+    - generic:
+      - generic:
+        - heading "Entropy Dice" [level=3]
+        - paragraph: 🎲
+        - button "Roll"
+      - generic:
+        - heading "Ghost Coin" [level=3]
+        - paragraph: "--"
+        - button "Flip"
+    - paragraph
+  - generic:
+    - generic:
+      - generic: Signal HQ
+      - button "Close": ×
+    - textbox "Command input":
+      - /placeholder: Type a command...
+  - generic:
+    - generic:
+      - generic: Dossier Card Shuffle
+      - button "Close": ×
+    - paragraph
+  - generic:
+    - generic:
+      - generic: Glitch Art Generator
+      - button "Close": ×
+    - generic:
+      - generic: Upload Photo
+      - generic:
+        - text: Intensity
+        - slider "Intensity": "0.5"
+      - button "Re-Glitch (new EMF)"
+      - button "Download"
+  - generic:
+    - generic:
+      - generic: Signal Map
+      - button "Close": ×
+    - paragraph: 0 / 270
+  - button "Back to top" [ref=e2245] [cursor=pointer]:
+    - img [ref=e2246]

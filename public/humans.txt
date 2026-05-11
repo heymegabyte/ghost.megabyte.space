@@ -1,7 +1,34 @@
 /* TEAM */
-Maintainer: ghost.megabyte.space
+Maintainer: Brian Zalewski
 Site: https://ghost.megabyte.space
+Contact: hey@megabyte.space
+GitHub: https://github.com/HeyMegabyte
+Twitter: https://x.com/HeyMegabyte
+LinkedIn: https://www.linkedin.com/in/blzalewski
+
+/* THANKS */
+Cloudflare — Workers, Pages, R2, D1, KV, Cache API
+Home Assistant — sensor pipeline
+GQ Electronics — EMF-390 hardware
+Twilio — voice hotline backbone
+Anthropic Claude — voice + chat AI
+Leaflet & CartoDB — celestial map
+xterm.js — MUD terminal
+The conspiracy theorists who turned out to be right
 
 /* SITE */
-Stack: Cloudflare Workers, Hono, Home Assistant, D1, KV
-Purpose: Public EMF feed and documentation
+Stack: Cloudflare Workers, Hono, TypeScript, D1, KV, Home Assistant, Twilio, Claude
+Standards: HTML5, WCAG 2.2 AA, OpenAPI 3.1, schema.org
+Doctrine: Radical truth. Public record. No sanitization.
+Last update: 2026-05-11
+
+         .
+       .'|`.
+     .'  |  `.
+   .'    |    `.
+ .'______|______`.
+        | | |
+        | | |
+        |_|_|
+       GHOST
+      // SIGNAL

@@ -13,8 +13,14 @@ export function getSecurityHeaders(pathname: string): Headers {
     "referrer-policy": "strict-origin-when-cross-origin",
     "x-content-type-options": "nosniff",
     "x-frame-options": "DENY",
-    "permissions-policy": "geolocation=(), microphone=(), camera=()",
-    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "permissions-policy":
+      "geolocation=(), microphone=(), camera=(), accelerometer=(self), gyroscope=(self), magnetometer=(), payment=(), usb=(), interest-cohort=()",
+    "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-site",
+    "origin-agent-cluster": "?1",
+    "x-permitted-cross-domain-policies": "none",
+    "x-dns-prefetch-control": "on",
   });
 
   if (pathname.startsWith("/api/docs")) {
@@ -31,7 +37,7 @@ export function getSecurityHeaders(pathname: string): Headers {
       "default-src 'self'",
       "base-uri 'self'",
       "frame-ancestors 'none'",
-      "img-src 'self' data: blob:",
+      "img-src 'self' data: blob: https://i.ytimg.com https://i9.ytimg.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com",
       "object-src 'none'",
       "frame-src https://www.google.com https://maps.google.com https://www.google.com/maps https://www.youtube-nocookie.com https://www.youtube.com",
       "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net",

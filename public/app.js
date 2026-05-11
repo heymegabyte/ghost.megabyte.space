@@ -26,6 +26,10 @@ const copySheetsStatusEl = $("copy-sheets-status");
 const copyRangeLinkEl = $("copy-range-link");
 const randomNumberEl = $("random-number");
 const randomMetaEl = $("random-meta");
+const chartSkeletonEl = $("chart-skeleton");
+const chartTooltipEl = $("chart-tooltip");
+const copyEntropyBtn = $("copy-entropy");
+const copyEntropyStatusEl = $("copy-entropy-status");
 const safetyNoteEl = $("safety-note");
 const timelineTrackEl = $("timeline-track");
 const timelineContainerEl = $("timeline-container");
@@ -118,13 +122,13 @@ function getPresetRange(preset) {
   return { start: start.toISOString(), end: now.toISOString() };
 }
 
-function setRange(preset, range) {
+function setRange(preset, range, { persist = false } = {}) {
   state.range = { preset, ...range };
-  if (historyStartEl) historyStartEl.value = formatInputDT(range.start);
-  if (historyEndEl) historyEndEl.value = formatInputDT(range.end);
+  if (historyStartEl && document.activeElement !== historyStartEl) historyStartEl.value = formatInputDT(range.start);
+  if (historyEndEl && document.activeElement !== historyEndEl) historyEndEl.value = formatInputDT(range.end);
   rangeButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.range === preset));
   if (teleRangeEl) teleRangeEl.textContent = preset === "custom" ? "custom" : preset;
-  updateRangeUrl();
+  if (persist) updateRangeUrl();
 }
 
 function refreshPreset() {
@@ -297,6 +301,25 @@ function drawChart(points) {
     ctx.beginPath(); ctx.arc(last.x, last.y, 5, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#FF174466";
     ctx.beginPath(); ctx.arc(last.x, last.y, 10, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Anomaly threshold (mean + 1σ)
+  const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const variance = vals.map((v) => (v - mean) ** 2).reduce((a, b) => a + b, 0) / vals.length;
+  const threshold = mean + Math.sqrt(variance);
+  if (threshold <= max) {
+    const ty = h - padBottom - ((threshold - min) / span) * (h - padTop - padBottom);
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,109,0,0.6)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(padLeft, ty); ctx.lineTo(w - padRight, ty); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(255,109,0,0.85)";
+    ctx.font = "8px 'JetBrains Mono', monospace";
+    ctx.textAlign = "right";
+    ctx.fillText(`ANOMALY +1σ ${threshold.toFixed(3)}`, w - padRight - 2, ty - 3);
+    ctx.restore();
   }
 
   // Y-axis value labels
@@ -505,13 +528,18 @@ async function loadCurrent() {
 }
 
 async function loadHistory() {
-  const res = await fetch(`/api/v1/ghost-emf/history?${rangeParams()}`, { headers: { accept: "application/json" } });
-  if (!res.ok) return;
-  const d = await res.json();
-  state.chartPoints = Array.isArray(d.points) ? d.points : [];
-  drawChart(state.chartPoints);
-  if (chartMetaEl)
-    chartMetaEl.textContent = `${d.displayPointCount} points from ${d.rawPointCount} samples.`;
+  if (chartSkeletonEl) { chartSkeletonEl.hidden = false; chartSkeletonEl.removeAttribute("aria-hidden"); }
+  try {
+    const res = await fetch(`/api/v1/ghost-emf/history?${rangeParams()}`, { headers: { accept: "application/json" } });
+    if (!res.ok) return;
+    const d = await res.json();
+    state.chartPoints = Array.isArray(d.points) ? d.points : [];
+    drawChart(state.chartPoints);
+    if (chartMetaEl)
+      chartMetaEl.textContent = `${d.displayPointCount} points from ${d.rawPointCount} samples.`;
+  } finally {
+    if (chartSkeletonEl) { chartSkeletonEl.hidden = true; chartSkeletonEl.setAttribute("aria-hidden", "true"); }
+  }
 }
 
 async function loadEntropy() {
@@ -659,8 +687,6 @@ function initAvatarSlideshow() {
       t.setAttribute("aria-selected", i === current ? "true" : "false");
     });
     if (counter) counter.textContent = `${current + 1} / ${total}`;
-    const activeThumb = thumbs[current];
-    if (activeThumb) activeThumb.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }
 
   function next() { goTo(current + 1); }
@@ -1358,6 +1384,104 @@ function initGalleryLightbox() {
   }
 }
 
+/* ── YouTube Facade ──
+   Progressive enhancement: <div class="yt-facade" data-yt="VIDEO_ID"
+        data-title="…" data-start="0" data-allow="…">
+   Renders a poster + play button, then swaps in the real iframe on click.
+   Falls back to plain anchor if JS is disabled (server-side <noscript> link). */
+function initYouTubeFacades() {
+  const facades = $$(".yt-facade");
+  if (!facades.length) return;
+
+  // hqdefault.jpg + mqdefault.jpg are guaranteed for every YouTube video.
+  // maxresdefault/sddefault only exist for HD uploads — probing them fires
+  // 404s in DevTools for SD/older videos, so we use the guaranteed tier.
+  const thumbCandidates = (id) => [
+    `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+    `https://i.ytimg.com/vi/${id}/mqdefault.jpg`,
+  ];
+
+  facades.forEach((facade) => {
+    const id = facade.dataset.yt;
+    if (!id) return;
+    const title = facade.dataset.title || "Play video";
+    const start = facade.dataset.start || "0";
+    const allow = facade.dataset.allow ||
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+
+    if (!facade.style.backgroundImage) {
+      const candidates = thumbCandidates(id);
+      const probe = (i) => {
+        if (i >= candidates.length) return;
+        const im = new Image();
+        im.onload = () => {
+          if (im.naturalWidth >= 320) {
+            facade.style.backgroundImage = `url("${candidates[i]}")`;
+          } else {
+            probe(i + 1);
+          }
+        };
+        im.onerror = () => probe(i + 1);
+        im.src = candidates[i];
+      };
+      probe(0);
+    }
+
+    if (!facade.querySelector(".yt-facade-play")) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "yt-facade-play";
+      btn.setAttribute("aria-label", `Play: ${title}`);
+      facade.appendChild(btn);
+    }
+    if (title && !facade.querySelector(".yt-facade-title")) {
+      const lbl = document.createElement("span");
+      lbl.className = "yt-facade-title";
+      lbl.textContent = title;
+      facade.appendChild(lbl);
+    }
+    facade.setAttribute("role", "button");
+    facade.setAttribute("tabindex", "0");
+    facade.setAttribute("aria-label", `Play: ${title}`);
+
+    const activate = () => {
+      if (facade.classList.contains("is-playing")) return;
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&start=${start}`;
+      iframe.title = title;
+      iframe.setAttribute("allow", allow);
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      iframe.loading = "eager";
+      facade.classList.add("is-playing");
+      facade.appendChild(iframe);
+    };
+
+    facade.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") return;
+      activate();
+    });
+    facade.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        activate();
+      }
+    });
+
+    // Warm the YT origin once the user mouses over — speeds up first play
+    let warmed = false;
+    facade.addEventListener("pointerover", () => {
+      if (warmed) return;
+      warmed = true;
+      const link = document.createElement("link");
+      link.rel = "preconnect";
+      link.href = "https://www.youtube-nocookie.com";
+      link.crossOrigin = "";
+      document.head.appendChild(link);
+    }, { once: true });
+  });
+}
+
 /* ── Live Transmission Feed ── */
 
 const feedStreamEl = $("feed-stream");
@@ -1490,9 +1614,8 @@ async function loadFeed(isPolling) {
 async function refreshAll() {
   try {
     refreshPreset();
-    await Promise.all([loadCurrent(), loadHistory(), loadEntropy()]);
+    await Promise.all([loadCurrent(), loadHistory(), loadEntropy(), loadTransmissionCount()]);
     loadSnapshotUtils().catch(() => {});
-    loadTransmissionCount().catch(() => {});
   } catch {
     if (currentStateEl) currentStateEl.textContent = "Signal not responding.";
     if (chartMetaEl) chartMetaEl.textContent = "Unable to load data.";
@@ -1502,6 +1625,61 @@ async function refreshAll() {
 /* ── Event Listeners ── */
 
 window.addEventListener("resize", () => drawChart(state.chartPoints));
+/* Prevent browser from restoring scroll position on reload/back-forward */
+history.scrollRestoration = 'manual';
+
+// Chart tooltip — mousemove on canvas
+if (chartCanvas) {
+  const canvasWrap = chartCanvas.closest(".chart-canvas-wrap") || chartCanvas.parentElement;
+
+  function showChartTooltip(e) {
+    if (!state.chartPoints.length || !chartTooltipEl) return;
+    const rect = chartCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const frac = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+
+    const vals = state.chartPoints.map((p) => p.value);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const span = Math.max(0.0001, max - min);
+    const rangeStart = new Date(state.range.start ?? state.chartPoints[0].timestamp).getTime();
+    const rangeEnd = new Date(state.range.end ?? state.chartPoints[state.chartPoints.length - 1].timestamp).getTime();
+    const tAtCursor = rangeStart + frac * (rangeEnd - rangeStart);
+    let nearest = state.chartPoints[0];
+    let bestDist = Infinity;
+    state.chartPoints.forEach((pt) => {
+      const d = Math.abs(new Date(pt.timestamp).getTime() - tAtCursor);
+      if (d < bestDist) { bestDist = d; nearest = pt; }
+    });
+
+    const ptFrac = (new Date(nearest.timestamp).getTime() - rangeStart) / Math.max(1, rangeEnd - rangeStart);
+    const xPct = ptFrac * 100;
+    const yFrac = (nearest.value - min) / span;
+
+    const label = new Date(nearest.timestamp).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    chartTooltipEl.innerHTML = `<span class="chart-tooltip-val">${nearest.value.toFixed(4)} mG</span><span class="chart-tooltip-time">${label}</span>`;
+    chartTooltipEl.style.left = `${Math.min(xPct, 88)}%`;
+    chartTooltipEl.style.top = `${Math.max(8, (1 - yFrac) * 80)}%`;
+    chartTooltipEl.removeAttribute("aria-hidden");
+    chartTooltipEl.style.opacity = "1";
+  }
+
+  function hideChartTooltip() {
+    if (!chartTooltipEl) return;
+    chartTooltipEl.style.opacity = "0";
+    chartTooltipEl.setAttribute("aria-hidden", "true");
+  }
+
+  chartCanvas.addEventListener("mousemove", showChartTooltip);
+  chartCanvas.addEventListener("touchmove", showChartTooltip, { passive: true });
+  chartCanvas.addEventListener("mouseleave", hideChartTooltip);
+  chartCanvas.addEventListener("touchend", hideChartTooltip);
+}
+
+// Service worker registration
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => {}); });
+}
+
 initOrbs();
 initWaveform();
 initScrollReveal();
@@ -1511,12 +1689,16 @@ initAvatarSlideshow();
 initPlateVault();
 initPlateLoupe();
 initGalleryLightbox();
+initYouTubeFacades();
+initHobbitAudio();
 
 if (document.body.dataset.page === "home") {
   Promise.all([loadMeta(), loadTimeline()])
     .then(() => {
       const r = parseInitialRange();
-      setRange(r.preset, { start: r.start, end: r.end });
+      const u = new URL(location.href);
+      const userPicked = u.searchParams.has("range") || (u.searchParams.has("start") && u.searchParams.has("end"));
+      setRange(r.preset, { start: r.start, end: r.end }, { persist: userPicked });
       return refreshAll();
     })
     .catch((err) => {
@@ -1529,7 +1711,7 @@ if (document.body.dataset.page === "home") {
     btn.addEventListener("click", async () => {
       const p = btn.dataset.range;
       if (!p) return;
-      setRange(p, getPresetRange(p));
+      setRange(p, getPresetRange(p), { persist: true });
       try {
         await Promise.all([loadHistory(), loadEntropy()]);
         loadSnapshotUtils().catch(() => {});
@@ -1545,7 +1727,7 @@ if (document.body.dataset.page === "home") {
       if (chartMetaEl) chartMetaEl.textContent = "Choose a valid start and end time.";
       return;
     }
-    setRange("custom", { start: s, end: en });
+    setRange("custom", { start: s, end: en }, { persist: true });
     try {
       await Promise.all([loadHistory(), loadEntropy()]);
       loadSnapshotUtils().catch(() => {});
@@ -1575,6 +1757,23 @@ if (document.body.dataset.page === "home") {
     }
   });
 
+  // Entropy copy button
+  copyEntropyBtn?.addEventListener("click", async () => {
+    const val = randomNumberEl?.textContent?.trim();
+    if (!val || val === "--") return;
+    try {
+      await navigator.clipboard.writeText(val);
+      if (copyEntropyStatusEl) copyEntropyStatusEl.textContent = "Copied.";
+      copyEntropyBtn.classList.add("is-copied");
+      setTimeout(() => {
+        if (copyEntropyStatusEl) copyEntropyStatusEl.textContent = "";
+        copyEntropyBtn.classList.remove("is-copied");
+      }, 1800);
+    } catch {
+      if (copyEntropyStatusEl) copyEntropyStatusEl.textContent = "Copy failed.";
+    }
+  });
+
   // Timeline: vertical, all events visible — no keyboard nav needed
 
   // Chat widget
@@ -1593,9 +1792,10 @@ if (document.body.dataset.page === "home") {
     sendChatMessage(msg);
   });
 
-  // Close chat on Escape
+  // Close chat on Escape, open on Cmd/Ctrl+K
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && state.chatOpen) toggleChat(false);
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); toggleChat(true); }
   });
 
   // Scroll-triggered dossier cards and emo ducks
@@ -1717,6 +1917,10 @@ if (document.body.dataset.page === "home") {
       if (!mudOpened) {
         term.open(mudXtermEl);
         mudOpened = true;
+        // xterm focuses its textarea on open — blur it without scrolling.
+        if (document.activeElement && document.activeElement !== document.body) {
+          document.activeElement.blur();
+        }
       }
       openSocket();
 
@@ -1740,21 +1944,23 @@ if (document.body.dataset.page === "home") {
       mudXtermEl.addEventListener("focusin", focusTerm);
       mudXtermEl.setAttribute("tabindex", "0");
       mudXtermEl.style.cursor = "text";
-      // Auto-focus once the terminal opens so keyboard input works without explicit click
-      setTimeout(focusTerm, 300);
     }
 
-    // Lazy-connect: only open TCP when terminal scrolls into view
-    const mudObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          connectMud();
-          mudObserver.disconnect();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    mudObserver.observe(mudXtermEl);
+    // Connect only after user has scrolled (never on fresh page load —
+    // term.open() focuses xterm's textarea which can scroll the page).
+    const startMudObserver = () => {
+      const mudObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            connectMud();
+            mudObserver.disconnect();
+          }
+        },
+        { rootMargin: "0px" },
+      );
+      mudObserver.observe(mudXtermEl);
+    };
+    window.addEventListener("scroll", startMudObserver, { passive: true, once: true });
 
     const mudReconnectBtn = $("mud-reconnect");
     mudReconnectBtn?.addEventListener("click", () => {
@@ -1766,30 +1972,54 @@ if (document.body.dataset.page === "home") {
     });
   }
 
-  // Newsletter form
+  // Newsletter form (email only — anonymous by design)
   const newsletterForm = $("newsletter-form");
   const newsletterEmail = $("newsletter-email");
+  const newsletterWebsite = $("newsletter-website");
+  const newsletterSubmit = $("newsletter-submit");
   const newsletterStatus = $("newsletter-status");
+  const setNewsletterState = (state, message) => {
+    if (!newsletterStatus) return;
+    newsletterStatus.dataset.state = state;
+    newsletterStatus.textContent = message;
+  };
   newsletterForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (newsletterWebsite?.value) return; // honeypot tripped
     const email = newsletterEmail?.value?.trim();
-    if (!email) return;
-    newsletterStatus.textContent = "Subscribing...";
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setNewsletterState("error", "Enter a valid email.");
+      newsletterEmail?.focus();
+      return;
+    }
+    if (newsletterSubmit) {
+      newsletterSubmit.disabled = true;
+      newsletterSubmit.dataset.label = newsletterSubmit.textContent;
+      newsletterSubmit.textContent = "Subscribing…";
+    }
+    setNewsletterState("pending", "Routing through the signal relay…");
     try {
       const res = await fetch("/api/v1/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        newsletterStatus.textContent = "Subscribed. The signal will find you.";
+        setNewsletterState("success", data.message || "Subscribed. The signal will find you.");
         newsletterEmail.value = "";
+      } else if (res.status === 429) {
+        setNewsletterState("error", "Too many attempts. Wait a minute and try again.");
       } else {
-        const data = await res.json().catch(() => ({}));
-        newsletterStatus.textContent = data.error || "Something went wrong. Try again.";
+        setNewsletterState("error", data.error || "Something went wrong. Try again.");
       }
     } catch {
-      newsletterStatus.textContent = "Network error. The signal is disrupted.";
+      setNewsletterState("error", "Network error. The signal is disrupted.");
+    } finally {
+      if (newsletterSubmit) {
+        newsletterSubmit.disabled = false;
+        newsletterSubmit.textContent = newsletterSubmit.dataset.label || "Subscribe";
+      }
     }
   });
 
@@ -1822,4 +2052,443 @@ if (document.body.dataset.page === "home") {
       if (teleAgeEl) teleAgeEl.textContent = age;
     }
   }, 60000);
+}
+
+/* ---------- Middle-Earth Map (ambient CSS-only — no JS needed) ---------- */
+function initMiddleEarthMap() {
+  return;
+}
+
+/* ---------- Hobbit Kettle Fire — Web Audio API (120fps cinematic) ---------- */
+function initHobbitAudio() {
+  const section   = document.getElementById('hobbits');
+  const playBtn   = document.getElementById('hobbit-play');
+  const canvas    = document.getElementById('hobbit-viz');
+  const embersDiv = document.getElementById('hobbit-embers');
+  const fillEl    = document.getElementById('hobbit-progress-fill');
+  const glowEl    = document.getElementById('hobbit-progress-glow');
+  const timeEl    = document.getElementById('hobbit-time');
+  const progOuter = document.getElementById('hobbit-progress-outer');
+  const badge     = document.getElementById('hobbit-badge');
+  const badgeText = document.getElementById('hobbit-badge-text');
+  const vuL       = document.getElementById('vu-fill-l');
+  const vuR       = document.getElementById('vu-fill-r');
+
+  if (!playBtn || !canvas) return;
+
+  const ctx2d = canvas.getContext('2d', { alpha: true });
+  let audioCtx, analyser, source, audio;
+  let isPlaying = false;
+  let rafId = null;
+  let idleRafId = null;
+  let t = 0;
+
+  // Fire color palette — sub-bass (deep red) through treble (white-gold)
+  const FIRE = ['#1a0400','#3d0800','#7a1200','#c42200','#ff3800','#ff6200','#ff8f00','#ffbc00','#ffd84d','#fff0a0'];
+
+  function fireColor(val) {
+    const i = Math.min(FIRE.length - 1, Math.floor(Math.max(0, val) * (FIRE.length - 1)));
+    return FIRE[i];
+  }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60);
+    return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  }
+
+  function syncCanvasSize() {
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight || 220;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w; canvas.height = h;
+    }
+  }
+
+  // Pre-baked ambient spectrum profile for idle state
+  // Mimics acoustic fire/kettle ambient: heavy bass, rolling mids, sparse treble
+  function makeIdleProfile(bins) {
+    return Array.from({ length: bins }, (_, i) => {
+      const p = i / bins;
+      let v;
+      if      (p < 0.04)  v = 0.82 + Math.random() * 0.16;  // sub-bass
+      else if (p < 0.10)  v = 0.68 + Math.random() * 0.22;  // bass
+      else if (p < 0.22)  v = 0.42 + Math.random() * 0.28;  // low-mid
+      else if (p < 0.40)  v = 0.24 + Math.random() * 0.22;  // mid
+      else if (p < 0.62)  v = 0.10 + Math.random() * 0.16;  // hi-mid
+      else                v = 0.02 + Math.random() * 0.08;   // treble
+      return v;
+    });
+  }
+
+  const IDLE_BINS = 128;
+  let idleProfile = makeIdleProfile(IDLE_BINS);
+  // Smooth the profile
+  idleProfile = idleProfile.map((v, i) => {
+    const neighbors = idleProfile.slice(Math.max(0, i - 2), i + 3);
+    return neighbors.reduce((a, b) => a + b, 0) / neighbors.length;
+  });
+
+  // Perlin-like noise for idle breathing
+  function noise(x) {
+    return (Math.sin(x * 1.7) + Math.sin(x * 3.1) + Math.sin(x * 0.4)) / 3;
+  }
+
+  function drawIdleFrame(timestamp) {
+    syncCanvasSize();
+    const W = canvas.width, H = canvas.height;
+    const ts = (timestamp || 0) * 0.0004;
+
+    ctx2d.clearRect(0, 0, W, H);
+
+    // Background gradient — deep ember glow
+    const bg = ctx2d.createLinearGradient(0, H, 0, 0);
+    bg.addColorStop(0, 'rgba(60,12,2,0.85)');
+    bg.addColorStop(0.4, 'rgba(20,6,2,0.6)');
+    bg.addColorStop(1, 'rgba(6,6,16,0.95)');
+    ctx2d.fillStyle = bg;
+    ctx2d.fillRect(0, 0, W, H);
+
+    // Subtle warm glow from bottom center
+    const glow = ctx2d.createRadialGradient(W / 2, H, 0, W / 2, H, H * 0.7);
+    glow.addColorStop(0, 'rgba(200,60,0,0.22)');
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx2d.fillStyle = glow;
+    ctx2d.fillRect(0, 0, W, H);
+
+    const barCount = IDLE_BINS;
+    const centerY  = H * 0.72;
+    const step     = W / barCount;
+    const barW     = Math.max(1, step - 1.2);
+
+    for (let i = 0; i < barCount; i++) {
+      // Breathing: each bar oscillates gently with unique phase
+      const breathe = 0.06 * noise(ts + i * 0.18);
+      const val = Math.max(0.01, Math.min(1, idleProfile[i] + breathe));
+      const barH = val * centerY * 0.94;
+      const x    = i * step;
+
+      // Bar gradient (bottom = deep red, top = gold/white)
+      const g = ctx2d.createLinearGradient(x, centerY - barH, x, centerY);
+      g.addColorStop(0, fireColor(Math.min(1, val + 0.15)));
+      g.addColorStop(0.55, fireColor(val * 0.75));
+      g.addColorStop(1, 'rgba(80,10,0,0.3)');
+      ctx2d.fillStyle = g;
+      ctx2d.globalAlpha = 0.82;
+      ctx2d.beginPath();
+      if (ctx2d.roundRect) ctx2d.roundRect(x, centerY - barH, barW, barH, [1.5, 1.5, 0, 0]);
+      else ctx2d.rect(x, centerY - barH, barW, barH);
+      ctx2d.fill();
+
+      // Reflection below centerline — dim mirror
+      if (barH > 2) {
+        const rH  = barH * 0.28;
+        const rg  = ctx2d.createLinearGradient(x, centerY, x, centerY + rH);
+        rg.addColorStop(0, `rgba(180,40,0,${val * 0.25})`);
+        rg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx2d.fillStyle = rg;
+        ctx2d.globalAlpha = 1;
+        ctx2d.fillRect(x, centerY, barW, rH);
+      }
+
+      // Peak cap dots on tall bars
+      if (val > 0.5) {
+        ctx2d.fillStyle = FIRE[FIRE.length - 1];
+        ctx2d.globalAlpha = (val - 0.5) * 0.9;
+        ctx2d.fillRect(x, centerY - barH - 2, barW, 2);
+      }
+    }
+    ctx2d.globalAlpha = 1;
+
+    // Static waveform — ambient sine-composite across top third
+    ctx2d.beginPath();
+    const wH  = H * 0.14;
+    const wY  = H * 0.22;
+    const wg  = ctx2d.createLinearGradient(0, 0, W, 0);
+    wg.addColorStop(0,   'rgba(255,180,60,0)');
+    wg.addColorStop(0.1, 'rgba(255,200,80,0.45)');
+    wg.addColorStop(0.5, 'rgba(255,230,120,0.6)');
+    wg.addColorStop(0.9, 'rgba(255,200,80,0.45)');
+    wg.addColorStop(1,   'rgba(255,180,60,0)');
+    ctx2d.strokeStyle = wg;
+    ctx2d.lineWidth = 1.5;
+    for (let x = 0; x <= W; x++) {
+      const p  = x / W;
+      const yn = (Math.sin(p * Math.PI * 6 + ts) * 0.4 + Math.sin(p * Math.PI * 2.3 + ts * 1.6) * 0.3 + Math.sin(p * Math.PI * 11 + ts * 0.5) * 0.08) * wH;
+      x === 0 ? ctx2d.moveTo(x, wY + yn) : ctx2d.lineTo(x, wY + yn);
+    }
+    ctx2d.stroke();
+
+    // Overlay info text
+    ctx2d.save();
+    ctx2d.font = '500 10px "JetBrains Mono", monospace';
+    ctx2d.letterSpacing = '0.1em';
+
+    // Frequency band zone labels in upper area
+    const zones = [
+      { label: 'SUB', x: W * 0.03 },
+      { label: 'BASS', x: W * 0.10 },
+      { label: 'LOW MID', x: W * 0.22 },
+      { label: 'MID', x: W * 0.40 },
+      { label: 'HI MID', x: W * 0.62 },
+      { label: 'TREBLE', x: W * 0.82 },
+    ];
+    zones.forEach(({ label, x }) => {
+      ctx2d.fillStyle = 'rgba(255,180,80,0.3)';
+      ctx2d.fillText(label, x, H * 0.10);
+    });
+
+    // Vertical zone dividers
+    [0.085, 0.19, 0.36, 0.56, 0.76].forEach(pct => {
+      ctx2d.strokeStyle = 'rgba(255,148,38,0.08)';
+      ctx2d.lineWidth = 0.5;
+      ctx2d.setLineDash([3, 6]);
+      ctx2d.beginPath();
+      ctx2d.moveTo(W * pct, H * 0.06);
+      ctx2d.lineTo(W * pct, H * 0.95);
+      ctx2d.stroke();
+    });
+    ctx2d.setLineDash([]);
+
+    // dB scale labels on right side
+    ctx2d.textAlign = 'right';
+    ['0 dB', '-12', '-24', '-36'].forEach((label, i) => {
+      const y = centerY * (0.05 + i * 0.32);
+      ctx2d.fillStyle = 'rgba(255,180,80,0.22)';
+      ctx2d.fillText(label, W - 6, y + 3);
+      ctx2d.strokeStyle = 'rgba(255,148,38,0.06)';
+      ctx2d.lineWidth = 0.5;
+      ctx2d.setLineDash([2, 8]);
+      ctx2d.beginPath();
+      ctx2d.moveTo(0, y); ctx2d.lineTo(W - 30, y);
+      ctx2d.stroke();
+      ctx2d.setLineDash([]);
+    });
+    ctx2d.restore();
+
+    // Scanlines
+    for (let y = 0; y < H; y += 3) {
+      ctx2d.fillStyle = 'rgba(0,0,0,0.03)';
+      ctx2d.fillRect(0, y, W, 1);
+    }
+
+    idleRafId = requestAnimationFrame(drawIdleFrame);
+  }
+
+  // ── Particle system ──
+  const particles = [];
+  function addParticles(energy, W, H) {
+    const n = Math.floor(energy * 10);
+    for (let i = 0; i < n; i++) {
+      particles.push({
+        x: W * (0.1 + Math.random() * 0.8),
+        y: H * 0.72,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: -(2 + Math.random() * 4) * energy,
+        life: 1,
+        decay: 0.014 + Math.random() * 0.018,
+        r: 1.5 + Math.random() * 3,
+      });
+    }
+  }
+
+  function updateParticles(W) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.vy *= 0.97; p.vx *= 0.98;
+      p.life -= p.decay;
+      if (p.life <= 0 || p.y < 0) { particles.splice(i, 1); continue; }
+      ctx2d.globalAlpha = p.life * 0.85;
+      ctx2d.fillStyle = fireColor(1 - p.life * 0.4);
+      ctx2d.beginPath();
+      ctx2d.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx2d.fill();
+    }
+    ctx2d.globalAlpha = 1;
+  }
+
+  // ── Live frame (playing) ──
+  function drawLiveFrame() {
+    rafId = requestAnimationFrame(drawLiveFrame);
+    t += 0.008;
+    syncCanvasSize();
+
+    const W = canvas.width, H = canvas.height;
+    const FFT = analyser.frequencyBinCount;
+    const freq = new Uint8Array(FFT);
+    const wave = new Uint8Array(FFT);
+    analyser.getByteFrequencyData(freq);
+    analyser.getByteTimeDomainData(wave);
+
+    const bass    = freq.slice(0, FFT >> 3).reduce((a, b) => a + b, 0) / (FFT >> 3) / 255;
+    const mid     = freq.slice(FFT >> 3, FFT >> 1).reduce((a, b) => a + b, 0) / (FFT * 3 / 8) / 255;
+    const treble  = freq.slice(FFT >> 1, (FFT * 3) >> 2).reduce((a, b) => a + b, 0) / (FFT >> 2) / 255;
+    const overall = bass * 0.6 + mid * 0.3 + treble * 0.1;
+
+    // Phosphor trail
+    ctx2d.fillStyle = `rgba(6,6,16,${0.22 + bass * 0.22})`;
+    ctx2d.fillRect(0, 0, W, H);
+
+    // Ember bg glow
+    const bgG = ctx2d.createRadialGradient(W / 2, H, H * 0.05, W / 2, H, H);
+    bgG.addColorStop(0, `rgba(${Math.round(110 + bass * 90)},${Math.round(25 + bass * 20)},0,${0.45 + bass * 0.4})`);
+    bgG.addColorStop(0.6, 'rgba(30,6,0,0.25)');
+    bgG.addColorStop(1, 'rgba(6,6,16,0)');
+    ctx2d.fillStyle = bgG;
+    ctx2d.fillRect(0, 0, W, H);
+
+    // Mirrored bars
+    const BARS = Math.min(128, FFT);
+    const centerY = H * 0.72;
+    const step = W / BARS;
+    for (let i = 0; i < BARS; i++) {
+      const raw  = freq[Math.floor(i * FFT / BARS)] / 255;
+      const hUp  = raw * centerY * 0.95;
+      const x    = i * step;
+      const barW = step - 1;
+      const g = ctx2d.createLinearGradient(x, centerY - hUp, x, centerY);
+      g.addColorStop(0, fireColor(Math.min(1, raw + 0.18)));
+      g.addColorStop(0.5, fireColor(raw * 0.7));
+      g.addColorStop(1, 'rgba(60,8,0,0.25)');
+      ctx2d.fillStyle = g;
+      ctx2d.beginPath();
+      if (ctx2d.roundRect) ctx2d.roundRect(x, centerY - hUp, barW, hUp, [2, 2, 0, 0]);
+      else ctx2d.rect(x, centerY - hUp, barW, hUp);
+      ctx2d.fill();
+      // Reflection
+      if (hUp > 2) {
+        const rg = ctx2d.createLinearGradient(x, centerY, x, centerY + hUp * 0.3);
+        rg.addColorStop(0, `rgba(160,35,0,${raw * 0.35})`);
+        rg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx2d.fillStyle = rg;
+        ctx2d.fillRect(x, centerY, barW, hUp * 0.3);
+      }
+      if (raw > 0.55) {
+        ctx2d.fillStyle = '#fff0a0';
+        ctx2d.globalAlpha = (raw - 0.55) * 1.4;
+        ctx2d.fillRect(x, centerY - hUp - 2, barW, 2);
+        ctx2d.globalAlpha = 1;
+      }
+    }
+
+    // Waveform
+    ctx2d.beginPath();
+    ctx2d.lineWidth = 1.5 + overall * 2;
+    const wg = ctx2d.createLinearGradient(0, 0, W, 0);
+    wg.addColorStop(0,   'rgba(255,180,50,0)');
+    wg.addColorStop(0.1, `rgba(255,200,80,${0.5 + overall * 0.4})`);
+    wg.addColorStop(0.5, `rgba(255,240,160,${0.65 + overall * 0.3})`);
+    wg.addColorStop(0.9, `rgba(255,200,80,${0.5 + overall * 0.4})`);
+    wg.addColorStop(1,   'rgba(255,180,50,0)');
+    ctx2d.strokeStyle = wg;
+    const waveH = H * 0.16, waveY = H * 0.2;
+    for (let i = 0; i < FFT; i++) {
+      const x = (i / FFT) * W;
+      const y = waveY + ((wave[i] - 128) / 128) * waveH;
+      i === 0 ? ctx2d.moveTo(x, y) : ctx2d.lineTo(x, y);
+    }
+    ctx2d.stroke();
+
+    // Bass pulse ring
+    if (bass > 0.4) {
+      const ring = ctx2d.createRadialGradient(W / 2, centerY, 10 + bass * 50, W / 2, centerY, 20 + bass * 100);
+      ring.addColorStop(0, `rgba(255,100,0,${(bass - 0.4) * 1.2})`);
+      ring.addColorStop(1, 'rgba(255,60,0,0)');
+      ctx2d.fillStyle = ring;
+      ctx2d.beginPath();
+      ctx2d.arc(W / 2, centerY, 20 + bass * 100, 0, Math.PI * 2);
+      ctx2d.fill();
+    }
+
+    // Scanlines
+    for (let y = 0; y < H; y += 3) {
+      ctx2d.fillStyle = 'rgba(0,0,0,0.03)';
+      ctx2d.fillRect(0, y, W, 1);
+    }
+
+    // Particles
+    if (overall > 0.28 && Math.random() < 0.5) addParticles(overall, W, H);
+    updateParticles(W);
+
+    // VU meters
+    if (vuL) vuL.style.width = `${Math.min(100, bass * 160 + mid * 40)}%`;
+    if (vuR) vuR.style.width = `${Math.min(100, bass * 150 + mid * 50 + Math.random() * 5)}%`;
+
+    // Section beat
+    if (section) section.dataset.beat = bass > 0.5 ? '1' : '0';
+
+    // Progress
+    if (audio && audio.duration && Math.random() < 0.12) {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      if (fillEl) fillEl.style.width = `${pct}%`;
+      if (glowEl) glowEl.style.width = `${pct}%`;
+      if (progOuter) progOuter.setAttribute('aria-valuenow', Math.round(pct));
+      if (timeEl) timeEl.textContent = formatTime(audio.currentTime);
+    }
+  }
+
+  async function setupAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser  = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.88;
+    analyser.minDecibels = -90;
+    analyser.maxDecibels = -10;
+
+    audio = new Audio('/hobbit-kettle-fire.mp3');
+    audio.crossOrigin = 'anonymous';
+    audio.loop = true;
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  async function play() {
+    cancelAnimationFrame(idleRafId);
+    idleRafId = null;
+    ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+
+    await setupAudio();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    audio.play();
+    isPlaying = true;
+    playBtn.setAttribute('aria-pressed', 'true');
+    playBtn.querySelector('.hobbit-play-icon svg').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    if (badge) badge.classList.add('is-live');
+    if (badgeText) badgeText.textContent = 'LIVE';
+    if (!rafId) drawLiveFrame();
+  }
+
+  function pause() {
+    if (audio) audio.pause();
+    isPlaying = false;
+    cancelAnimationFrame(rafId);
+    rafId = null;
+    playBtn.setAttribute('aria-pressed', 'false');
+    playBtn.querySelector('.hobbit-play-icon svg').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    if (badge) badge.classList.remove('is-live');
+    if (badgeText) badgeText.textContent = 'PAUSED';
+    if (section) section.dataset.beat = '0';
+    if (vuL) vuL.style.width = '0%';
+    if (vuR) vuR.style.width = '0%';
+    ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+    idleRafId = requestAnimationFrame(drawIdleFrame);
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (isPlaying) pause(); else play();
+  });
+
+  if (progOuter) {
+    progOuter.addEventListener('click', (e) => {
+      if (!audio || !audio.duration) return;
+      const rect = progOuter.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    });
+  }
+
+  // Start idle visualization immediately on init
+  syncCanvasSize();
+  idleRafId = requestAnimationFrame(drawIdleFrame);
 }

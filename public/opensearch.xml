@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Ghost Signal</ShortName>
+  <Description>Search The Ghost Signal — public EMF sensor and AI hotline records.</Description>
+  <Tags>emf entropy ghost signal hotline paranormal</Tags>
+  <Contact>hey@megabyte.space</Contact>
+  <Url type="text/html" template="https://ghost.megabyte.space/?q={searchTerms}"/>
+  <Image height="32" width="32" type="image/png">https://ghost.megabyte.space/favicon-32x32.png?v=20260501-ghost</Image>
+  <Image height="16" width="16" type="image/png">https://ghost.megabyte.space/favicon-16x16.png?v=20260501-ghost</Image>
+  <InputEncoding>UTF-8</InputEncoding>
+  <SearchForm>https://ghost.megabyte.space/</SearchForm>
+</OpenSearchDescription>

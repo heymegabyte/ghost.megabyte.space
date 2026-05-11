@@ -1,4 +1,10 @@
 Contact: mailto:hey@megabyte.space
+Contact: https://github.com/HeyMegabyte
 Expires: 2027-04-23T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://ghost.megabyte.space/.well-known/security.txt
+Policy: https://ghost.megabyte.space/privacy
+Acknowledgments: https://ghost.megabyte.space/humans.txt
+Hiring: https://megabyte.space
+# Responsible disclosure welcomed. Reproducible PoC appreciated.
+# Out of scope: rate limits, missing headers without exploit, theoretical issues.
