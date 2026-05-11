@@ -2023,16 +2023,19 @@ if (document.body.dataset.page === "home") {
     }
   });
 
-  // Feed
-  loadFeed(false).catch(() => {});
-  feedFilterButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      feedState.filter = btn.dataset.feed;
-      feedFilterButtons.forEach((b) => b.classList.toggle("is-active", b === btn));
-      applyFeedFilter();
+  // Feed — only wired when a standalone feed-stream exists. Merged Transmission Log
+  // (transmissions.js) owns feed-total + feed-status when there is no feed-stream.
+  if (feedStreamEl) {
+    loadFeed(false).catch(() => {});
+    feedFilterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        feedState.filter = btn.dataset.feed;
+        feedFilterButtons.forEach((b) => b.classList.toggle("is-active", b === btn));
+        applyFeedFilter();
+      });
     });
-  });
-  setInterval(() => loadFeed(true).catch(() => {}), 5000);
+    setInterval(() => loadFeed(true).catch(() => {}), 5000);
+  }
 
   // Auto-refresh
   setInterval(() => loadCurrent().catch(() => {}), 2000);

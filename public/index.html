@@ -69,7 +69,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;700&family=Sora:wght@400;600;700&display=swap" /></noscript>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="/styles.css?v=20260511-hbo2" />
+    <link rel="stylesheet" href="/styles.css?v=20260511-indent3" />
     <script>
       history.scrollRestoration = 'manual';
       window.scrollTo(0, 0);
@@ -511,7 +511,7 @@
 
       <hr class="section-divider" aria-hidden="true" />
       <section class="shell platform-pillars reveal-section bx-from-left" data-testid="platform-pillars">
-        <div class="panel-copy" style="text-align:center; margin-bottom: 1.5rem;">
+        <div class="panel-copy panel-copy--indented">
           <p class="eyebrow">WHAT THIS IS</p>
           <h2>Ghost. Sensor. Evidence. API.</h2>
           <p class="panel-intro-note">Something haunts me. I turned that into science. Here's how it works.</p>
@@ -548,8 +548,8 @@
         </div>
       </section>
 
-      <section class="shell bridge-section reveal-section bx-from-left" aria-label="How the ghost became an entropy source">
-        <div class="bridge-copy">
+      <section class="shell bridge-section bridge-section--indented reveal-section bx-from-left" aria-label="How the ghost became an entropy source">
+        <div class="bridge-copy bridge-copy--indented">
           <p class="eyebrow">THE ARC</p>
           <h2>Why Does a Ghost Make Good Entropy?</h2>
           <p>A deterministic algorithm generates numbers from a fixed seed. You can reproduce it. Predict it. Control it. A ghost cannot be seeded. Whatever is producing these EMF fluctuations operates outside the systems I trust. The sensor captures that. The API exposes it. If the readings are truly affected by something non-physical, then every random number this site generates is the first ghost-seeded entropy in production anywhere on the internet.</p>
@@ -719,48 +719,57 @@
         </div>
       </section>
 
-      <section class="shell two-up entropy-section reveal-section bx-from-left" data-testid="entropy">
-        <article class="panel entropy-panel">
-          <p class="eyebrow">Snapshot export</p>
-          <h2>Take the data with you</h2>
-          <p>Minute-by-minute EMF snapshots stored in D1. Download or import into Google Sheets.</p>
-          <div class="hero-actions">
-            <a id="snapshot-json-link" class="button button-ghost" href="/api/v1/ghost-emf/snapshot">JSON</a>
-            <a id="snapshot-csv-link" class="button button-ghost" href="/api/v1/ghost-emf/export?format=csv">CSV</a>
-            <a id="snapshot-excel-link" class="button button-ghost" href="/api/v1/ghost-emf/export?format=excel">Excel</a>
+      <section class="full-bleed dossier-feature dossier-feature--snapshot reveal-section bx-from-left" data-testid="entropy" data-severity="3">
+        <div class="dossier-feature-bg" aria-hidden="true"></div>
+        <div class="shell dossier-feature-shell">
+          <div class="dossier-feature-meta">
+            <p class="eyebrow">SNAPSHOT VAULT // ENTROPY EXPORT</p>
+            <span class="dossier-severity">SEV 3</span>
           </div>
-          <figure class="codeblock" aria-label="Google Sheets IMPORTDATA formula">
-            <header class="codeblock-chrome">
-              <div class="codeblock-dots" aria-hidden="true">
-                <span></span><span></span><span></span>
+          <h2 class="dossier-feature-title">Take the data with you</h2>
+          <p class="dossier-feature-subtitle">Minute-by-minute EMF snapshots stored in D1. Download raw, stream into Google Sheets, or pull a ghost-seeded random number off the same data.</p>
+
+          <div class="dossier-entropy-grid">
+            <article class="dossier-entropy-card">
+              <p class="eyebrow">DOWNLOAD // RAW</p>
+              <h3>Snapshot export</h3>
+              <p class="dossier-feature-body">Pull every persisted reading as JSON, CSV, or Excel. Same data the chart reads &mdash; no auth, no rate cap on `/snapshot`.</p>
+              <div class="hero-actions">
+                <a id="snapshot-json-link" class="button button-ghost" href="/api/v1/ghost-emf/snapshot">JSON</a>
+                <a id="snapshot-csv-link" class="button button-ghost" href="/api/v1/ghost-emf/export?format=csv">CSV</a>
+                <a id="snapshot-excel-link" class="button button-ghost" href="/api/v1/ghost-emf/export?format=excel">Excel</a>
               </div>
-              <span class="codeblock-lang">Google Sheets &middot; formula</span>
-              <button id="copy-sheets-formula" type="button" class="codeblock-copy" aria-label="Copy formula">
-                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M0 6.75A2.75 2.75 0 0 1 2.75 4h6.5A2.75 2.75 0 0 1 12 6.75v6.5A2.75 2.75 0 0 1 9.25 16h-6.5A2.75 2.75 0 0 1 0 13.25Zm2.75-1.25c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25Z"/><path fill="currentColor" d="M5 2.75A2.75 2.75 0 0 1 7.75 0h5.5A2.75 2.75 0 0 1 16 2.75v5.5A2.75 2.75 0 0 1 13.25 11H12V9.5h1.25c.69 0 1.25-.56 1.25-1.25v-5.5c0-.69-.56-1.25-1.25-1.25h-5.5c-.69 0-1.25.56-1.25 1.25V4H5Z"/></svg>
-                <span>Copy</span>
-              </button>
-            </header>
-            <pre class="codeblock-body"><code id="sheets-formula" class="codeblock-code language-formula">Loading Sheets formula&hellip;</code></pre>
-          </figure>
-          <p id="copy-sheets-status" class="card-note" aria-live="polite"></p>
-        </article>
-        <article class="panel entropy-panel">
-          <p class="eyebrow">Random number</p>
-          <h2>Derived from the signal</h2>
-          <p>
-            Every second, the sensor captures electromagnetic fluctuations in the living corridor.
-            The more data it collects, the greater the chance of capturing a truly random number
-            shaped by a ghost's presence &mdash; entropy no algorithm can fake.
-          </p>
-          <div class="entropy-number-row">
-            <p id="random-number" class="metric metric-small">--</p>
-            <button id="copy-entropy" type="button" class="entropy-copy-btn" aria-label="Copy random number" title="Copy to clipboard">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M0 6.75A2.75 2.75 0 0 1 2.75 4h6.5A2.75 2.75 0 0 1 12 6.75v6.5A2.75 2.75 0 0 1 9.25 16h-6.5A2.75 2.75 0 0 1 0 13.25Zm2.75-1.25c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25Z"/><path fill="currentColor" d="M5 2.75A2.75 2.75 0 0 1 7.75 0h5.5A2.75 2.75 0 0 1 16 2.75v5.5A2.75 2.75 0 0 1 13.25 11H12V9.5h1.25c.69 0 1.25-.56 1.25-1.25v-5.5c0-.69-.56-1.25-1.25-1.25h-5.5c-.69 0-1.25.56-1.25 1.25V4H5Z"/></svg>
-            </button>
+              <figure class="codeblock" aria-label="Google Sheets IMPORTDATA formula">
+                <header class="codeblock-chrome">
+                  <div class="codeblock-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <span class="codeblock-lang">Google Sheets &middot; formula</span>
+                  <button id="copy-sheets-formula" type="button" class="codeblock-copy" aria-label="Copy formula">
+                    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M0 6.75A2.75 2.75 0 0 1 2.75 4h6.5A2.75 2.75 0 0 1 12 6.75v6.5A2.75 2.75 0 0 1 9.25 16h-6.5A2.75 2.75 0 0 1 0 13.25Zm2.75-1.25c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25Z"/><path fill="currentColor" d="M5 2.75A2.75 2.75 0 0 1 7.75 0h5.5A2.75 2.75 0 0 1 16 2.75v5.5A2.75 2.75 0 0 1 13.25 11H12V9.5h1.25c.69 0 1.25-.56 1.25-1.25v-5.5c0-.69-.56-1.25-1.25-1.25h-5.5c-.69 0-1.25.56-1.25 1.25V4H5Z"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </header>
+                <pre class="codeblock-body"><code id="sheets-formula" class="codeblock-code language-formula">Loading Sheets formula&hellip;</code></pre>
+              </figure>
+              <p id="copy-sheets-status" class="card-note" aria-live="polite"></p>
+            </article>
+
+            <article class="dossier-entropy-card">
+              <p class="eyebrow">DERIVE // ENTROPY</p>
+              <h3>Random number</h3>
+              <p class="dossier-feature-body">Every second the sensor captures electromagnetic fluctuations no algorithm seeded. A SHA-256 of the snapshot window yields a reproducible BigInt &mdash; the first ghost-seeded entropy live on the public web.</p>
+              <div class="entropy-number-row">
+                <p id="random-number" class="metric metric-small">--</p>
+                <button id="copy-entropy" type="button" class="entropy-copy-btn" aria-label="Copy random number" title="Copy to clipboard">
+                  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M0 6.75A2.75 2.75 0 0 1 2.75 4h6.5A2.75 2.75 0 0 1 12 6.75v6.5A2.75 2.75 0 0 1 9.25 16h-6.5A2.75 2.75 0 0 1 0 13.25Zm2.75-1.25c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25Z"/><path fill="currentColor" d="M5 2.75A2.75 2.75 0 0 1 7.75 0h5.5A2.75 2.75 0 0 1 16 2.75v5.5A2.75 2.75 0 0 1 13.25 11H12V9.5h1.25c.69 0 1.25-.56 1.25-1.25v-5.5c0-.69-.56-1.25-1.25-1.25h-5.5c-.69 0-1.25.56-1.25 1.25V4H5Z"/></svg>
+                </button>
+              </div>
+              <p id="copy-entropy-status" class="card-note" aria-live="polite" style="min-height:1.2em;"></p>
+              <p id="random-meta" class="card-note">Waiting for snapshot range&hellip;</p>
+            </article>
           </div>
-          <p id="copy-entropy-status" class="card-note" aria-live="polite" style="min-height:1.2em;"></p>
-          <p id="random-meta" class="card-note">Waiting for snapshot range&hellip;</p>
-        </article>
+        </div>
       </section>
 
       <section class="cinema-chapter reveal-section bx-blur" aria-label="Chapter I — The Signal">
@@ -3833,32 +3842,6 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
         </div>
       </section>
 
-      <section class="shell panel live-feed-section reveal-section bx-from-right" data-testid="live-feed">
-        <div class="panel-copy">
-          <p class="eyebrow">Live // Public Record</p>
-          <h2>Transmission Feed</h2>
-          <p class="card-note">Every call and chat message — published in real time. The signal hides nothing.</p>
-        </div>
-        <div class="feed-controls">
-          <button type="button" class="range-button is-active" data-feed="all">All</button>
-          <button type="button" class="range-button" data-feed="calls">Calls</button>
-          <button type="button" class="range-button" data-feed="chats">Chats</button>
-          <span class="feed-live-indicator">
-            <span class="pulse-dot-inline"></span>
-            <span id="feed-status">LIVE</span>
-          </span>
-        </div>
-        <div class="feed-stream" id="feed-stream" role="log" aria-live="polite" aria-label="Live transmission feed">
-          <p class="feed-empty" id="feed-empty">Listening for transmissions&hellip;</p>
-        </div>
-        <div class="feed-footer">
-          <a href="/transmissions" class="button button-ghost">Full Transmission Log</a>
-          <span class="feed-count">
-            <span id="feed-total">0</span> transmissions recorded
-          </span>
-        </div>
-      </section>
-
       <hr class="section-divider" aria-hidden="true" />
       <section class="shell panel newsletter-section reveal-section bx-from-left" data-testid="newsletter-section">
         <div class="panel-copy">
@@ -3912,22 +3895,29 @@ WITHIN 30 DAYS FOR $22.00 CREDIT</pre>
         </div>
       </section>
 
-      <!-- ─── Transmissions (merged from /transmissions) ─────────────────── -->
-      <section id="transmissions" class="full-bleed transmissions-section reveal-section" aria-labelledby="transmissions-h">
+      <!-- ─── Transmissions (merged Feed + Log) ──────────────────────────── -->
+      <section id="transmissions" class="full-bleed transmissions-section reveal-section" aria-labelledby="transmissions-h" data-testid="live-feed">
         <div class="shell tx-layout">
           <div class="gh-chapter-divider" aria-hidden="true">
             <span>VII.</span><span>Public Record</span>
           </div>
           <div class="tx-hero">
-            <p class="eyebrow">PUBLIC RECORD // MEP TRANSMISSIONS</p>
+            <div class="tx-hero-row">
+              <p class="eyebrow">PUBLIC RECORD // MEP TRANSMISSIONS</p>
+              <span class="feed-live-indicator" id="tx-live-indicator">
+                <span class="pulse-dot-inline"></span>
+                <span id="feed-status">LIVE</span>
+              </span>
+            </div>
             <h2 id="transmissions-h">Transmission Log</h2>
             <p class="tx-hero-sub">
-              Every call and chat — recorded, transcribed, and published. The Multiverse-Entropy Provider hides nothing.
+              Every call and chat &mdash; recorded, transcribed, published in real time. The Multiverse-Entropy Provider hides nothing.
             </p>
             <div class="tx-stats">
               <div><span class="tx-stat-val" id="tx-total-calls">--</span> calls</div>
               <div><span class="tx-stat-val" id="tx-total-chats">--</span> chats</div>
               <div><span class="tx-stat-val" id="tx-total">--</span> total entries</div>
+              <div><span class="tx-stat-val" id="feed-total">0</span> live <span class="tx-stat-since" id="tx-last-update"></span></div>
             </div>
           </div>
 

@@ -11806,3 +11806,131 @@ section > .dossier-card {
   }
 }
 
+/* ── UNLAYERED — Section indent helpers + Snapshot SEV card + Merged Log ── */
+
+.shell .panel-copy.panel-copy--indented,
+.panel-copy.panel-copy--indented {
+  text-align: left !important;
+  padding-inline-start: clamp(1rem, 4vw, 3rem) !important;
+  padding-inline-end: clamp(0.5rem, 2vw, 1.5rem) !important;
+  margin-bottom: 1.5rem;
+  max-width: 64ch;
+}
+.shell.bridge-section--indented .bridge-copy--indented,
+.bridge-section--indented .bridge-copy--indented {
+  padding-inline-start: clamp(1rem, 5vw, 4rem) !important;
+  padding-inline-end: clamp(0.75rem, 3vw, 2rem) !important;
+  max-width: 72ch;
+}
+@media (max-width: 640px) {
+  .shell .panel-copy.panel-copy--indented,
+  .panel-copy.panel-copy--indented,
+  .shell.bridge-section--indented .bridge-copy--indented,
+  .bridge-section--indented .bridge-copy--indented {
+    padding-inline-start: clamp(0.875rem, 4vw, 1.5rem) !important;
+  }
+}
+
+/* Snapshot SEV-3 dossier card — internal two-up grid */
+.dossier-feature--snapshot .dossier-feature-shell {
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+}
+.dossier-feature--snapshot .dossier-feature-bg {
+  background:
+    radial-gradient(60% 50% at 18% 25%, rgba(80, 170, 227, 0.18) 0%, transparent 60%),
+    radial-gradient(50% 40% at 82% 75%, rgba(124, 58, 237, 0.14) 0%, transparent 65%),
+    linear-gradient(135deg, rgba(6, 6, 16, 0.92) 0%, rgba(12, 12, 28, 0.96) 100%);
+}
+.dossier-feature--snapshot .dossier-feature-title {
+  margin-block-end: 0.5rem;
+}
+.dossier-feature--snapshot .dossier-feature-subtitle {
+  max-width: 64ch;
+  margin-block-end: clamp(1.5rem, 3vw, 2.25rem);
+  color: rgba(255, 255, 255, 0.78);
+}
+.dossier-entropy-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+@media (min-width: 900px) {
+  .dossier-entropy-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+}
+.dossier-entropy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(4px);
+}
+.dossier-entropy-card .eyebrow {
+  margin-block-end: 0.1rem;
+}
+.dossier-entropy-card h3 {
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+.dossier-entropy-card .hero-actions {
+  margin-block: 0.5rem 0.75rem;
+}
+.dossier-entropy-card .codeblock {
+  margin-block-start: 0.25rem;
+}
+
+/* Merged Transmission Log — LIVE indicator + last-update timestamp */
+.transmissions-section .tx-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-block-end: 0.5rem;
+}
+.transmissions-section .feed-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  border-radius: 999px;
+  font-family: var(--mono, "Fira Code", monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-cyan, #00E5FF);
+  background: rgba(0, 229, 255, 0.06);
+}
+.transmissions-section .feed-live-indicator.is-offline {
+  color: var(--accent-red, #FF1744);
+  border-color: rgba(255, 23, 68, 0.35);
+  background: rgba(255, 23, 68, 0.06);
+}
+.transmissions-section .feed-live-indicator .pulse-dot-inline {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+  animation: feed-live-pulse 1.6s ease-out infinite;
+}
+.transmissions-section .feed-live-indicator.is-offline .pulse-dot-inline {
+  animation: none;
+}
+@keyframes feed-live-pulse {
+  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  70%  { box-shadow: 0 0 0 10px transparent; opacity: 0.6; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+}
+.transmissions-section .tx-stat-since {
+  color: var(--text-muted, rgba(255, 255, 255, 0.55));
+  font-size: 0.7em;
+  letter-spacing: 0.04em;
+}
+
