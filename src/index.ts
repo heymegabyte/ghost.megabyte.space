@@ -34,6 +34,7 @@
  *  - `POST /api/v1/debate` — Anthropic-backed debate endpoint.
  *  - `POST /api/v1/newsletter/subscribe` — Listmonk passthrough.
  *  - `POST /api/v1/listmonk/webhook` — HMAC-verified ingestion → D1 + PostHog.
+ *  - `GET  /api/v1/email/health` — suppression count + 24h event volume + PostHog wiring status.
  *
  * Static + redirect surface:
  *  - `GET /transmissions` → 301 → `/#transmissions`.
@@ -1374,6 +1375,12 @@ app.post("/api/v1/listmonk/webhook", async (c) => {
   const signature = c.req.header("x-listmonk-signature") ?? c.req.header("X-Listmonk-Signature") ?? null;
   const verified = await verifyListmonkSignature(rawBody, signature, secret);
   if (!verified) {
+    console.warn("listmonk_webhook_unauthorized", {
+      ip: c.req.header("cf-connecting-ip") ?? null,
+      ua: c.req.header("user-agent") ?? null,
+      hasSignature: signature !== null,
+      bodyBytes: rawBody.length,
+    });
     return c.json({ error: "Invalid signature.", code: "UNAUTHORIZED" }, 401);
   }
 
@@ -1398,6 +1405,112 @@ app.post("/api/v1/listmonk/webhook", async (c) => {
     const message = err instanceof Error ? err.message : String(err);
     console.error("listmonk_webhook_exception", { message });
     return c.json({ error: "Webhook ingestion failed.", code: "INGEST_FAILED" }, 500);
+  }
+});
+
+/**
+ * Operational health surface for the email pipeline. Surfaces:
+ *  - `suppressions` — total rows in `email_suppressions`.
+ *  - `eventsLast24h` — count of `email_events` received in the last 24 hours.
+ *  - `lastEventAt` — most recent `received_at` (null when ledger empty).
+ *  - `posthogWired` — whether `POSTHOG_API_KEY` is bound.
+ *  - `webhookSecretWired` — whether `LISTMONK_WEBHOOK_SECRET` is bound.
+ *  - `dbBound` — whether `EMF_DB` is bound.
+ *
+ * Returns `503` when `EMF_DB` is unbound so a single GET acts as both a
+ * monitor probe and a wiring sanity-check during rollout of the 14-pipeline
+ * email-automation surface.
+ */
+app.get("/api/v1/email/health", async (c) => {
+  const posthogWired = Boolean(c.env.POSTHOG_API_KEY);
+  const webhookSecretWired = Boolean(c.env.LISTMONK_WEBHOOK_SECRET);
+  const dbBound = Boolean(c.env.EMF_DB);
+
+  if (!c.env.EMF_DB) {
+    return c.json(
+      {
+        ok: false,
+        code: "DB_UNBOUND",
+        dbBound,
+        posthogWired,
+        webhookSecretWired,
+        suppressions: null,
+        eventsLast24h: null,
+        lastEventAt: null,
+      },
+      503,
+    );
+  }
+
+  try {
+    const tableCheck = await c.env.EMF_DB
+      .prepare(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('email_events','email_suppressions')",
+      )
+      .all<{ name: string }>();
+    const presentTables = new Set((tableCheck.results ?? []).map((r) => r.name));
+    const migrationApplied =
+      presentTables.has("email_events") && presentTables.has("email_suppressions");
+
+    if (!migrationApplied) {
+      return c.json(
+        {
+          ok: false,
+          code: "MIGRATION_PENDING",
+          dbBound,
+          posthogWired,
+          webhookSecretWired,
+          presentTables: Array.from(presentTables),
+          suppressions: null,
+          eventsLast24h: null,
+          lastEventAt: null,
+        },
+        503,
+      );
+    }
+
+    const batchResults = await c.env.EMF_DB.batch<
+      Record<string, number | string | null>
+    >([
+      c.env.EMF_DB.prepare("SELECT COUNT(*) AS n FROM email_suppressions"),
+      c.env.EMF_DB.prepare(
+        "SELECT COUNT(*) AS n FROM email_events WHERE received_at >= datetime('now','-24 hours')",
+      ),
+      c.env.EMF_DB.prepare(
+        "SELECT received_at FROM email_events ORDER BY received_at DESC LIMIT 1",
+      ),
+    ]);
+
+    const suppressions = Number(batchResults[0]?.results?.[0]?.n ?? 0);
+    const eventsLast24h = Number(batchResults[1]?.results?.[0]?.n ?? 0);
+    const lastEventAt =
+      (batchResults[2]?.results?.[0]?.received_at as string | undefined) ?? null;
+
+    return c.json({
+      ok: true,
+      dbBound,
+      posthogWired,
+      webhookSecretWired,
+      suppressions,
+      eventsLast24h,
+      lastEventAt,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("email_health_query_failed", { message });
+    return c.json(
+      {
+        ok: false,
+        code: "QUERY_FAILED",
+        dbBound,
+        posthogWired,
+        webhookSecretWired,
+        suppressions: null,
+        eventsLast24h: null,
+        lastEventAt: null,
+      },
+      500,
+    );
   }
 });
 
