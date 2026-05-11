@@ -152,9 +152,10 @@ export interface EntropySummary {
   updatedAt: string;
 }
 
-/** Hono `c.var` shape — currently only the per-request correlation id. */
+/** Hono `c.var` shape — per-request correlation id + optional pre-parsed Twilio form body. */
 export interface AppVariables {
   requestId: string;
+  twilioForm?: Record<string, string>;
 }
 
 /** Technical-event overlay card on the homepage chart (see `timeline-events.ts`). */

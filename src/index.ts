@@ -85,6 +85,7 @@ import { parse as parseYaml } from "yaml";
 import timelineYamlText from "./data/timeline.yaml";
 import { handleChat, getChatHistory } from "./lib/chat";
 import { buildGreetingTwiml, handleGather, getTransmissions, getTransmissionCount } from "./lib/twilio";
+import { verifyTwilioSignature } from "./lib/twilio-verify";
 import { storyMilestones, timelineAnnotations } from "./lib/timeline-events";
 import { ingestListmonkEvent, verifyListmonkSignature } from "./lib/email-events";
 import type { AppVariables, Env, TimelineData } from "./types";
@@ -1115,7 +1116,7 @@ app.get("/api/v1/chat/history/:sessionId", async (c) => {
   return c.json({ messages }, 200);
 });
 
-app.post("/api/v1/twilio/voice", async (c) => {
+app.post("/api/v1/twilio/voice", verifyTwilioSignature, async (c) => {
   const siteUrl = getSiteUrl(c.env);
   const gatherUrl = `${siteUrl}/api/v1/twilio/gather`;
   const twiml = buildGreetingTwiml(gatherUrl);
@@ -1124,8 +1125,8 @@ app.post("/api/v1/twilio/voice", async (c) => {
   });
 });
 
-app.post("/api/v1/twilio/gather", async (c) => {
-  const formData = await c.req.parseBody();
+app.post("/api/v1/twilio/gather", verifyTwilioSignature, async (c) => {
+  const formData = c.var.twilioForm ?? (await c.req.parseBody());
   const speechResult = (formData.SpeechResult as string) ?? "";
   const callSid = (formData.CallSid as string) ?? "unknown";
   const callerNumber = (formData.From as string) ?? "unknown";
@@ -1138,7 +1139,7 @@ app.post("/api/v1/twilio/gather", async (c) => {
   });
 });
 
-app.post("/api/v1/twilio/status", async (c) => {
+app.post("/api/v1/twilio/status", verifyTwilioSignature, async (c) => {
   return c.json({ ok: true }, 200);
 });
 

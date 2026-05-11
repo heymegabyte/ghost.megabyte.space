@@ -7,7 +7,9 @@
     "check": "tsc --noEmit",
     "dev": "wrangler dev",
     "dev:e2e": "HOME=.wrangler/home XDG_CONFIG_HOME=.wrangler/config wrangler dev --local --port 8787 --test-scheduled --persist-to .wrangler/state/e2e --env-file .dev.vars.playwright",
-    "deploy": "wrangler deploy",
+    "stamp": "node scripts/stamp-cache.mjs",
+    "stamp:dry": "node scripts/stamp-cache.mjs --dry",
+    "deploy": "node scripts/stamp-cache.mjs && wrangler deploy",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report"
