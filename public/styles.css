@@ -11822,6 +11822,15 @@ section > .dossier-card {
   padding-inline-end: clamp(0.75rem, 3vw, 2rem) !important;
   max-width: 72ch;
 }
+/* Pillars grid: breathing room left+right so cards don't kiss the screen edges */
+.platform-pillars .pillars-grid {
+  padding-inline: clamp(1rem, 4vw, 3rem) !important;
+}
+@media (max-width: 640px) {
+  .platform-pillars .pillars-grid {
+    padding-inline: clamp(0.875rem, 4vw, 1.5rem) !important;
+  }
+}
 @media (max-width: 640px) {
   .shell .panel-copy.panel-copy--indented,
   .panel-copy.panel-copy--indented,
