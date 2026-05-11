@@ -14,8 +14,8 @@
   <a href="https://ghost.megabyte.space" title="Ghost Signal homepage" target="_blank">
     <img alt="Homepage" src="https://img.shields.io/website?down_color=%23FF4136&down_message=Down&label=ghost.megabyte.space&logo=cloudflare&logoColor=white&up_color=%2300E5FF&up_message=Live&url=https%3A%2F%2Fghost.megabyte.space&style=for-the-badge" />
   </a>
-  <a href="https://ghost.megabyte.space/api/docs" title="OpenAPI / Swagger UI" target="_blank">
-    <img alt="OpenAPI" src="https://img.shields.io/badge/OpenAPI-3.1-6BA539?logo=openapiinitiative&logoColor=white&style=for-the-badge" />
+  <a href="https://ghost.megabyte.space/api/docs" title="Scalar API reference UI" target="_blank">
+    <img alt="OpenAPI" src="https://img.shields.io/badge/OpenAPI-3.0-6BA539?logo=openapiinitiative&logoColor=white&style=for-the-badge" />
   </a>
   <a href="https://ghost.megabyte.space/docs" title="Human-friendly docs" target="_blank">
     <img alt="Docs" src="https://img.shields.io/badge/Docs-Read%20me-7C3AED?logo=readthedocs&logoColor=white&style=for-the-badge" />
@@ -124,19 +124,22 @@ Every reading, transcript, and entropy byte is permanent public record. If somet
 
 ## Quick Start
 
-No keys. No accounts. Sixty requests per minute per IP.
+No keys. No accounts. 60 requests / minute / IP across `/api/v1/ghost-emf/*` (the combined `/api/v1/sensors` fan-out is intentionally not rate-limited).
 
 ```bash
 # Read the current EMF (mG) sensor value
-curl https://ghost.megabyte.space/api/v1/current
+curl https://ghost.megabyte.space/api/v1/ghost-emf/current
 
-# Pull the last 24h of history
-curl 'https://ghost.megabyte.space/api/v1/history?hours=24'
+# Pull the last 24h of history (60-second buckets)
+curl 'https://ghost.megabyte.space/api/v1/ghost-emf/history?start=-24h&step=60'
 
-# Mint 256 true-entropy random integers in [0, 65535]
-curl 'https://ghost.megabyte.space/api/v1/random?count=256&min=0&max=65535'
+# Combined EMF + EF + RF snapshot in one call (not rate-limited)
+curl https://ghost.megabyte.space/api/v1/sensors
 
-# Browse the Swagger UI
+# Derive a reproducible random number from a snapshot window
+curl 'https://ghost.megabyte.space/api/v1/ghost-emf/random?start=-1h&digits=12'
+
+# Browse the Scalar API reference UI (OpenAPI 3.0)
 open https://ghost.megabyte.space/api/docs
 ```
 
@@ -154,32 +157,37 @@ pnpm dev
 
 ## The API
 
-The formal OpenAPI 3.1 spec lives at [`/api/v1/openapi.json`](https://ghost.megabyte.space/api/v1/openapi.json). Browse the [Swagger UI](https://ghost.megabyte.space/api/docs) or the [hand-written docs](https://ghost.megabyte.space/docs).
+The formal OpenAPI 3.0 spec lives at [`/api/v1/openapi.json`](https://ghost.megabyte.space/api/v1/openapi.json). The [Scalar API reference UI](https://ghost.megabyte.space/api/docs) at `/api/docs` renders it interactively. Hand-written docs are anchored at [`/#docs`](https://ghost.megabyte.space/#docs).
 
 ### Endpoints
 
+Public-API routes under `/api/v1/ghost-emf/*` share one rate-limit prefix (60 rpm/IP). `/api/v1/sensors` is the only sensor endpoint deliberately exempt from the limit (it's the single fan-out call the chart relies on).
+
 | Method | Path | Purpose | Cache TTL |
 |---|---|---|---|
-| `GET` | `/api/v1/health` | Liveness + version + timestamp | none |
-| `GET` | `/api/v1/meta` | Sensor metadata, started-at, units, rate limit | 60s |
-| `GET` | `/api/v1/current` | Latest single reading | 2s |
-| `GET` | `/api/v1/sensors` | All EMF / EF / RF families at once | 2s |
-| `GET` | `/api/v1/history` | Time-windowed series (`hours`, `from`, `to`, `step`) | 15s |
-| `GET` | `/api/v1/entropy` | Entropy summary (mean, variance, peak, deltas) | 15s |
-| `GET` | `/api/v1/snapshot` | Raw D1 snapshot rows | 15s |
-| `GET` | `/api/v1/export` | CSV / NDJSON bulk export | 30s |
-| `GET` | `/api/v1/google-sheets` | Sheets-friendly TSV stream | 30s |
-| `GET` | `/api/v1/random` | True-random integers from live entropy | none |
-| `GET` | `/api/v1/timeline` | Curated timeline of dossier events | 300s |
+| `GET` | `/health` | Liveness + version + timestamp | none |
+| `GET` | `/api/v1/ghost-emf/meta` | Sensor metadata, started-at, units, rate limit | 60s |
+| `GET` | `/api/v1/ghost-emf/current` | Latest single EMF reading | 2s |
+| `GET` | `/api/v1/sensors` | Combined EMF + EF + RF snapshot (not rate-limited) | 2s |
+| `GET` | `/api/v1/ghost-emf/history` | Time-windowed series (`start`, `end`, `step`) | 15s |
+| `GET` | `/api/v1/ghost-emf/entropy` | Shannon entropy summary (bits, bins, mean) | 15s |
+| `GET` | `/api/v1/ghost-emf/snapshot` | Raw D1 snapshot rows | 15s |
+| `GET` | `/api/v1/ghost-emf/export` | CSV / Excel bulk export | n/a |
+| `GET` | `/api/v1/ghost-emf/google-sheets` | `=IMPORTDATA(...)` formula helper | n/a |
+| `GET` | `/api/v1/ghost-emf/random` | Reproducible RNG derived from snapshot hash | n/a |
+| `GET` | `/api/v1/ghost-emf/timeline` | Narrative + technical milestones | 300s |
 | `GET` | `/api/v1/transmissions` | Hotline call transcript index | 60s |
 | `GET` | `/api/v1/transmissions/live` | Server-sent stream of new transcripts | n/a |
-| `GET` | `/api/v1/transmission-count` | Total recorded calls | 60s |
+| `GET` | `/api/v1/transmission-count` | Combined chat + call count | 60s |
 | `POST` | `/api/v1/chat` | Ghost Signal AI chat (Claude Sonnet) | n/a |
-| `POST` | `/api/v1/debate` | Two-agent debate stream | n/a |
-| `POST` | `/api/v1/newsletter/subscribe` | Subscribe via email | n/a |
+| `GET`  | `/api/v1/chat/history/:sessionId` | Replay a chat session | n/a |
+| `POST` | `/api/v1/debate` | Anthropic-backed debate endpoint | n/a |
+| `POST` | `/api/v1/newsletter/subscribe` | Listmonk passthrough | n/a |
 | `POST` | `/api/v1/twilio/voice` | TwiML entrypoint for incoming calls | n/a |
 | `POST` | `/api/v1/twilio/gather` | TwiML speech-gather webhook | n/a |
 | `POST` | `/api/v1/twilio/status` | TwiML completion / recording webhook | n/a |
+| `GET`  | `/api/v1/openapi.json` | OpenAPI 3.0 document | n/a |
+| `GET`  | `/api/docs` | Scalar API reference UI | n/a |
 | `GET`  | `/ws/mud` | WebSocket bridge into the public MUD | n/a |
 
 ### Sensor Families
@@ -193,10 +201,11 @@ The formal OpenAPI 3.1 spec lives at [`/api/v1/openapi.json`](https://ghost.mega
 ### Rate Limits &amp; Caching
 
 ```
-Rate limit:  60 requests / minute / IP   (KV-backed sliding window)
-Cache:       Cloudflare Cache API at the edge
-Headers:     ETag, Last-Modified, Cache-Control: public,max-age=<TTL>
-Origin:      Worker -> Home Assistant -> GQ EMF-390 USB
+Rate limit:  60 requests / minute / IP   (KV-backed fixed-window, /api/v1/ghost-emf/*)
+Cache:       Cloudflare Cache API at the edge (caches.default)
+Headers:     x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset,
+             Cache-Control: public, max-age=<TTL>, s-maxage=<TTL>, stale-while-revalidate=<2-3x TTL>
+Origin:      Worker -> Home Assistant -> GQ EMF-390 (USB)
 ```
 
 | Tier | Latency budget | Notes |
@@ -209,32 +218,35 @@ Origin:      Worker -> Home Assistant -> GQ EMF-390 USB
 
 ```bash
 # Last 6 hours, 60-second buckets
-curl 'https://ghost.megabyte.space/api/v1/history?hours=6&step=60'
+curl 'https://ghost.megabyte.space/api/v1/ghost-emf/history?start=-6h&step=60'
 
-# Entropy distribution since project start
-curl 'https://ghost.megabyte.space/api/v1/entropy?from=2026-04-03'
+# Entropy summary for the trailing hour
+curl 'https://ghost.megabyte.space/api/v1/ghost-emf/entropy?start=-1h'
 
-# Pure CSV stream for spreadsheets
-curl -o emf.csv 'https://ghost.megabyte.space/api/v1/export?format=csv&hours=24'
+# CSV stream for spreadsheets
+curl -o emf.csv 'https://ghost.megabyte.space/api/v1/ghost-emf/export?start=-24h&format=csv'
 
-# 16-byte hex true-random token
-curl 'https://ghost.megabyte.space/api/v1/random?bytes=16&format=hex'
+# 12-digit reproducible random number derived from the trailing hour
+curl 'https://ghost.megabyte.space/api/v1/ghost-emf/random?start=-1h&digits=12'
 ```
 
 ```js
-// JavaScript: poll /current at 2s
+// JavaScript: poll /current at 3s
 async function tick() {
-  const r = await fetch("https://ghost.megabyte.space/api/v1/current");
-  const { value, unit, timestamp } = await r.json();
-  console.log(`${timestamp} ${value} ${unit}`);
+  const r = await fetch("https://ghost.megabyte.space/api/v1/ghost-emf/current");
+  const reading = await r.json();
+  console.log(`${reading.sampledAt} ${reading.numericValue} ${reading.unit ?? ""}`);
 }
-setInterval(tick, 2000);
+setInterval(tick, 3000);
 ```
 
 ```py
 # Python: bulk export to a DataFrame
 import pandas as pd
-df = pd.read_csv("https://ghost.megabyte.space/api/v1/export?format=csv&hours=168")
+df = pd.read_csv(
+    "https://ghost.megabyte.space/api/v1/ghost-emf/export"
+    "?start=-168h&format=csv"
+)
 print(df.describe())
 ```
 
@@ -266,23 +278,25 @@ client -|  Edge    |------> | Worker (Hono)   |------> | Home Assistant     |
 
 ### Cache Strategy
 
+Caching uses the Cloudflare global Cache API (`caches.default`) — every cache write goes through `ctx.waitUntil` so it never blocks the response. Override TTLs at runtime by setting the matching `*_CACHE_TTL_SECONDS` env var (see [Environment Variables](#environment-variables)).
+
 | Endpoint | TTL | Why |
 |---|---|---|
-| `/api/v1/current` | 2 s | Real-time enough for charts; cheap on misses |
+| `/api/v1/ghost-emf/current` | 2 s | Real-time enough for charts; cheap on misses |
 | `/api/v1/sensors` | 2 s | Fan-out across families needs to stay fresh |
-| `/api/v1/history` | 15 s | Bucketed series tolerates short staleness |
-| `/api/v1/entropy` | 15 s | Recomputed against latest 15s of readings |
-| `/api/v1/random` | 0 s | Never cache &mdash; defeats true-randomness |
-| `/api/v1/timeline` | 300 s | Curated content, rarely changes |
+| `/api/v1/ghost-emf/history` | 15 s | Bucketed series tolerates short staleness |
+| `/api/v1/ghost-emf/entropy` | 15 s | Recomputed against trailing window |
+| `/api/v1/ghost-emf/random` | 0 s | Deterministic — caching would defeat verifiability |
+| `/api/v1/ghost-emf/timeline` | 300 s | Curated content, rarely changes |
 
 ### Bindings
 
-| Binding | Type | Purpose |
-|---|---|---|
-| `ASSETS` | Cloudflare Assets | Static `public/` directory |
-| `EMF_DB` | D1 | Snapshot history, transcripts, newsletter, debate logs |
-| `RATE_LIMIT_KV` | KV | Per-IP sliding-window counters + entropy seed |
-| `AI` | Workers AI | Claude Haiku fallback for chat persona |
+| Binding | Type | Required | Purpose | Degradation when missing |
+|---|---|---|---|---|
+| `ASSETS` | Cloudflare Assets | **yes** | Static `public/` directory | Hard failure |
+| `EMF_DB` | D1 | no | `emf_snapshots`, `chat_messages`, `call_transmissions`, `newsletter_subscribers` | Snapshot endpoints `503`; chat / calls skip persistence |
+| `RATE_LIMIT_KV` | KV | no | Per-IP fixed-window counters on `/api/v1/ghost-emf/*` | Rate limiter no-ops (all requests pass) |
+| `AI` | Workers AI | no | Llama 3.1 fallback when Anthropic is unset / down | Chat falls back to the static `"static on the line"` reply |
 
 ```jsonc
 // wrangler.jsonc (excerpt)
@@ -315,23 +329,30 @@ The dev server runs at `http://127.0.0.1:8787/`. The Worker reads from a local m
 
 ### Environment Variables
 
+The canonical schema lives in [`src/types.ts`](src/types.ts) on the `Env` interface — every binding and var carries inline TSDoc describing its degradation path. Highlights:
+
 | Variable | Description | Default |
 |---|---|---|
-| `EMF_SENSOR_HASS_URL` | Home Assistant base URL | unset (mock mode) |
-| `EMF_SENSOR_HASS_TOKEN` | Home Assistant long-lived access token | unset |
-| `EMF_SENSOR_ENTITY_ID` | EMF magnitude entity in Home Assistant | `sensor.gq_emf390_emf_mg` |
-| `EF_SENSOR_ENTITY_ID` | Electric-field entity | `sensor.gq_emf390_ef_v_m` |
-| `RF_SENSOR_ENTITY_ID` | RF density entity | `sensor.gq_emf390_rf_total_density_mw_m2` |
-| `EMF_SENSOR_STARTED_AT` | ISO timestamp the public record began | `2026-04-03T02:47:58.394637+00:00` |
-| `CURRENT_CACHE_TTL_SECONDS` | Cache TTL for `/current` and `/sensors` | `2` |
+| `HASS_SERVER` | Home Assistant base URL (e.g. `https://hass.example.com`) | required (mock mode bypasses) |
+| `HASS_TOKEN` | Home Assistant Long-Lived Access Token | required (mock mode bypasses) |
+| `EMF_SENSOR_ENTITY_ID` | Primary EMF entity in Home Assistant | required |
+| `EF_SENSOR_ENTITY_ID` | Electric-field entity | optional |
+| `RF_SENSOR_ENTITY_ID` | RF density entity | optional |
+| `EMF_SENSOR_NAME` | Friendly name override surfaced via `/meta` | falls back to HA attribute |
+| `EMF_SENSOR_STARTED_AT` | ISO timestamp the public record began | unset |
+| `MOCK_SENSOR_MODE` | `"1"` synthesises deterministic readings (Playwright) | unset |
+| `TEST_HELPERS_ENABLED` | `"1"` exposes `/__test/reset` + `/__test/seed` | unset |
+| `CURRENT_CACHE_TTL_SECONDS` | Cache TTL for `/current` and `/sensors` | `2` (wrangler vars), `3` (code fallback) |
 | `HISTORY_CACHE_TTL_SECONDS` | Cache TTL for `/history` | `15` |
 | `ENTROPY_CACHE_TTL_SECONDS` | Cache TTL for `/entropy` | `15` |
-| `PUBLIC_API_RATE_LIMIT_PER_MINUTE` | Per-IP request budget | `60` |
-| `ANTHROPIC_API_KEY` | Claude key for chat / hotline | unset (uses Workers AI fallback) |
-| `TWILIO_AUTH_TOKEN` | Twilio webhook signature secret | unset |
-| `RESEND_API_KEY` | Newsletter sender | unset |
+| `PUBLIC_API_RATE_LIMIT_PER_MINUTE` | Per-IP budget on `/api/v1/ghost-emf/*` | `60` |
+| `SITE_URL` | Canonical site URL used by absolute-URL helpers | `https://ghost.megabyte.space` |
+| `SITE_NAME` | Public site name in OpenAPI + UI copy | unset |
+| `ANTHROPIC_API_KEY` | Claude key for chat + hotline | unset → Workers AI fallback |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` | Twilio hotline credentials | unset |
+| `LISTMONK_URL` / `LISTMONK_API_USER` / `LISTMONK_API_TOKEN` / `LISTMONK_LIST_ID` | Newsletter subscribe target | unset |
 
-For the full list, see [`src/types.ts`](src/types.ts) `Env` interface.
+For the full, authoritative list, see [`src/types.ts`](src/types.ts) `Env` interface.
 
 <a href="#testing" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -427,7 +448,7 @@ If you have your own pattern of phenomena, the [hotline](#the-hotline) takes cal
 | Layer | Technology |
 |---|---|
 | **Edge runtime** | [Cloudflare Workers](https://workers.cloudflare.com/) |
-| **Web framework** | [Hono](https://hono.dev/) + [@hono/zod-openapi](https://hono.dev/snippets/zod-openapi) + [@hono/swagger-ui](https://hono.dev/snippets/swagger-ui) |
+| **Web framework** | [Hono](https://hono.dev/) + [@hono/zod-openapi](https://hono.dev/snippets/zod-openapi) (spec) + [Scalar API Reference](https://github.com/scalar/scalar) (UI at `/api/docs`) |
 | **Static assets** | Cloudflare Assets (`public/`) |
 | **Database** | [Cloudflare D1](https://developers.cloudflare.com/d1/) (snapshots, transcripts, newsletter, debate logs) |
 | **KV** | [Cloudflare KV](https://developers.cloudflare.com/kv/) (rate limit counters + entropy seed) |
@@ -445,8 +466,8 @@ If you have your own pattern of phenomena, the [hotline](#the-hotline) takes cal
 ## References
 
 - [Hono](https://hono.dev/) &mdash; tiny, fast Workers framework
-- [@hono/zod-openapi](https://hono.dev/snippets/zod-openapi) &mdash; OpenAPI 3.1 generator
-- [@hono/swagger-ui](https://hono.dev/snippets/swagger-ui) &mdash; Swagger UI middleware
+- [@hono/zod-openapi](https://hono.dev/snippets/zod-openapi) &mdash; OpenAPI 3.0 generator from Zod schemas
+- [Scalar API Reference](https://github.com/scalar/scalar) &mdash; interactive docs UI at `/api/docs`
 - [Cloudflare Workers](https://developers.cloudflare.com/workers/) &mdash; serverless edge runtime
 - [Cloudflare D1](https://developers.cloudflare.com/d1/) &mdash; serverless SQLite at the edge
 - [Cloudflare Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) &mdash; per-Worker cache control
