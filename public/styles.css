@@ -7246,6 +7246,40 @@
   }
 
   /* ═══════════════════════════════════════════════
+     Dream Burden — 2×2 DALL-E dream grid
+     ═══════════════════════════════════════════════ */
+  .dossier-feature-media-row--dreams {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.25rem;
+  }
+  .dossier-feature-media-row--dreams .dossier-feature-figure {
+    margin: 0; min-width: 0;
+    display: flex; flex-direction: column; gap: 0.6rem;
+  }
+  .dossier-feature-media-row--dreams .dossier-feature-figure picture {
+    aspect-ratio: 1 / 1;
+    align-items: center;
+  }
+  .dossier-feature-media-row--dreams .dossier-feature-figure picture img {
+    width: 100%; height: 100%;
+    max-height: none;
+    object-fit: cover;
+  }
+  .dossier-feature-media-row--dreams .dossier-feature-figure figcaption {
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  @media (max-width: 720px) {
+    .dossier-feature-media-row--dreams { grid-template-columns: 1fr; gap: 1.25rem; }
+  }
+
+  /* ═══════════════════════════════════════════════
      Jungle Habitat — side-by-side video pair
      ═══════════════════════════════════════════════ */
   .dossier-feature-media-row--jungle {
