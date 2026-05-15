@@ -73,14 +73,19 @@ Cloudflare Workers · Hono 4 + `@hono/zod-openapi` (OpenAPI 3.0 spec) + Scalar A
 - `GET /api/v1/sensors` — combined EMF + EF + RF in one call. Chart polling target.
 
 ### Conversational
-- `POST /api/v1/chat` — Ghost Signal AI chat (Claude Sonnet → Workers AI Llama → static).
+- `POST /api/v1/chat` — Ghost Signal AI chat single-shot (Claude Sonnet → Workers AI Llama → static). `chatRateLimit` (20 rpm/IP).
+- `POST /api/v1/chat/stream` — same as `/chat` but SSE token stream via Anthropic `messages.stream` with `AbortSignal` propagation. `chatRateLimit`.
 - `GET  /api/v1/chat/history/:sessionId` — replay (50-msg cap).
-- `POST /api/v1/twilio/{voice,gather,status}` — TwiML webhooks (Claude Haiku).
+- `POST /api/v1/chat/feedback` — thumbs up/down per assistant message; idempotent on `(messageId, sessionId)`.
+- `GET  /api/v1/chat/search` — FTS5 search across the chat archive; `LIKE` fallback when the virtual table is absent.
+- `POST /api/v1/twilio/{voice,gather,status}` — TwiML webhooks (Claude Haiku). HMAC-SHA1 signature-gated.
 - `GET  /api/v1/transmissions` — recent calls.
 - `GET  /api/v1/transmissions/live` — Server-Sent Events stream.
 - `GET  /api/v1/transmission-count` — chat + call sum.
 - `POST /api/v1/debate` — Anthropic-backed debate endpoint.
 - `POST /api/v1/newsletter/subscribe` — Listmonk passthrough.
+- `POST /api/v1/listmonk/webhook` — HMAC-SHA256 signature-gated ingestion → `email_events` + `email_suppressions` + PostHog fan-out.
+- `GET  /api/v1/email/health` — suppression count + 24h event volume + PostHog wiring status.
 
 ### Static + redirect
 - `GET /transmissions` → 301 → `/#transmissions`.
@@ -117,13 +122,13 @@ Cloudflare Workers · Hono 4 + `@hono/zod-openapi` (OpenAPI 3.0 spec) + Scalar A
 ## Security Boundaries
 - **Rate limiting** — only `/api/v1/ghost-emf/*` (60 rpm/IP). `/api/v1/sensors` deliberately exempt for chart polling.
 - **Test helpers** — 404-cloaked when `TEST_HELPERS_ENABLED !== "1"`. Seed additionally requires `MOCK_SENSOR_MODE=1`.
-- **Twilio signature** — `TWILIO_AUTH_TOKEN` is bound; signature validation is **not currently enforced**. Treat as a known gap if hardening Twilio webhooks.
+- **Twilio signature** — `TWILIO_AUTH_TOKEN` is bound and `X-Twilio-Signature` is verified on every webhook (`POST /api/v1/twilio/{voice,gather,status}`) via the `verifyTwilioSignature` middleware in `src/lib/twilio-verify.ts` (HMAC-SHA1, constant-time compare, `403 TWILIO_SIGNATURE_INVALID` on mismatch). When `TWILIO_AUTH_TOKEN` is unset the middleware no-ops, keeping `wrangler dev` ergonomic.
 - **CSP** — strict everywhere except `/api/docs` (Scalar requires inline-eval-ish resources). See `src/lib/headers.ts`.
 - **Error envelope** — `{ error, code, details?, requestId }`. Stack traces never leak — `app.onError` returns a generic `INTERNAL_ERROR` body for unknown throws.
 - **CORS** — preflight handled on `/api/*`.
 
 ## Verify-Before-Done Checklist
-1. `pnpm check` — TypeScript clean. Note: a small set of route-shape mismatches in `src/index.ts` (`currentRoute`, `sensorsRoute`) + two `stripTelnet` strict-index issues are **pre-existing** and unrelated to documentation passes. Do not paper over them — fix root-cause if touched.
+1. `pnpm check` — `tsc --noEmit` exits 0 under strict + `noUncheckedIndexedAccess`. Any new error blocks the deploy; fix the root cause rather than `@ts-ignore`.
 2. `pnpm test:e2e` — Playwright suites must stay GREEN at 6 breakpoints.
 3. `pnpm dev` — exercise affected routes in browser; check console for CSP / JS / 404 errors. Console errors = not done.
 4. `pnpm deploy` — see Deploy section below. Purge CDN. Smoke-test the affected route on the production custom domain.

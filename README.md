@@ -404,7 +404,7 @@ curl -X POST \
   --data '{"purge_everything":true}'
 ```
 
-See [`DEPLOY.md`](DEPLOY.md) for the full runbook, secrets handling, and rollback playbook.
+See [`docs/OPERATIONS.md`](docs/OPERATIONS.md) for the full runbook — first-time provisioning, secrets handling, smoke tests, rollback, D1/KV maintenance, and the incident playbook.
 
 <a href="#the-hotline" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 

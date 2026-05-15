@@ -9,7 +9,7 @@ ghost.megabyte.space is a single-tenant Cloudflare Worker fronting a public sens
 1. **Sensor data integrity** — readings must reflect what the Home Assistant entity actually emitted; no spoofed `state` values.
 2. **Cron continuity** — `*/1 * * * *` snapshots into `EMF_DB` must keep firing; gaps degrade `/history`, `/entropy`, `/random`, and `/export`.
 3. **Origin protection** — Home Assistant + Anthropic + Workers AI are bandwidth- and quota-limited; every uncached read hits one of them.
-4. **Phone-line abuse prevention** — `/api/v1/twilio/*` accepts arbitrary POST today (see § Twilio signature gap) and is fronted only by Twilio's own callback origin allowlist.
+4. **Phone-line abuse prevention** — `/api/v1/twilio/*` is gated by `X-Twilio-Signature` HMAC verification (see § Twilio signature verification) on top of Twilio's own callback origin allowlist.
 
 The primary adversaries we design against: scraper bots burning sensor cache, abusive callers gaming the AI hotline, and crawler floods burning Cache API quota on `/history`.
 
@@ -114,15 +114,22 @@ Mapping:
 
 Production wrangler vars (see [`wrangler.jsonc`](../wrangler.jsonc)) **never** set either flag. Setting them on the production environment is a deploy-time gate, not a runtime toggle.
 
-## Twilio signature gap (known)
+## Twilio signature verification (`src/lib/twilio-verify.ts`)
 
-`/api/v1/twilio/voice`, `/api/v1/twilio/gather`, and `/api/v1/twilio/status` accept arbitrary POST today. `TWILIO_AUTH_TOKEN` is provisioned but the `X-Twilio-Signature` header is **not** verified yet. Mitigations in place:
+`/api/v1/twilio/voice`, `/api/v1/twilio/gather`, and `/api/v1/twilio/status` are mounted behind the `verifyTwilioSignature` middleware:
 
-- Twilio's own egress IPs are the only sources that know the callback URL, and the URL is not advertised publicly.
+- Computes `HMAC-SHA1(TWILIO_AUTH_TOKEN, url + sorted(formParams).map(k => k + v).join(""))` via Web Crypto.
+- Constant-time compares against the `X-Twilio-Signature` header (no timing side-channel).
+- Re-stashes the parsed form body on `c.var.twilioForm` so route handlers don't double-parse the request.
+- Honors `x-forwarded-proto` when canonicalising the request URL.
+- 403s with `TWILIO_SIGNATURE_MISSING` when the header is absent and `TWILIO_SIGNATURE_INVALID` on HMAC mismatch.
+- When `TWILIO_AUTH_TOKEN` is unbound (local dev / Playwright) the middleware no-ops so test flows stay ergonomic.
+
+Defense in depth, still in place beyond the HMAC:
+
 - The TwiML pipeline only produces speech output and writes to D1; there is no money path, no privilege escalation surface.
 - `escapeXml` is the only legal interpolation primitive — no untrusted content reaches the TwiML stream raw.
-
-Closing this gap means computing `HMAC-SHA1(url + sorted-body-pairs, TWILIO_AUTH_TOKEN)` per request and 403'ing on mismatch. Tracked in the project's open-work list, not blocking.
+- Twilio's own egress IPs are the typical callers; the callback URL is not advertised publicly.
 
 ## Secrets
 
@@ -148,9 +155,9 @@ Closing this gap means computing `HMAC-SHA1(url + sorted-body-pairs, TWILIO_AUTH
 ## Known gaps (tracked, not blocking)
 
 1. **`'unsafe-inline'` in `script-src`** — move to nonced inline scripts or hoist them to `/app.js`. Owner: site rewrite track.
-2. **Twilio signature validation** — see § Twilio signature gap.
-3. **Per-route rate limiting on `/api/v1/chat`** — the chat endpoint is currently unbounded. Acceptable today because Anthropic itself rate-limits the upstream key; revisit if Anthropic bills become noisy.
-4. **No bot-management challenge on `/api/v1/sensors`** — by design exempt from the public rate limit; if abuse appears, the right move is a Cloudflare Bot Management rule, not in-Worker logic.
+2. **No bot-management challenge on `/api/v1/sensors`** — by design exempt from the public rate limit; if abuse appears, the right move is a Cloudflare Bot Management rule, not in-Worker logic.
+
+> `/api/v1/chat` + `/api/v1/chat/stream` are rate-limited via `chatRateLimit` (20 messages/IP/minute by default, see `src/lib/rate-limit.ts`).
 
 ## Reporting
 

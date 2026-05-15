@@ -84,7 +84,7 @@ export function normalizeEventType(raw: unknown): EmailEventType {
     : "unknown";
 }
 
-/** RFC 4648 base64url → ArrayBuffer (used for the signature header). */
+/** Decode a hex-encoded string to bytes. Returns an empty array on malformed input. */
 function hexToBytes(hex: string): Uint8Array {
   const clean = hex.replace(/^0x/, "").trim();
   if (!/^[0-9a-fA-F]*$/.test(clean) || clean.length % 2 !== 0) {

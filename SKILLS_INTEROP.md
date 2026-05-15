@@ -8,7 +8,7 @@ Project routing is already declared in [CLAUDE.md](/Users/apple/emdash-projects/
 - Goal/brief skills map to [PROJECT_BRIEF.md](/Users/apple/emdash-projects/worktrees/puny-chairs-create-9eu/PROJECT_BRIEF.md)
 - Slice/build skills map to [SPEC.md](/Users/apple/emdash-projects/worktrees/puny-chairs-create-9eu/SPEC.md) and the Worker/static-site implementation
 - Brand/design/motion skills map to the content and styling in [public/index.html](/Users/apple/emdash-projects/worktrees/puny-chairs-create-9eu/public/index.html) and [public/styles.css](/Users/apple/emdash-projects/worktrees/puny-chairs-create-9eu/public/styles.css)
-- Deploy/runtime skills map to [DEPLOY.md](/Users/apple/emdash-projects/worktrees/puny-chairs-create-9eu/DEPLOY.md)
+- Deploy/runtime skills map to [docs/OPERATIONS.md](/Users/apple/emdash-projects/worktrees/puny-chairs-create-9eu/docs/OPERATIONS.md)
 
 ## What changes under Codex
 - Claude-oriented subagent assumptions are not automatic here; Codex uses delegation only when explicitly requested

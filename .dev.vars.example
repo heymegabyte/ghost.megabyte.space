@@ -1,14 +1,88 @@
+# =============================================================================
+# ghost.megabyte.space — Worker secrets / runtime config
+# =============================================================================
+# Copy this file to `.dev.vars` for `wrangler dev`, or set values in the
+# Cloudflare dashboard / `wrangler secret put <KEY>` for production. The
+# canonical schema lives in `src/types.ts` (`Env` interface) — every
+# documented key below maps to a field there. Keys that are absent at
+# runtime degrade gracefully per the comments on each block.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Home Assistant upstream (REQUIRED for live sensor readings)
+# -----------------------------------------------------------------------------
+# Long-lived HA access token. If unset, EMF endpoints return synthetic data
+# in MOCK_SENSOR_MODE, otherwise 502 HOME_ASSISTANT_UNAVAILABLE.
 HASS_SERVER=https://connect.tomy.house
 HASS_TOKEN=replace-with-long-lived-home-assistant-token
-# Optional local-only test flags:
-# MOCK_SENSOR_MODE=1
-# TEST_HELPERS_ENABLED=1
+
+# -----------------------------------------------------------------------------
+# Sensor entity IDs (REQUIRED — primary EMF; OPTIONAL — EF / RF)
+# -----------------------------------------------------------------------------
 EMF_SENSOR_ENTITY_ID=sensor.gq_emf390_emf_mg
 EMF_SENSOR_NAME=Ghost EMF
 EMF_SENSOR_STARTED_AT=2026-04-03T02:47:58.394637+00:00
+# Optional companion sensors surfaced by /api/v1/sensors. Omit to skip.
+# EF_SENSOR_ENTITY_ID=sensor.gq_emf390_ef_vm
+# RF_SENSOR_ENTITY_ID=sensor.gq_emf390_rf_dbm
+
+# -----------------------------------------------------------------------------
+# Site identity (used by JSON-LD, OpenAPI servers, headers)
+# -----------------------------------------------------------------------------
 SITE_NAME=ghost.megabyte.space
 SITE_URL=https://ghost.megabyte.space
+
+# -----------------------------------------------------------------------------
+# Cache TTLs (seconds) — Cloudflare Cache API wrappers in src/index.ts
+# -----------------------------------------------------------------------------
 CURRENT_CACHE_TTL_SECONDS=3
 HISTORY_CACHE_TTL_SECONDS=15
 ENTROPY_CACHE_TTL_SECONDS=15
+
+# -----------------------------------------------------------------------------
+# Rate limits (per-IP fixed window, requests/minute)
+# -----------------------------------------------------------------------------
+# /api/v1/ghost-emf/* prefix; /api/v1/sensors deliberately exempt.
 PUBLIC_API_RATE_LIMIT_PER_MINUTE=60
+# /api/v1/chat + /api/v1/chat/stream. Defaults to 20 if unset.
+# CHAT_RATE_LIMIT=20
+
+# -----------------------------------------------------------------------------
+# Anthropic Claude (OPTIONAL — falls back to Workers AI Llama, then static)
+# -----------------------------------------------------------------------------
+# Web chat uses claude-sonnet-4-5; voice hotline uses claude-haiku-4-5.
+# ANTHROPIC_API_KEY=sk-ant-replace-with-real-key
+
+# -----------------------------------------------------------------------------
+# Twilio Voice (REQUIRED for the (601) 666-6602 hotline)
+# -----------------------------------------------------------------------------
+# When TWILIO_AUTH_TOKEN is set, every /api/v1/twilio/* webhook is
+# signature-verified (HMAC-SHA1, constant-time compare). Unset = no-op
+# (ergonomic for `wrangler dev`, NEVER acceptable in production).
+# TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# TWILIO_AUTH_TOKEN=replace-with-twilio-auth-token
+# TWILIO_PHONE_NUMBER=+16016666602
+
+# -----------------------------------------------------------------------------
+# Listmonk (OPTIONAL — newsletter passthrough + webhook ingestion)
+# -----------------------------------------------------------------------------
+# LISTMONK_URL=https://listmonk.megabyte.space
+# LISTMONK_API_USER=ghost-ingest
+# LISTMONK_API_TOKEN=replace-with-listmonk-api-token
+# LISTMONK_LIST_ID=1
+# HMAC-SHA256 secret verifying POST /api/v1/listmonk/webhook payloads.
+# LISTMONK_WEBHOOK_SECRET=replace-with-shared-webhook-secret
+
+# -----------------------------------------------------------------------------
+# PostHog (OPTIONAL — analytics fan-out from listmonk webhook handler)
+# -----------------------------------------------------------------------------
+# POSTHOG_API_KEY=phc_replace_with_project_api_key
+# POSTHOG_HOST=https://us.posthog.com
+
+# -----------------------------------------------------------------------------
+# Local-only flags (NEVER set in production)
+# -----------------------------------------------------------------------------
+# Deterministic mock sensor for Playwright + offline dev:
+# MOCK_SENSOR_MODE=1
+# Enables /__test/reset + /__test/seed (404-cloaked otherwise):
+# TEST_HELPERS_ENABLED=1

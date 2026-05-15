@@ -1,4 +1,4 @@
-@layer reset, base, components, utilities;
+@layer reset, base, components, utilities, cinema;
 
 @view-transition { navigation: auto; }
 
@@ -151,13 +151,13 @@
   }
   .brand-mark {
     font-family: 'Space Grotesk', 'Sora', sans-serif;
-    font-weight: 900;
-    font-size: clamp(1.4rem, 2.4vw + 0.6rem, 2.4rem);
-    letter-spacing: 0.04em;
+    font-weight: 800;
+    font-size: clamp(0.95rem, 1.1vw + 0.55rem, 1.4rem);
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: #f4faff;
     line-height: 1;
-    text-shadow: 0 0 18px rgba(0, 229, 255, 0.35), 0 0 2px rgba(255, 23, 68, 0.6);
+    text-shadow: 0 0 14px rgba(0, 229, 255, 0.3), 0 0 2px rgba(255, 23, 68, 0.5);
   }
   .brand-hotline {
     font-family: 'Cinzel Decorative', 'Space Grotesk', serif;
@@ -198,13 +198,13 @@
     pointer-events: none;
   }
   .brand-logo {
-    width: 44px; height: 44px; border-radius: 12px;
+    width: 34px; height: 34px; border-radius: 10px;
     object-fit: contain;
     background:
       radial-gradient(circle at 30% 25%, rgba(0, 229, 255, 0.18), transparent 60%),
       radial-gradient(circle at 75% 80%, rgba(124, 58, 237, 0.18), transparent 65%),
       rgba(6, 6, 16, 0.78);
-    padding: 4px;
+    padding: 3px;
     box-shadow:
       0 0 0 1px rgba(0, 229, 255, 0.32),
       inset 0 0 14px rgba(0, 229, 255, 0.18),
@@ -4182,11 +4182,12 @@
                 transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
   @media (prefers-reduced-motion: no-preference) {
-    .reveal-section:not(.is-revealed) {
+    html.js-reveal-active .reveal-section:not(.is-revealed):not(:target) {
       opacity: 0;
       transform: translateY(40px);
     }
-    .reveal-section.is-revealed {
+    .reveal-section.is-revealed,
+    .reveal-section:target {
       opacity: 1;
       transform: translateY(0);
     }
@@ -5111,6 +5112,26 @@
     background: rgba(255, 255, 255, 0.05);
     font-size: 0.55rem;
   }
+  .chat-error .chat-msg-text { color: #ff7676; }
+  .chat-msg-retry { color: var(--accent-red) !important; border: 1px solid rgba(255, 23, 68, 0.4) !important; }
+  .chat-msg-retry:hover { background: rgba(255, 23, 68, 0.12) !important; }
+  .chat-streaming .chat-msg-text::after {
+    content: "▍"; display: inline-block; margin-left: 0.1em;
+    color: var(--accent-cyan, #00e5ff);
+    animation: chatCaretBlink 1s steps(2, end) infinite;
+  }
+  @keyframes chatCaretBlink { 50% { opacity: 0; } }
+  .chat-msg-text h4, .chat-msg-text h5, .chat-msg-text h6 { margin: 0.55rem 0 0.25rem; font-size: 0.95rem; color: var(--text); }
+  .chat-msg-text ul, .chat-msg-text ol { margin: 0.3rem 0 0.3rem 1.1rem; padding: 0; }
+  .chat-msg-text li { margin: 0.1rem 0; }
+  .chat-msg-text blockquote {
+    margin: 0.35rem 0; padding: 0.15rem 0.6rem;
+    border-left: 2px solid var(--accent-cyan, #00e5ff);
+    color: var(--text-muted);
+  }
+  .chat-msg-text em { font-style: italic; opacity: 0.92; }
+  .chat-msg-text pre { margin: 0.4rem 0; padding: 0.5rem 0.7rem; background: rgba(0, 0, 0, 0.35); border-radius: 6px; overflow-x: auto; }
+  .chat-msg-text pre code { background: none; padding: 0; font-size: 0.78rem; }
   .chat-msg-attachments { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.25rem; }
   .chat-msg-attachment-img {
     max-width: 160px; max-height: 100px;
@@ -5177,7 +5198,84 @@
   .chat-settings[hidden],
   .chat-attachments[hidden],
   .chat-scroll-bottom[hidden],
-  .chat-tts-stop[hidden] { display: none; }
+  .chat-tts-stop[hidden],
+  .chat-stop-stream[hidden] { display: none; }
+
+  .chat-stop-stream {
+    color: var(--accent-red);
+    border: 1px solid rgba(255, 23, 68, 0.5);
+    background: rgba(255, 23, 68, 0.08);
+    transition: background-color 0.18s, transform 0.18s;
+  }
+  .chat-stop-stream:hover { background: rgba(255, 23, 68, 0.18); transform: translateY(-1px); }
+  .chat-stop-stream:focus-visible { outline: 2px solid var(--accent-cyan, #00e5ff); outline-offset: 2px; }
+
+  .chat-suggestion-chips {
+    display: flex; flex-wrap: wrap; gap: 0.35rem;
+    margin-top: 0.55rem;
+  }
+  .chat-suggestion-chip {
+    appearance: none;
+    background: rgba(0, 229, 255, 0.06);
+    border: 1px solid rgba(0, 229, 255, 0.28);
+    color: var(--text);
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background-color 0.18s, border-color 0.18s, transform 0.18s;
+  }
+  .chat-suggestion-chip:hover { background: rgba(0, 229, 255, 0.14); border-color: rgba(0, 229, 255, 0.55); transform: translateY(-1px); }
+  .chat-suggestion-chip:focus-visible { outline: 2px solid var(--accent-cyan, #00e5ff); outline-offset: 2px; }
+  .chat-suggestion-chip:active { transform: translateY(0); }
+
+  .chat-msg-feedback {
+    display: inline-flex; gap: 0.1rem;
+    margin-left: auto;
+  }
+  .chat-feedback-btn {
+    font-size: 0.78rem;
+    padding: 0.05rem 0.35rem;
+    line-height: 1;
+  }
+  .chat-feedback-btn.is-active {
+    color: var(--accent-cyan, #00e5ff);
+    background: rgba(0, 229, 255, 0.1);
+  }
+  .chat-feedback-btn.is-error { color: #ff7676; }
+
+  .chat-msg-table-wrap {
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .chat-msg-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  .chat-msg-table th,
+  .chat-msg-table td {
+    text-align: left;
+    padding: 0.4rem 0.55rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .chat-msg-table th {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .chat-msg-table tr:last-child td { border-bottom: none; }
+  .chat-msg-table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+
+  .chat-rate-limit .chat-msg-text { color: #ffb74d; }
+  .chat-rate-countdown {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-cyan, #00e5ff);
+  }
 
   /* Settings drawer */
   .chat-settings {
@@ -10789,8 +10887,8 @@
   }
 
   /* ── Brand lockup: keep hotline prominent on mobile ─────────────────── */
-  .brand-lockup { gap: clamp(0.6rem, 1.4vw, 1.4rem); }
-  .brand-mark { font-size: clamp(1.3rem, 2vw + 0.7rem, 2.4rem); }
+  .brand-lockup { gap: clamp(0.5rem, 1vw, 0.9rem); }
+  .brand-mark { font-size: clamp(0.9rem, 0.7vw + 0.55rem, 1.25rem); }
   .brand-hotline { font-size: clamp(1.05rem, 1.6vw + 0.5rem, 2.2rem); padding: 0.3em 0.7em; }
 
   /* ── Tablet break: hero stacks, status grid 2-col ───────────────────── */
@@ -11856,13 +11954,14 @@
 
   /* ── Section-entry choreography — fade + lift, GPU only ───────────────── */
   @media (prefers-reduced-motion: no-preference) {
-    .reveal-section {
+    html.js-reveal-active .reveal-section:not(:target) {
       transform: translate3d(0, 18px, 0);
       opacity: 0;
       transition: transform 720ms var(--gh-page-ease), opacity 720ms ease;
       will-change: transform, opacity;
     }
     .reveal-section.is-revealed,
+    .reveal-section:target,
     html.gh-page-entered .reveal-section {
       transform: translate3d(0, 0, 0);
       opacity: 1;
@@ -12022,162 +12121,336 @@
 }
 
 @layer cinema {
-  /* ── Merged Transmissions section (was /transmissions page) ──────────── */
+  /* ── Transmission Log Module ─────────────────────────────────────────── */
   .transmissions-section {
     padding: clamp(3rem, 7vw, 5rem) 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(255, 23, 68, 0.06), transparent 55%);
-    border-top: 1px solid rgba(255, 23, 68, 0.16);
-    border-bottom: 1px solid rgba(255, 23, 68, 0.16);
+    background: transparent;
   }
-  .transmissions-section .tx-layout {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+  .transmissions-section .tx-card-frame {
+    position: relative;
+    padding: clamp(2rem, 4.5vw, 3.25rem) clamp(1.5rem, 4vw, 2.75rem) clamp(1.75rem, 4vw, 2.75rem);
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 23, 68, 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, rgba(0, 229, 255, 0.05), transparent 60%),
+      linear-gradient(180deg, rgba(10, 8, 22, 0.78), rgba(6, 6, 16, 0.92));
+    border: 1px solid rgba(255, 23, 68, 0.20);
+    border-radius: 24px;
+    box-shadow:
+      0 40px 120px -20px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+      0 0 80px rgba(255, 23, 68, 0.06) inset;
+    backdrop-filter: blur(4px) saturate(1.1);
+    overflow: hidden;
+    isolation: isolate;
   }
+  /* top accent rail */
+  .transmissions-section .tx-card-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 23, 68, 0.55) 18%,
+      rgba(124, 58, 237, 0.55) 50%,
+      rgba(0, 229, 255, 0.55) 82%,
+      transparent 100%);
+    z-index: 2;
+  }
+  /* faint scanline overlay (cinema) */
+  .transmissions-section .tx-card-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    mix-blend-mode: screen;
+    border-radius: inherit;
+    z-index: 1;
+  }
+  .transmissions-section .tx-layout > * { position: relative; z-index: 3; }
+
+  /* chapter divider tightened to module top-bar */
+  .transmissions-section .tx-card-frame > .gh-chapter-divider {
+    margin: -0.5rem 0 1.5rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    opacity: 0.78;
+  }
+
+  /* ── Hero block ──────────────────────────────────────────────────────── */
   .transmissions-section .tx-hero {
     text-align: center;
-    padding: 1.5rem 0 2rem;
-    margin-bottom: 2rem;
+    padding: 0.25rem 0 2.25rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .transmissions-section .tx-hero-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .transmissions-section .tx-hero-row .eyebrow {
+    margin: 0;
+    text-align: left;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .transmissions-section .tx-hero h2 {
     font-family: var(--font-display, 'Cinzel', serif);
-    font-size: clamp(1.8rem, 4.5vw, 3rem);
+    font-size: clamp(2rem, 5vw, 3.4rem);
     font-weight: 700;
-    margin: 0.4rem 0 0.6rem;
+    margin: 0.6rem 0 0.7rem;
     color: #fff;
+    letter-spacing: -0.005em;
+    line-height: 1.05;
+    text-wrap: balance;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(244, 250, 255, 0.78) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 60px rgba(255, 23, 68, 0.12);
   }
   .transmissions-section .tx-hero-sub {
-    color: var(--text-muted, rgba(255,255,255,0.65));
-    max-width: 56ch;
-    margin: 0.5rem auto 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
+    color: var(--text-muted, rgba(255, 255, 255, 0.68));
+    max-width: 58ch;
+    margin: 0 auto;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    line-height: 1.65;
+    text-wrap: pretty;
   }
+
+  /* ── Stats grid (true sub-cards) ─────────────────────────────────────── */
   .transmissions-section .tx-stats {
-    display: flex;
-    gap: clamp(1rem, 3vw, 2rem);
-    justify-content: center;
-    margin-top: 1.4rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 1.75rem auto 0;
+    max-width: 720px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(12, 10, 28, 0.4), rgba(6, 6, 16, 0.3));
+  }
+  .transmissions-section .tx-stats > div {
+    padding: 1rem 0.75rem;
+    text-align: center;
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.78rem;
-    color: var(--text-muted, rgba(255,255,255,0.6));
+    font-size: 0.62rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.55));
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.16em;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.3s ease;
+  }
+  .transmissions-section .tx-stats > div:last-child {
+    border-right: none;
+  }
+  .transmissions-section .tx-stats > div:hover {
+    background: rgba(0, 229, 255, 0.04);
   }
   .transmissions-section .tx-stat-val {
     color: var(--accent-cyan, #00E5FF);
     font-weight: 700;
-    font-size: 1.4rem;
+    font-size: clamp(1.5rem, 2.2vw, 1.85rem);
     display: block;
     line-height: 1;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.45rem;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 18px rgba(0, 229, 255, 0.35);
   }
+  .transmissions-section .tx-stat-since {
+    display: block;
+    font-size: 0.55rem;
+    margin-top: 0.2rem;
+    opacity: 0.7;
+  }
+  @media (max-width: 640px) {
+    .transmissions-section .tx-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .transmissions-section .tx-stats > div:nth-child(2) { border-right: none; }
+    .transmissions-section .tx-stats > div:nth-child(1),
+    .transmissions-section .tx-stats > div:nth-child(2) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  /* ── Synopsis panel ──────────────────────────────────────────────────── */
   .transmissions-section .tx-synopsis {
-    padding: 1.4rem 1.6rem;
-    margin: 0 0 2rem;
-    border: 1px solid rgba(124, 58, 237, 0.22);
-    border-radius: var(--radius-panel, 14px);
-    background: linear-gradient(160deg, rgba(12, 10, 28, 0.7) 0%, rgba(6, 6, 16, 0.55) 100%);
-    backdrop-filter: blur(6px);
+    padding: 1.5rem 1.75rem;
+    margin: 0 0 1.75rem;
+    border: 1px solid rgba(124, 58, 237, 0.20);
+    border-left: 3px solid rgba(124, 58, 237, 0.55);
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(20, 14, 38, 0.55) 0%, rgba(8, 6, 18, 0.45) 100%);
+    backdrop-filter: blur(8px);
+    position: relative;
   }
   .transmissions-section .tx-synopsis h3 {
     font-family: var(--font-display, 'Cinzel', serif);
-    font-size: 1.05rem;
+    font-size: 0.78rem;
     color: var(--accent-purple, #7C3AED);
-    margin: 0 0 0.7rem;
-    letter-spacing: 0.04em;
+    margin: 0 0 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
   }
   .transmissions-section .tx-synopsis ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     line-height: 1.75;
-    color: rgba(255, 255, 255, 0.82);
+    color: rgba(255, 255, 255, 0.84);
+  }
+  .transmissions-section .tx-synopsis li {
+    padding: 0.15rem 0;
+    text-wrap: pretty;
   }
   .transmissions-section .tx-synopsis li::before {
-    content: "◆ ";
+    content: "◆";
     color: var(--accent-cyan, #00E5FF);
-    font-size: 0.7rem;
-    margin-right: 0.3rem;
+    font-size: 0.6rem;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+    opacity: 0.85;
   }
+
+  /* ── Filter pill-group ───────────────────────────────────────────────── */
   .transmissions-section .tx-filters {
-    display: flex;
-    gap: 0.65rem;
-    margin-bottom: 1.4rem;
+    display: inline-flex;
+    gap: 0;
+    margin: 0 0 1.5rem;
     flex-wrap: wrap;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(10, 8, 22, 0.5), rgba(6, 6, 16, 0.4));
+    backdrop-filter: blur(4px);
   }
   .transmissions-section .tx-filter-btn {
-    padding: 0.45rem 1rem;
-    border-radius: var(--radius-button, 999px);
-    border: 1px solid var(--line, rgba(255,255,255,0.12));
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
     background: transparent;
-    color: var(--text-muted, rgba(255,255,255,0.65));
+    color: var(--text-muted, rgba(255, 255, 255, 0.6));
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
+    font-weight: 500;
+    white-space: nowrap;
   }
-  .transmissions-section .tx-filter-btn:hover,
+  .transmissions-section .tx-filter-btn:hover {
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.04);
+  }
   .transmissions-section .tx-filter-btn.active {
-    border-color: var(--accent-cyan, #00E5FF);
-    color: var(--accent-cyan, #00E5FF);
-    background: rgba(0, 229, 255, 0.07);
+    color: #060610;
+    background: linear-gradient(180deg, rgba(0, 245, 255, 1), rgba(0, 200, 230, 1));
+    box-shadow:
+      0 0 20px rgba(0, 229, 255, 0.45),
+      0 0 0 1px rgba(0, 229, 255, 0.3);
+    font-weight: 700;
   }
+
+  /* ── List + cards ────────────────────────────────────────────────────── */
   .transmissions-section .tx-list {
     display: grid;
-    gap: 1rem;
+    gap: 0.85rem;
   }
   .transmissions-section .tx-card {
-    padding: 1.1rem 1.4rem;
-    border: 1px solid var(--line, rgba(255,255,255,0.1));
-    border-radius: var(--radius-panel, 14px);
-    background: linear-gradient(160deg, rgba(12, 10, 28, 0.6) 0%, rgba(6, 6, 16, 0.5) 100%);
-    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+    padding: 1.15rem 1.4rem 1.15rem 1.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(14, 12, 30, 0.55) 0%, rgba(6, 6, 16, 0.45) 100%);
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     cursor: pointer;
+    overflow: hidden;
+  }
+  .transmissions-section .tx-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0), rgba(0, 229, 255, 0.6), rgba(0, 229, 255, 0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
   .transmissions-section .tx-card:hover {
-    border-color: rgba(255, 23, 68, 0.32);
-    transform: translateY(-1px);
+    border-color: rgba(0, 229, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(160deg, rgba(16, 14, 34, 0.65) 0%, rgba(8, 6, 20, 0.5) 100%);
+  }
+  .transmissions-section .tx-card:hover::before { opacity: 1; }
+  .transmissions-section .tx-card:has(.tx-card-type.call):hover {
+    border-color: rgba(255, 23, 68, 0.35);
+  }
+  .transmissions-section .tx-card:has(.tx-card-type.call):hover::before {
+    background: linear-gradient(180deg, rgba(255, 23, 68, 0), rgba(255, 23, 68, 0.7), rgba(255, 23, 68, 0));
   }
   .transmissions-section .tx-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
     gap: 0.6rem;
   }
   .transmissions-section .tx-card-type {
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.62rem;
+    font-size: 0.6rem;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    padding: 0.15rem 0.55rem;
+    letter-spacing: 0.16em;
+    padding: 0.25rem 0.65rem;
     border-radius: 999px;
+    font-weight: 600;
+    line-height: 1;
   }
   .transmissions-section .tx-card-type.call {
-    border: 1px solid var(--accent-red, #FF1744);
+    border: 1px solid rgba(255, 23, 68, 0.45);
+    background: rgba(255, 23, 68, 0.08);
     color: var(--accent-red, #FF1744);
   }
   .transmissions-section .tx-card-type.chat {
-    border: 1px solid var(--accent-cyan, #00E5FF);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    background: rgba(0, 229, 255, 0.06);
     color: var(--accent-cyan, #00E5FF);
   }
   .transmissions-section .tx-card-time {
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
     font-size: 0.68rem;
-    color: var(--text-muted, rgba(255,255,255,0.55));
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
   }
   .transmissions-section .tx-card-preview {
-    font-size: 0.88rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.86);
     max-height: 4.8rem;
     overflow: hidden;
     mask-image: linear-gradient(180deg, #000 60%, transparent);
     -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent);
+    text-wrap: pretty;
   }
   .transmissions-section .tx-card.expanded .tx-card-preview {
     max-height: none;
@@ -12185,32 +12458,37 @@
     -webkit-mask-image: none;
   }
   .transmissions-section .tx-card-turns {
-    margin-top: 0.75rem;
+    margin-top: 0.85rem;
     display: none;
   }
   .transmissions-section .tx-card.expanded .tx-card-turns { display: block; }
   .transmissions-section .tx-turn {
-    padding: 0.55rem 0;
+    padding: 0.65rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
-    font-size: 0.85rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.86rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.86);
   }
   .transmissions-section .tx-turn-label {
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.62rem;
+    font-size: 0.6rem;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.2rem;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
   }
   .transmissions-section .tx-turn-label.caller { color: var(--accent-red, #FF1744); }
   .transmissions-section .tx-turn-label.signal { color: var(--accent-cyan, #00E5FF); }
   .transmissions-section .tx-empty {
     text-align: center;
-    padding: 2.5rem;
-    color: var(--text-muted, rgba(255,255,255,0.6));
+    padding: 3rem 2rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.55));
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.92rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(6, 6, 16, 0.3);
   }
   .transmissions-section .tx-insignificant { opacity: 0.42; }
   .transmissions-section .tx-filters:not(.show-all) + .tx-list .tx-insignificant {
@@ -12219,6 +12497,15 @@
   .transmissions-section .tx-filters.show-all + .tx-list .tx-insignificant {
     display: block;
     opacity: 0.62;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .transmissions-section .tx-card,
+    .transmissions-section .tx-card::before,
+    .transmissions-section .tx-filter-btn,
+    .transmissions-section .tx-stats > div {
+      transition: none;
+    }
+    .transmissions-section .tx-card:hover { transform: none; }
   }
 
   /* ── Merged Docs section (was /docs page) ────────────────────────────── */
@@ -12725,5 +13012,297 @@ dialog.lightbox .lightbox-close:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   dialog.lightbox .lightbox-image { animation: none; }
+}
+
+/* ============================================================
+   CINEMA LAYER — atmospheric polish on every homepage section.
+   Loaded last in cascade order so it can refine without
+   rewriting earlier component rules. Every animation gated by
+   prefers-reduced-motion. Every novel API gated by @supports.
+   ============================================================ */
+@layer cinema {
+  /* Section rhythm — push hero into the void, then pull every
+     subsequent section forward with a thin atmospheric scrim
+     so the eye never feels stuck on a flat backdrop. */
+  main > section,
+  main > .section,
+  main > article {
+    position: relative;
+    isolation: isolate;
+  }
+  main > section::before,
+  main > .section::before,
+  main > article::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124, 58, 237, 0.04), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0, 229, 255, 0.025), transparent 70%);
+    opacity: 0.9;
+  }
+
+  /* Section dividers — turn the existing <hr> into a hairline
+     glow with a centered diamond glyph for chapter-break feel. */
+  main hr.section-divider {
+    position: relative;
+    height: 1px;
+    border: 0;
+    margin: clamp(3rem, 6vw, 5rem) auto;
+    max-width: min(72rem, 92vw);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(124, 58, 237, 0.18) 25%,
+      rgba(0, 229, 255, 0.35) 50%,
+      rgba(255, 23, 68, 0.18) 75%,
+      transparent 100%
+    );
+    overflow: visible;
+  }
+  main hr.section-divider::after {
+    content: "◆";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(0, 229, 255, 0.6);
+    background: #060610;
+    font-size: 0.65rem;
+    line-height: 1;
+    padding: 0 0.6rem;
+    letter-spacing: 0.4em;
+    text-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+  }
+
+  /* Typography — balance hero + section headings so wraps land
+     on natural break points; pretty body copy. */
+  h1, h2, .hero-headline {
+    text-wrap: balance;
+  }
+  p, li, dd, blockquote {
+    text-wrap: pretty;
+  }
+
+  /* Hero — vignette + subtle drift on the stage so it never
+     feels static. Drift respects reduced-motion. */
+  .hero {
+    position: relative;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 10%, rgba(255, 23, 68, 0.08), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0, 0, 0, 0.6), transparent 70%);
+    mix-blend-mode: screen;
+  }
+  .hero > * {
+    position: relative;
+    z-index: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-stage .hero-video,
+    .hero-stage .hero-waveform {
+      will-change: transform;
+      animation: cinema-drift 24s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes cinema-drift {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(0, -8px, 0) scale(1.015); }
+  }
+
+  /* Scroll-reveal hardening — every section that already opts
+     into .reveal-section gets a richer entrance with a slight
+     blur lift, smoothing the chapter transition. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js-reveal-active .reveal-section:not(.is-revealed):not(:target) {
+      filter: blur(6px) saturate(0.85);
+      transform: translateY(28px);
+    }
+    .reveal-section.is-revealed,
+    .reveal-section:target {
+      filter: blur(0) saturate(1);
+      transform: translateY(0);
+      transition:
+        filter 700ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 700ms ease-out;
+    }
+  }
+
+  /* Scroll-driven progress accent — top hairline bar that
+     fills as you read down the page. Modern-browser only. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 100%;
+        z-index: 9999;
+        background: linear-gradient(
+          90deg,
+          #FF1744 0%,
+          #7C3AED 50%,
+          #00E5FF 100%
+        );
+        transform-origin: 0 50%;
+        transform: scaleX(0);
+        animation: cinema-scroll-progress linear;
+        animation-timeline: scroll(root);
+        pointer-events: none;
+        box-shadow: 0 0 14px rgba(0, 229, 255, 0.45);
+      }
+      @keyframes cinema-scroll-progress {
+        to { transform: scaleX(1); }
+      }
+    }
+  }
+
+  /* Status grid + sensor grid — soften card frames with a
+     conic accent and lift on hover without layout shift. */
+  .status-grid > *,
+  .sensor-grid > * {
+    position: relative;
+    transition: transform 320ms ease, box-shadow 320ms ease;
+  }
+  .status-grid > *::after,
+  .sensor-grid > *::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: conic-gradient(
+      from 220deg at 50% 50%,
+      transparent 0deg,
+      rgba(0, 229, 255, 0.06) 90deg,
+      transparent 180deg,
+      rgba(124, 58, 237, 0.06) 270deg,
+      transparent 360deg
+    );
+    opacity: 0;
+    transition: opacity 480ms ease;
+  }
+  @media (hover: hover) {
+    .status-grid > *:hover,
+    .sensor-grid > *:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 229, 255, 0.12) inset;
+    }
+    .status-grid > *:hover::after,
+    .sensor-grid > *:hover::after {
+      opacity: 1;
+    }
+  }
+
+  /* Evidence + dossier section — wrap large blocks in a soft
+     vignette so the eye lands on body copy first. */
+  .evidence-grid,
+  .porcine-grid,
+  .mission-block,
+  .dossier-block {
+    position: relative;
+  }
+  .evidence-grid::before,
+  .porcine-grid::before {
+    content: "";
+    position: absolute;
+    inset: -2rem;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 70% 50% at 50% 50%,
+      rgba(0, 0, 0, 0.4),
+      transparent 80%
+    );
+  }
+
+  /* Newsletter + MUD terminal — refined glow rim. */
+  .mud-terminal,
+  .newsletter-form,
+  .mud-terminal-chrome {
+    position: relative;
+  }
+  .mud-terminal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow:
+      0 0 0 1px rgba(0, 229, 255, 0.06) inset,
+      0 0 60px rgba(0, 229, 255, 0.05) inset;
+  }
+
+  /* Pull-quote callouts — punch up the glyph rendering and
+     give every callout a hairline brand frame. */
+  .evidence-callout {
+    position: relative;
+    overflow: hidden;
+  }
+  .evidence-callout::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(135deg, rgba(255, 23, 68, 0.05), transparent 40%),
+      linear-gradient(315deg, rgba(0, 229, 255, 0.04), transparent 40%);
+  }
+  .evidence-callout-glow {
+    background: linear-gradient(120deg, #FF1744, #7C3AED 55%, #00E5FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 24px rgba(124, 58, 237, 0.35);
+  }
+
+  /* Transmissions card-frame — deepen the existing frame with
+     a faint scanline texture for archival/CRT feel. */
+  .transmissions-section .tx-card-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: overlay;
+    opacity: 0.6;
+  }
+
+  /* Reduced-motion + low-power overrides — kill every layered
+     animation so the page is calm + accessible. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-stage .hero-video,
+    .hero-stage .hero-waveform {
+      animation: none !important;
+    }
+    body::before {
+      animation: none !important;
+      transform: scaleX(0) !important;
+    }
+    .reveal-section:not(.is-revealed) {
+      filter: none !important;
+      transform: none !important;
+    }
+  }
 }
 

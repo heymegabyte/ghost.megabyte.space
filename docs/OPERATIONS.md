@@ -12,9 +12,65 @@ pnpm check              # tsc --noEmit — any new error blocks the deploy
 pnpm test:e2e           # Playwright headless against wrangler dev
 ```
 
-`pnpm check` may surface four pre-existing TypeScript narrowing complaints in `src/index.ts` (route response unions + a couple of "possibly undefined" cmds in the MUD proxy). They are listed in [`CLAUDE.md`](../CLAUDE.md) § Verify-Before-Done as known-pre-existing. If you touched the file, fix the root cause; if you didn't, don't paper over them.
+`pnpm check` runs `tsc --noEmit` under `strict` + `noUncheckedIndexedAccess` + `useUnknownInCatchVariables` and is expected to exit 0. Any new diagnostic blocks the deploy — fix the root cause; do not paper over with `@ts-ignore`.
 
 `pnpm test:e2e` boots `wrangler dev --local --test-scheduled --persist-to .wrangler/state/e2e` with the Playwright dev vars (`.dev.vars.playwright`) and exercises the full surface. Failing tests must be triaged before deploy — they catch contract drift on the public API.
+
+## First-time provisioning
+
+The repo bootstraps to a working dev loop with:
+
+```sh
+pnpm install
+cp .dev.vars.example .dev.vars   # fill in the local-only secret values
+pnpm check
+pnpm dev
+```
+
+For a fresh Cloudflare account (or a new environment), the bindings declared in [`wrangler.jsonc`](../wrangler.jsonc) must exist first:
+
+1. Create a KV namespace for `RATE_LIMIT_KV` and copy the `id` into `wrangler.jsonc`.
+2. Create a D1 database named `ghost-megabyte-space-emf` for `EMF_DB` and copy the `database_id` into `wrangler.jsonc`.
+3. Apply the SQL migrations:
+   ```sh
+   npx wrangler d1 migrations apply ghost-megabyte-space-emf --remote
+   ```
+4. Confirm `ghost.megabyte.space` does not already resolve via a conflicting CNAME before binding the custom domain route.
+5. Provision the initial secrets:
+   ```sh
+   # Always-required
+   npx wrangler secret put HASS_SERVER
+   npx wrangler secret put HASS_TOKEN
+
+   # Chat (Anthropic primary → Workers AI Llama fallback)
+   npx wrangler secret put ANTHROPIC_API_KEY
+
+   # Hotline (signature-verified Twilio webhooks)
+   npx wrangler secret put TWILIO_ACCOUNT_SID
+   npx wrangler secret put TWILIO_AUTH_TOKEN
+   npx wrangler secret put TWILIO_PHONE_NUMBER
+
+   # Listmonk (newsletter + signed webhook → email_events / suppressions)
+   npx wrangler secret put LISTMONK_URL
+   npx wrangler secret put LISTMONK_API_USER
+   npx wrangler secret put LISTMONK_API_TOKEN
+   npx wrangler secret put LISTMONK_LIST_ID
+   npx wrangler secret put LISTMONK_WEBHOOK_SECRET
+
+   # PostHog analytics fan-out (optional; the webhook handler reports posthog: "skipped" without it)
+   npx wrangler secret put POSTHOG_API_KEY
+   npx wrangler secret put POSTHOG_HOST
+   ```
+   Non-secret config (`EMF_SENSOR_ENTITY_ID`, `EMF_SENSOR_NAME`, `EMF_SENSOR_STARTED_AT`, optional `EF_SENSOR_ENTITY_ID`, `RF_SENSOR_ENTITY_ID`, cache TTLs, rate-limit ceilings) lives in `wrangler.jsonc` `vars` and does NOT need `secret put`. See `.dev.vars.example` for the full key-by-key reference.
+
+Once the secrets are in place the cron handler (`*/1 * * * *` → `persistSnapshot`) populates `emf_snapshots` automatically; the rest of the public surface follows.
+
+## Sensor reference
+
+- **Public entity** — `sensor.gq_emf390_emf_mg` (GQ EMF-390 → Home Assistant).
+- **Earliest retained reading** — `2026-04-03T02:47:58.394637+00:00`. Use this as the lower bound when smoke-testing range-aware endpoints.
+- **History source** — Home Assistant recorder via `GET /api/history/period/<timestamp>` with `filter_entity_id` and `end_time`.
+- **Snapshot cadence** — one D1 row per minute via Worker cron.
 
 ## Deploy
 
@@ -29,7 +85,7 @@ npx wrangler deploy
 Notes:
 - `wrangler deploy` reads `wrangler.jsonc` and uses the explicit `account_id`, `name`, and `routes` block already declared there.
 - Static assets ship as part of the same deploy because `wrangler.jsonc` declares the `ASSETS` binding pointing at `./public` with `run_worker_first=true`.
-- Secrets (`HASS_TOKEN`, `ANTHROPIC_API_KEY`, `TWILIO_*`, `LISTMONK_API_TOKEN`) are managed separately via `wrangler secret put <NAME>` — they are NOT in `wrangler.jsonc` `vars`.
+- Secrets (`HASS_TOKEN`, `ANTHROPIC_API_KEY`, `TWILIO_*`, `LISTMONK_*` including `LISTMONK_WEBHOOK_SECRET`, `POSTHOG_API_KEY`) are managed separately via `wrangler secret put <NAME>` — they are NOT in `wrangler.jsonc` `vars`. Full key list lives in [`.dev.vars.example`](../.dev.vars.example).
 
 After the deploy command exits successfully, wrangler prints the new Worker Version ID. Capture it for the rollback path below.
 
@@ -63,11 +119,25 @@ curl -sS https://ghost.megabyte.space/api/v1/sensors | jq '.emf.numericValue, .e
 curl -sS https://ghost.megabyte.space/api/v1/ghost-emf/current -i | grep -i '^x-ratelimit\|^cache-control'
 ```
 
+Extended smoke run exercising range-aware endpoints (uses the earliest retained reading from § Sensor reference):
+
+```sh
+START=2026-04-03T02:47:58.394637%2B00:00
+END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+curl -sS "https://ghost.megabyte.space/api/v1/ghost-emf/history?start=${START}&end=${END}&targetPoints=960" | jq '.points | length'
+curl -sS "https://ghost.megabyte.space/api/v1/ghost-emf/entropy?start=${START}&end=${END}&bins=24&targetPoints=960" | jq '.shannonBits'
+curl -sS "https://ghost.megabyte.space/api/v1/ghost-emf/snapshot?start=${START}&end=${END}" | jq '.records | length'
+curl -sS "https://ghost.megabyte.space/api/v1/ghost-emf/export?start=${START}&end=${END}&format=csv" | head -3
+curl -sS "https://ghost.megabyte.space/api/v1/ghost-emf/random?start=${START}&end=${END}&digits=10" | jq .
+curl -sS https://ghost.megabyte.space/api/v1/ghost-emf/timeline | jq '.milestones | length'
+```
+
 A green smoke run shows:
 - `/health` returns `{ status: "ok", version, timestamp }`.
 - `/meta` returns the sensor entity-id list and `startedAt`.
 - `/sensors` returns numeric values for at least `emf`.
 - `/current` carries `x-ratelimit-*` headers and `cache-control: public, max-age=2`.
+- `/history`, `/entropy`, `/snapshot`, `/export`, `/random`, `/timeline` all return non-empty bodies with sane shapes.
 
 Then open `https://ghost.megabyte.space/api/docs` in a browser and verify the Scalar API Reference page loads (CSP relaxed for this path only).
 

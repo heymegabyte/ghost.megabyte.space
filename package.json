@@ -7,15 +7,16 @@
     "check": "tsc --noEmit",
     "dev": "wrangler dev",
     "dev:e2e": "HOME=.wrangler/home XDG_CONFIG_HOME=.wrangler/config wrangler dev --local --port 8787 --test-scheduled --persist-to .wrangler/state/e2e --env-file .dev.vars.playwright",
+    "validate:metadata": "node scripts/validate-route-metadata.mjs",
+    "prestamp": "node scripts/validate-route-metadata.mjs",
     "stamp": "node scripts/stamp-cache.mjs",
     "stamp:dry": "node scripts/stamp-cache.mjs --dry",
-    "deploy": "node scripts/stamp-cache.mjs && wrangler deploy",
+    "deploy": "node scripts/validate-route-metadata.mjs && node scripts/stamp-cache.mjs && wrangler deploy",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@hono/swagger-ui": "^0",
     "@hono/zod-openapi": "^0",
     "hono": "^4",
     "yaml": "^2.8.3",

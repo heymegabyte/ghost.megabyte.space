@@ -54,11 +54,13 @@ export interface Env {
   ENTROPY_CACHE_TTL_SECONDS?: string;
   /** Per-IP, per-minute request budget on `/api/v1/ghost-emf/*`. */
   PUBLIC_API_RATE_LIMIT_PER_MINUTE?: string;
+  /** Per-IP, per-minute message budget on `/api/v1/chat` + `/api/v1/chat/stream`. Defaults to 20. */
+  CHAT_RATE_LIMIT?: string;
   /** Anthropic API key for chat + hotline replies. */
   ANTHROPIC_API_KEY?: string;
-  /** Twilio Account SID (signature validation; not currently enforced). */
+  /** Twilio Account SID. Surfaced for diagnostics; not used by signature verification. */
   TWILIO_ACCOUNT_SID?: string;
-  /** Twilio auth token. */
+  /** Twilio auth token. Used by `verifyTwilioSignature` to validate `X-Twilio-Signature` on every webhook. */
   TWILIO_AUTH_TOKEN?: string;
   /** Twilio hotline phone number in E.164. */
   TWILIO_PHONE_NUMBER?: string;

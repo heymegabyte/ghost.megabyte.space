@@ -60,6 +60,24 @@ mud-terminal.png
 qa-temp.mjs
 test-mud.mjs
 
+# Verification screenshots (visual-QA artifacts — keep local, never commit)
+.playwright-mcp/
+/chat-*.png
+/chat[0-9]*-*.png
+/chat[0-9]*-*.jpeg
+/dream-*.jpeg
+/dream-*.png
+/dreams-*.jpeg
+/dreams-*.png
+/exhibit-*.jpeg
+/exhibit-*.png
+/perf-*.jpeg
+/perf-*.png
+/qa-*.png
+/qa-*.jpeg
+/transmissions-*.png
+/transmissions-*.jpeg
+
 # Misc local cruft
 *.bak
 *.orig

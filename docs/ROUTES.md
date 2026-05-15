@@ -6,7 +6,7 @@
 
 - `RL` column: `yes` = under `/api/v1/ghost-emf/*` rate-limit middleware (60 rpm/IP, KV-backed fixed window). `no` = exempt.
 - `Cache` column: edge cache TTL via `caches.default`. `n/a` = uncached.
-- `Auth` column: `public` = no auth. `webhook` = signature-verifiable but not enforced today (gap — see [`SECURITY.md`](./SECURITY.md)).
+- `Auth` column: `public` = no auth. `webhook` = `X-Twilio-Signature` HMAC-SHA1 verified against `TWILIO_AUTH_TOKEN` (see [`SECURITY.md`](./SECURITY.md) § Twilio signature verification).
 
 ## Public API — `/api/v1/ghost-emf/*` (rate-limited)
 
@@ -33,16 +33,21 @@
 
 | Method | Path | RL | Cache | Auth | Notes |
 |---|---|---|---|---|---|
-| POST | `/api/v1/chat` | no | n/a | public | Visitor → Ghost Signal reply. Anthropic Sonnet → Workers AI Llama → static fallback. |
+| POST | `/api/v1/chat` | 20rpm/IP | n/a | public | Visitor → Ghost Signal reply (single shot). Anthropic Sonnet → Workers AI Llama → static fallback. |
+| POST | `/api/v1/chat/stream` | 20rpm/IP | n/a | public | Same as `/chat` but SSE token-by-token via Anthropic `messages.stream` with `AbortSignal` propagation. |
 | GET | `/api/v1/chat/history/:sessionId` | no | n/a | public | Replay 50-message ascending. |
-| POST | `/api/v1/twilio/voice` | no | n/a | webhook | TwiML greeting. |
-| POST | `/api/v1/twilio/gather` | no | n/a | webhook | Speech-gather + Claude Haiku reply. |
-| POST | `/api/v1/twilio/status` | no | n/a | webhook | Call-completed write to D1. |
+| POST | `/api/v1/chat/feedback` | no | n/a | public | Thumbs-up/-down rating per assistant message. Idempotent on `(messageId, sessionId)`. |
+| GET | `/api/v1/chat/search` | no | n/a | public | FTS5 search across `chat_messages_fts` (porter unicode61 + `snippet()`); `LIKE` fallback when virtual table absent. |
+| POST | `/api/v1/twilio/voice` | no | n/a | webhook | TwiML greeting. HMAC-SHA1 signature gate via `verifyTwilioSignature`. |
+| POST | `/api/v1/twilio/gather` | no | n/a | webhook | Speech-gather + Claude Haiku reply. HMAC-SHA1 signature gate. |
+| POST | `/api/v1/twilio/status` | no | n/a | webhook | Call-completed write to D1. HMAC-SHA1 signature gate. |
 | GET | `/api/v1/transmissions` | no | n/a | public | Recent call rows. |
 | GET | `/api/v1/transmissions/live` | no | n/a | public | Server-Sent Events stream. |
 | GET | `/api/v1/transmission-count` | no | n/a | public | Combined chat + call count. |
 | POST | `/api/v1/debate` | no | n/a | public | Anthropic-backed debate endpoint. |
 | POST | `/api/v1/newsletter/subscribe` | no | n/a | public | Listmonk passthrough. |
+| POST | `/api/v1/listmonk/webhook` | no | n/a | webhook | HMAC-SHA256 signature gate (`X-Listmonk-Signature`) → `email_events` + `email_suppressions` + PostHog fan-out. |
+| GET | `/api/v1/email/health` | no | n/a | public | Suppression count + 24h event volume + PostHog wiring status. |
 
 ## Static + redirect surface
 

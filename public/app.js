@@ -51,6 +51,7 @@ const chatDropOverlayEl = $("chat-drop-overlay");
 const chatMicEl = $("chat-mic");
 const chatTtsEl = $("chat-tts-toggle");
 const chatTtsStopEl = $("chat-tts-stop");
+const chatStopStreamEl = $("chat-stop-stream");
 const chatSendEl = $("chat-send");
 const chatSettingsToggleEl = $("chat-settings-toggle");
 const chatSettingsEl = $("chat-settings");
@@ -468,9 +469,12 @@ const chatHistory = [];
 let chatAutoScrollLocked = true;
 let chatUnreadCount = 0;
 let chatLastSentMessage = "";
+let chatStreamController = null;
+let chatRateLimitTimer = null;
 
 const CHAT_PREFS_KEY = "ghost-chat-prefs";
 const CHAT_TRANSCRIPT_KEY = "ghost-chat-transcript";
+const CHAT_OPEN_KEY = "ghost-chat-open";
 const CHAT_PREF_DEFAULTS = {
   tts: false, voice: "", rate: 1.0, lang: "en-US",
   sound: false, notify: false, autoscroll: true, confidential: false, suggest: true,
@@ -507,6 +511,7 @@ function toggleChat(open) {
   chatToggleEl?.setAttribute("aria-expanded", String(state.chatOpen));
   chatPanelEl?.setAttribute("aria-hidden", String(!state.chatOpen));
   document.body.classList.toggle("chat-open", state.chatOpen);
+  try { localStorage.setItem(CHAT_OPEN_KEY, state.chatOpen ? "1" : "0"); } catch {}
   if (state.chatOpen) {
     chatUnreadCount = 0;
     updateUnreadBadge();
@@ -527,11 +532,66 @@ function escapeHtml(s) {
 }
 
 function renderRichText(text) {
+  if (!text) return "";
+  const blocks = [];
   let html = escapeHtml(text);
-  html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code}</code></pre>`);
+  html = html.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, _lang, code) => {
+    blocks.push(`<pre><code>${code.replace(/\n$/, "")}</code></pre>`);
+    return ` B${blocks.length - 1} `;
+  });
   html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  html = html.replace(/(?:^|\n)(\|[^\n]+\|)\n(\|[\s:|-]+\|)\n((?:\|[^\n]+\|\n?)+)/g, (_, headerRow, _sep, bodyBlock) => {
+    const splitRow = (row) => row.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+    const headers = splitRow(headerRow);
+    const rows = bodyBlock.trim().split("\n").map(splitRow);
+    const thead = `<thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead>`;
+    const tbody = `<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    blocks.push(`<div class="chat-msg-table-wrap"><table class="chat-msg-table">${thead}${tbody}</table></div>`);
+    return `\n B${blocks.length - 1} \n`;
+  });
+  const lines = html.split("\n");
+  const out = [];
+  let listType = null;
+  let inQuote = false;
+  const flushList = () => { if (listType) { out.push(`</${listType}>`); listType = null; } };
+  const flushQuote = () => { if (inQuote) { out.push("</blockquote>"); inQuote = false; } };
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    if (line.startsWith(" B")) { flushList(); flushQuote(); out.push(line); continue; }
+    const h = line.match(/^(#{1,3})\s+(.+)$/);
+    if (h) { flushList(); flushQuote(); out.push(`<h${h[1].length + 3}>${h[2]}</h${h[1].length + 3}>`); continue; }
+    const bq = line.match(/^&gt;\s?(.*)$/);
+    if (bq) {
+      flushList();
+      if (!inQuote) { out.push("<blockquote>"); inQuote = true; }
+      out.push(bq[1] || "<br/>");
+      continue;
+    }
+    flushQuote();
+    const ul = line.match(/^[-*]\s+(.+)$/);
+    const ol = line.match(/^(\d+)\.\s+(.+)$/);
+    if (ul) {
+      if (listType !== "ul") { flushList(); out.push("<ul>"); listType = "ul"; }
+      out.push(`<li>${ul[1]}</li>`);
+      continue;
+    }
+    if (ol) {
+      if (listType !== "ol") { flushList(); out.push("<ol>"); listType = "ol"; }
+      out.push(`<li>${ol[2]}</li>`);
+      continue;
+    }
+    flushList();
+    if (line === "") { out.push("<br/>"); continue; }
+    out.push(line);
+  }
+  flushList(); flushQuote();
+  html = out.join("\n");
   html = html.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/(^|[^a-z])(https?:\/\/[^\s<]+)/g, (m, lead, url) => `${lead}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+  html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+  html = html.replace(/(^|[\s(])_([^_\n]+)_(?=[\s.,!?)]|$)/g, "$1<em>$2</em>");
+  html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  html = html.replace(/(^|[^"=>a-z])(https?:\/\/[^\s<]+)/g, (_, lead, url) => `${lead}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+  html = html.replace(/ B(\d+) /g, (_, i) => blocks[Number(i)] || "");
   return html;
 }
 
@@ -689,6 +749,166 @@ function renderAttachments() {
   }).join("");
 }
 
+function addErrorBubble(text, latencyMs) {
+  const msg = addChatMessage("assistant", text, { latencyMs });
+  if (!msg) return null;
+  msg.classList.add("chat-error");
+  const meta = msg.querySelector(".chat-msg-meta");
+  if (meta) {
+    const retry = el("button", "chat-msg-action chat-msg-retry");
+    retry.type = "button";
+    retry.dataset.msgAction = "retry";
+    retry.setAttribute("aria-label", "Retry");
+    retry.textContent = "retry";
+    meta.append(retry);
+  }
+  return msg;
+}
+
+function beginStreamingBubble(messageId) {
+  if (!chatMessagesEl) return null;
+  const msg = el("div", "chat-message chat-assistant chat-streaming");
+  msg.dataset.msgRole = "assistant";
+  msg.dataset.msgText = "";
+  if (messageId) msg.dataset.msgId = messageId;
+  const time = fmtTime();
+  msg.innerHTML = `
+    <div class="chat-msg-row">
+      <span class="chat-avatar chat-avatar-ai" aria-hidden="true">◊</span>
+      <div class="chat-msg-body">
+        <p class="chat-msg-text"></p>
+        <div class="chat-msg-meta">
+          <time class="chat-msg-time">${time}</time>
+        </div>
+      </div>
+    </div>`;
+  chatMessagesEl.append(msg);
+  if (chatAutoScrollLocked) scrollChatToBottom();
+  return msg;
+}
+
+function renderSuggestionChips(items, anchorMsg) {
+  if (!anchorMsg || !Array.isArray(items) || items.length === 0) return;
+  const body = anchorMsg.querySelector(".chat-msg-body");
+  if (!body) return;
+  anchorMsg.querySelector(".chat-suggestion-chips")?.remove();
+  const wrap = el("div", "chat-suggestion-chips");
+  wrap.setAttribute("role", "group");
+  wrap.setAttribute("aria-label", "Suggested follow-ups");
+  for (const item of items.slice(0, 4)) {
+    if (typeof item !== "string" || !item.trim()) continue;
+    const chip = el("button", "chat-suggestion-chip");
+    chip.type = "button";
+    chip.textContent = item.trim();
+    chip.addEventListener("click", () => {
+      wrap.remove();
+      sendChatMessage(item.trim());
+    });
+    wrap.append(chip);
+  }
+  if (wrap.children.length > 0) body.append(wrap);
+}
+
+function addRateLimitCountdown(seconds) {
+  if (!chatMessagesEl || !Number.isFinite(seconds) || seconds <= 0) return;
+  if (chatRateLimitTimer) { clearInterval(chatRateLimitTimer); chatRateLimitTimer = null; }
+  const msg = el("div", "chat-message chat-error chat-rate-limit");
+  msg.setAttribute("role", "status");
+  msg.innerHTML = `
+    <div class="chat-msg-row">
+      <span class="chat-avatar chat-avatar-ai" aria-hidden="true">◊</span>
+      <div class="chat-msg-body">
+        <p class="chat-msg-text">Rate limit hit. Resuming in <strong class="chat-rate-countdown">${seconds}s</strong>.</p>
+      </div>
+    </div>`;
+  chatMessagesEl.append(msg);
+  if (chatAutoScrollLocked) scrollChatToBottom();
+  let remaining = seconds;
+  const tick = msg.querySelector(".chat-rate-countdown");
+  chatRateLimitTimer = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearInterval(chatRateLimitTimer);
+      chatRateLimitTimer = null;
+      msg.remove();
+      return;
+    }
+    if (tick) tick.textContent = `${remaining}s`;
+  }, 1000);
+}
+
+function appendStreamDelta(msg, delta) {
+  if (!msg || !delta) return;
+  const next = (msg.dataset.msgText || "") + delta;
+  msg.dataset.msgText = next;
+  const body = msg.querySelector(".chat-msg-text");
+  if (body) body.innerHTML = renderRichText(next);
+  if (chatAutoScrollLocked) scrollChatToBottom();
+}
+
+function finalizeStreamingBubble(msg, latencyMs) {
+  if (!msg) return;
+  const text = msg.dataset.msgText || "";
+  msg.classList.remove("chat-streaming");
+  const meta = msg.querySelector(".chat-msg-meta");
+  if (meta) {
+    if (latencyMs) {
+      const lat = el("span", "chat-msg-latency");
+      lat.textContent = `${Math.round(latencyMs)}ms`;
+      meta.append(lat);
+    }
+    for (const action of ["copy", "speak", "regen"]) {
+      const btn = el("button", "chat-msg-action");
+      btn.type = "button";
+      btn.dataset.msgAction = action;
+      btn.setAttribute("aria-label", action);
+      btn.textContent = action;
+      meta.append(btn);
+    }
+    if (msg.dataset.msgId) {
+      const fb = el("span", "chat-msg-feedback");
+      fb.setAttribute("role", "group");
+      fb.setAttribute("aria-label", "Rate this reply");
+      for (const rating of [1, -1]) {
+        const btn = el("button", "chat-msg-action chat-feedback-btn");
+        btn.type = "button";
+        btn.dataset.msgAction = "feedback";
+        btn.dataset.rating = String(rating);
+        btn.setAttribute("aria-label", rating === 1 ? "Mark reply helpful" : "Mark reply not helpful");
+        btn.textContent = rating === 1 ? "▲" : "▽";
+        fb.append(btn);
+      }
+      meta.append(fb);
+    }
+  }
+  chatHistory.push({ role: "assistant", text, ts: Date.now() });
+  saveTranscript();
+  if (!chatAutoScrollLocked) { chatUnreadCount++; updateUnreadBadge(); }
+  if (chatPrefs.tts) speakText(text);
+  if (chatPrefs.sound) playReplyChime();
+  if (chatPrefs.notify && document.hidden) tryNotify(text);
+}
+
+async function submitChatFeedback(messageId, rating, btn) {
+  if (!messageId || !state.chatSessionId) return;
+  try {
+    const res = await fetch("/api/v1/chat/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ messageId, sessionId: state.chatSessionId, rating }),
+    });
+    if (!res.ok) throw new Error("feedback failed");
+    if (btn) {
+      const meta = btn.closest(".chat-msg-feedback");
+      meta?.querySelectorAll(".chat-feedback-btn").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      btn.setAttribute("aria-pressed", "true");
+    }
+  } catch {
+    if (btn) btn.classList.add("is-error");
+  }
+}
+
 async function sendChatMessage(message) {
   hideStarters();
   const attachmentsForRender = chatAttachments.map((a) => ({ name: a.name, previewUrl: a.previewUrl }));
@@ -701,38 +921,144 @@ async function sendChatMessage(message) {
   chatAttachments.length = 0;
   renderAttachments();
   showTyping();
+  setChatStatus(true, "Streaming");
   const t0 = performance.now();
+  let bubble = null;
+  let suggestions = null;
+  let aborted = false;
+
+  if (chatStreamController) {
+    try { chatStreamController.abort(); } catch {}
+  }
+  const controller = new AbortController();
+  chatStreamController = controller;
+  if (chatStopStreamEl) chatStopStreamEl.hidden = false;
 
   try {
-    const res = await fetch("/api/v1/chat", {
+    const res = await fetch("/api/v1/chat/stream", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", accept: "text/event-stream" },
       body: JSON.stringify({ message, sessionId: state.chatSessionId }),
+      signal: controller.signal,
     });
-    removeTyping();
-    const latencyMs = performance.now() - t0;
-    if (!res.ok) {
+
+    if (!res.ok || !res.body) {
+      removeTyping();
+      const latencyMs = performance.now() - t0;
       setChatStatus(false);
-      addChatMessage("assistant", "The signal encountered interference. Try again.", { latencyMs });
+      if (res.status === 429) {
+        const reset = Number(res.headers.get("x-ratelimit-reset")) || 0;
+        const wait = reset > 0 ? Math.max(1, reset - Math.floor(Date.now() / 1000)) : 30;
+        addErrorBubble("Too many messages. Slow down — the signal needs a breath.", latencyMs);
+        addRateLimitCountdown(wait);
+      } else {
+        addErrorBubble("The signal encountered interference. Try again.", latencyMs);
+      }
       return;
     }
-    setChatStatus(true);
-    const data = await res.json();
-    if (data.sessionId) {
-      state.chatSessionId = data.sessionId;
-      localStorage.setItem("ghost-chat-session", data.sessionId);
+
+    const headerSession = res.headers.get("x-session-id");
+    if (headerSession) {
+      state.chatSessionId = headerSession;
+      localStorage.setItem("ghost-chat-session", headerSession);
     }
-    addChatMessage("assistant", data.response, { latencyMs });
-  } catch {
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let started = false;
+    let messageId = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split("\n\n");
+      buffer = events.pop() ?? "";
+      for (const evt of events) {
+        const line = evt.split("\n").find((l) => l.startsWith("data:"));
+        if (!line) continue;
+        const payload = line.slice(5).trim();
+        if (!payload) continue;
+        let parsed;
+        try { parsed = JSON.parse(payload); } catch { continue; }
+        if (parsed.type === "start") {
+          if (typeof parsed.messageId === "string") messageId = parsed.messageId;
+          if (typeof parsed.sessionId === "string") {
+            state.chatSessionId = parsed.sessionId;
+            localStorage.setItem("ghost-chat-session", parsed.sessionId);
+          }
+        } else if (parsed.type === "delta" && typeof parsed.text === "string") {
+          if (!started) { removeTyping(); bubble = beginStreamingBubble(messageId); started = true; setChatStatus(true, "Streaming"); }
+          appendStreamDelta(bubble, parsed.text);
+        } else if (parsed.type === "suggestions" && Array.isArray(parsed.items)) {
+          suggestions = parsed.items;
+        } else if (parsed.type === "done") {
+          if (parsed.sessionId) {
+            state.chatSessionId = parsed.sessionId;
+            localStorage.setItem("ghost-chat-session", parsed.sessionId);
+          }
+          if (parsed.messageId && bubble) bubble.dataset.msgId = parsed.messageId;
+          if (parsed.aborted) aborted = true;
+        } else if (parsed.type === "error") {
+          throw new Error(parsed.message || "stream error");
+        }
+      }
+    }
+
+    if (!started) {
+      removeTyping();
+      if (!aborted) addErrorBubble("Static on the line. Try again in a moment.", performance.now() - t0);
+      return;
+    }
+    finalizeStreamingBubble(bubble, performance.now() - t0);
+    if (!aborted && suggestions) renderSuggestionChips(suggestions, bubble);
+    setChatStatus(true, "Online");
+  } catch (err) {
     removeTyping();
-    setChatStatus(false);
-    addChatMessage("assistant", "Connection lost. The signal will return.");
+    if (controller.signal.aborted || err?.name === "AbortError") {
+      if (bubble && (bubble.dataset.msgText || "").length > 0) {
+        finalizeStreamingBubble(bubble, performance.now() - t0);
+      } else if (bubble) {
+        bubble.remove();
+      }
+      setChatStatus(true, "Online");
+    } else {
+      setChatStatus(false);
+      if (bubble) bubble.remove();
+      addErrorBubble("Connection lost. The signal will return.");
+    }
+  } finally {
+    if (chatStreamController === controller) chatStreamController = null;
+    if (chatStopStreamEl) chatStopStreamEl.hidden = true;
   }
 }
 
-function setChatStatus(online) {
+async function restoreServerHistory(sessionId) {
+  if (!sessionId) return false;
+  try {
+    const res = await fetch(`/api/v1/chat/history/${encodeURIComponent(sessionId)}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    const messages = Array.isArray(data?.messages) ? data.messages : [];
+    if (messages.length === 0) return false;
+    chatHistory.length = 0;
+    chatMessagesEl?.querySelectorAll(".chat-message").forEach((n, i) => { if (i > 0) n.remove(); });
+    for (const m of messages) {
+      if (m.role === "user" || m.role === "assistant") {
+        addChatMessage(m.role, m.content);
+      }
+    }
+    hideStarters();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function setChatStatus(online, label) {
   if (chatStatusDotEl) chatStatusDotEl.classList.toggle("is-offline", !online);
-  if (chatStatusTextEl) chatStatusTextEl.textContent = online ? "Online" : "Offline";
+  if (chatStatusTextEl) chatStatusTextEl.textContent = label || (online ? "Online" : "Offline");
 }
 
 function autoGrowTextarea() {
@@ -755,10 +1081,19 @@ function runSlashCommand(cmd) {
   const c = cmd.trim().toLowerCase();
   if (c === "/clear") { clearConversation(); return true; }
   if (c === "/help") { openChatShortcuts(); return true; }
-  if (c === "/stop") { window.speechSynthesis?.cancel(); chatTtsStopEl?.setAttribute("hidden", ""); return true; }
+  if (c === "/stop") {
+    window.speechSynthesis?.cancel();
+    chatTtsStopEl?.setAttribute("hidden", "");
+    if (chatStreamController) { try { chatStreamController.abort(); } catch {} }
+    return true;
+  }
   if (c === "/export") { exportTranscript(); return true; }
   if (c === "/share") { shareConversation(); return true; }
   if (c === "/search") { toggleChatSearch(true); return true; }
+  if (c === "/summarize") {
+    sendChatMessage("Summarize this conversation so far in 5 punchy bullet points, then suggest the next question I should ask.");
+    return true;
+  }
   return false;
 }
 
@@ -2451,8 +2786,24 @@ if (document.body.dataset.page === "home") {
       speakText(text);
     } else if (action === "regen") {
       const last = chatHistory.slice().reverse().find((m) => m.role === "user");
-      if (last) sendChatMessage(last.content);
+      if (last) sendChatMessage(last.text);
+    } else if (action === "retry") {
+      if (chatLastSentMessage) {
+        row?.remove();
+        chatHistory.pop();
+        sendChatMessage(chatLastSentMessage);
+      }
+    } else if (action === "feedback") {
+      const rating = Number(btn.dataset.rating);
+      const messageId = row?.dataset.msgId;
+      if (Number.isFinite(rating) && messageId) submitChatFeedback(messageId, rating, btn);
     }
+  });
+
+  // Stop streaming
+  chatStopStreamEl?.addEventListener("click", () => {
+    if (chatStreamController) { try { chatStreamController.abort(); } catch {} }
+    chatStopStreamEl.hidden = true;
   });
 
   // File attachments
@@ -2499,7 +2850,15 @@ if (document.body.dataset.page === "home") {
 
   // Chat init chain
   applyChatPrefs();
-  restoreTranscript();
+  const sharedSessionId = new URL(location.href).searchParams.get("session");
+  if (sharedSessionId) {
+    state.chatSessionId = sharedSessionId;
+    localStorage.setItem("ghost-chat-session", sharedSessionId);
+    restoreServerHistory(sharedSessionId).then((ok) => { if (!ok) restoreTranscript(); });
+  } else {
+    restoreTranscript();
+    restoreServerHistory(state.chatSessionId);
+  }
   initChatVoice();
   initChatTts();
   initChatSettings();
@@ -2510,6 +2869,11 @@ if (document.body.dataset.page === "home") {
   autoGrowTextarea();
   updateCharCount();
   setChatStatus(navigator.onLine);
+  try {
+    if (localStorage.getItem(CHAT_OPEN_KEY) === "1") {
+      requestAnimationFrame(() => toggleChat(true));
+    }
+  } catch {}
 
   // Global keyboard shortcuts
   document.addEventListener("keydown", (e) => {

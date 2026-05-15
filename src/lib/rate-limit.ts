@@ -99,3 +99,45 @@ export const publicReadRateLimit = createMiddleware<Bindings>(async (c, next) =>
   c.header("x-ratelimit-remaining", String(Math.max(limit - current - 1, 0)));
   c.header("x-ratelimit-reset", String(resetAt));
 });
+
+/**
+ * Per-IP rate limit specifically for AI chat endpoints (`POST /api/v1/chat`,
+ * `POST /api/v1/chat/stream`). Tighter than the public read budget because each
+ * request burns Anthropic credits and writes two D1 rows.
+ *
+ * Defaults: 20 messages / minute / IP. Override via `CHAT_RATE_LIMIT` env var.
+ * Key prefix `rate-limit:chat:<ip>:<minute-bucket>` keeps it separate from the
+ * public-read counter so a heavy `/sensors` poller does not block the chat.
+ */
+export const chatRateLimit = createMiddleware<Bindings>(async (c, next) => {
+  if (!c.env.RATE_LIMIT_KV) {
+    await next();
+    return;
+  }
+
+  if (c.req.method === "OPTIONS") {
+    await next();
+    return;
+  }
+
+  const limit = Number.parseInt(c.env.CHAT_RATE_LIMIT ?? "20", 10) || 20;
+  const ip = getIpAddress(c.req.raw);
+  const minuteBucket = Math.floor(Date.now() / 60_000);
+  const resetAt = (minuteBucket + 1) * 60;
+  const key = `rate-limit:chat:${ip}:${minuteBucket}`;
+  const current = Number.parseInt((await c.env.RATE_LIMIT_KV.get(key)) ?? "0", 10);
+
+  if (current >= limit) {
+    throw new ApiError("Too many messages. Slow down — the signal needs a breath.", 429, "RATE_LIMITED", {
+      limit,
+      resetAt,
+    });
+  }
+
+  await c.env.RATE_LIMIT_KV.put(key, String(current + 1), { expirationTtl: 120 });
+  await next();
+
+  c.header("x-ratelimit-limit", String(limit));
+  c.header("x-ratelimit-remaining", String(Math.max(limit - current - 1, 0)));
+  c.header("x-ratelimit-reset", String(resetAt));
+});

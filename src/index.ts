@@ -25,8 +25,11 @@
  *  - `GET /api/v1/ghost-emf/timeline` — narrative + technical milestones.
  *
  * Conversational surfaces (web chat + Twilio voice hotline):
- *  - `POST /api/v1/chat` — visitor → Ghost Signal reply.
+ *  - `POST /api/v1/chat` — visitor → Ghost Signal reply (single shot, rate-limited).
+ *  - `POST /api/v1/chat/stream` — visitor → Ghost Signal reply (SSE token stream, rate-limited).
  *  - `GET  /api/v1/chat/history/:sessionId` — replay a chat session.
+ *  - `POST /api/v1/chat/feedback` — thumbs up/down rating on an assistant message.
+ *  - `GET  /api/v1/chat/search` — FTS5 search across the chat archive (LIKE fallback).
  *  - `POST /api/v1/twilio/voice|gather|status` — TwiML webhooks for 601-666-6602.
  *  - `GET  /api/v1/transmissions` — latest call rows.
  *  - `GET  /api/v1/transmissions/live` — Server-Sent Events stream.
@@ -71,7 +74,7 @@ import { applyResponseHeaders, getSecurityHeaders } from "./lib/headers";
 import { downsamplePoints, parseHistoryWindow } from "./lib/history";
 import { fetchCurrentReading, fetchAllSensors, fetchHistoryPoints, persistSnapshot } from "./lib/home-assistant";
 import { areTestHelpersEnabled, resetSnapshots, seedSnapshots } from "./lib/test-helpers";
-import { publicReadRateLimit } from "./lib/rate-limit";
+import { chatRateLimit, publicReadRateLimit } from "./lib/rate-limit";
 import {
   buildGoogleSheetsFormula,
   buildSnapshotCsv,
@@ -83,11 +86,19 @@ import {
 } from "./lib/snapshots";
 import { parse as parseYaml } from "yaml";
 import timelineYamlText from "./data/timeline.yaml";
-import { handleChat, getChatHistory } from "./lib/chat";
+import {
+  handleChat,
+  handleChatStream,
+  getChatHistory,
+  persistChatFeedback,
+  searchChatMessages,
+} from "./lib/chat";
 import { buildGreetingTwiml, handleGather, getTransmissions, getTransmissionCount } from "./lib/twilio";
 import { verifyTwilioSignature } from "./lib/twilio-verify";
 import { storyMilestones, timelineAnnotations } from "./lib/timeline-events";
 import { ingestListmonkEvent, verifyListmonkSignature } from "./lib/email-events";
+import { parseJsonBody } from "./lib/request";
+import { DEFAULT_DEBATE_TOPIC, resolveDebateRounds } from "./lib/debate-bank";
 import type { AppVariables, Env, TimelineData } from "./types";
 
 type Bindings = {
@@ -694,7 +705,14 @@ app.openapi(currentRoute, async (c) => {
 
     return response;
   } catch {
-    return c.json({ error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR" }, 503);
+    // 503 schema is declared on `currentRoute` but `@hono/zod-openapi`'s
+    // `RouteConfigToTypedResponse` mis-narrows the secondary status slot to
+    // `never`. The runtime payload matches `ErrorSchema`; the cast unblocks
+    // strict TS without changing wire behavior.
+    return c.json(
+      { error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR", requestId: c.get("requestId") ?? "" },
+      503,
+    ) as never;
   }
 });
 
@@ -709,6 +727,14 @@ const sensorsRoute = createRoute({
       content: {
         "application/json": {
           schema: AllSensorsSchema,
+        },
+      },
+    },
+    503: {
+      description: "Sensor upstream unavailable",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
         },
       },
     },
@@ -740,7 +766,11 @@ app.openapi(sensorsRoute, async (c) => {
 
     return response;
   } catch {
-    return c.json({ error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR" }, 503);
+    // See `currentRoute` handler — same library inference quirk for 503.
+    return c.json(
+      { error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR", requestId: c.get("requestId") ?? "" },
+      503,
+    ) as never;
   }
 });
 
@@ -1092,18 +1122,41 @@ app.openapi(timelineRoute, (c) => {
   );
 });
 
-app.post("/api/v1/chat", async (c) => {
-  const body = await c.req.json<{ message?: string; sessionId?: string }>();
-  const message = body.message?.trim();
-  if (!message || message.length === 0 || message.length > 2000) {
-    return c.json({ error: "Message must be 1-2000 characters.", code: "INVALID_MESSAGE" }, 400);
-  }
+const ChatRequestSchema = z.object({
+  message: z.string().trim().min(1, "Message required.").max(2000, "Message must be ≤ 2000 characters."),
+  sessionId: z.string().uuid("Session id must be a valid UUID.").optional(),
+});
 
-  const sessionId = body.sessionId || crypto.randomUUID();
+app.use("/api/v1/chat", chatRateLimit);
+app.use("/api/v1/chat/stream", chatRateLimit);
+
+app.post("/api/v1/chat", async (c) => {
+  const parsed = await parseJsonBody(c, ChatRequestSchema, "INVALID_MESSAGE");
+  if (!parsed.ok) return parsed.response;
+
+  const sessionId = parsed.data.sessionId || crypto.randomUUID();
   const ip = c.req.header("cf-connecting-ip") ?? c.req.header("x-forwarded-for") ?? "unknown";
-  const response = await handleChat(c.env, message, sessionId, ip);
+  const response = await handleChat(c.env, parsed.data.message, sessionId, ip);
 
   return c.json({ response, sessionId }, 200);
+});
+
+app.post("/api/v1/chat/stream", async (c) => {
+  const parsed = await parseJsonBody(c, ChatRequestSchema, "INVALID_MESSAGE");
+  if (!parsed.ok) return parsed.response;
+
+  const sessionId = parsed.data.sessionId || crypto.randomUUID();
+  const ip = c.req.header("cf-connecting-ip") ?? c.req.header("x-forwarded-for") ?? "unknown";
+  const stream = await handleChatStream(c.env, parsed.data.message, sessionId, ip, c.req.raw.signal);
+
+  return new Response(stream, {
+    headers: {
+      "content-type": "text/event-stream; charset=utf-8",
+      "cache-control": "no-cache, no-transform",
+      "x-accel-buffering": "no",
+      "x-session-id": sessionId,
+    },
+  });
 });
 
 app.get("/api/v1/chat/history/:sessionId", async (c) => {
@@ -1114,6 +1167,41 @@ app.get("/api/v1/chat/history/:sessionId", async (c) => {
 
   const messages = await getChatHistory(c.env, sessionId);
   return c.json({ messages }, 200);
+});
+
+const ChatFeedbackSchema = z.object({
+  messageId: z.string().min(1, "messageId required."),
+  sessionId: z.string().min(1, "sessionId required."),
+  rating: z.union([z.literal(1), z.literal(-1)]),
+  reason: z.string().max(500, "reason ≤ 500 characters.").optional(),
+});
+
+app.post("/api/v1/chat/feedback", async (c) => {
+  const parsed = await parseJsonBody(c, ChatFeedbackSchema, "INVALID_FEEDBACK");
+  if (!parsed.ok) return parsed.response;
+  const ip = c.req.header("cf-connecting-ip") ?? c.req.header("x-forwarded-for") ?? "unknown";
+  const ok = await persistChatFeedback(c.env, {
+    messageId: parsed.data.messageId,
+    sessionId: parsed.data.sessionId,
+    rating: parsed.data.rating,
+    reason: parsed.data.reason,
+    ipAddress: ip,
+  });
+  return c.json({ ok, persisted: ok }, 200);
+});
+
+app.get("/api/v1/chat/search", async (c) => {
+  const q = (c.req.query("q") ?? "").trim();
+  if (!q) {
+    return c.json({ error: "Query 'q' required.", code: "MISSING_QUERY" }, 400);
+  }
+  if (q.length > 200) {
+    return c.json({ error: "Query must be ≤ 200 characters.", code: "QUERY_TOO_LONG" }, 400);
+  }
+  const sessionId = c.req.query("sessionId") ?? undefined;
+  const limit = Number.parseInt(c.req.query("limit") ?? "20", 10) || 20;
+  const hits = await searchChatMessages(c.env, q, sessionId, limit);
+  return c.json({ q, sessionId: sessionId ?? null, total: hits.length, hits }, 200);
 });
 
 app.post("/api/v1/twilio/voice", verifyTwilioSignature, async (c) => {
@@ -1230,33 +1318,8 @@ app.get("/api/v1/transmission-count", async (c) => {
 
 app.post("/api/v1/debate", async (c) => {
   const body = await c.req.json<{ topic?: string }>().catch(() => ({} as { topic?: string }));
-  const topic = body.topic || "True entropy from a public EMF sensor";
-
-  // Generate debate rounds — client-side pre-written for now (no AI dependency)
-  const debateBank: Record<string, Array<{ for: string; against: string }>> = {
-    "True entropy from a public EMF sensor": [
-      { for: "True randomness from a living EMF source — entropy no algorithm can fake. Built into AI to prevent deterministic tyranny.", against: "EMF readings from a single sensor are noise, not entropy. Peer-reviewed RNG hardware already exists." },
-      { for: "The multiverse fog-of-war theory suggests EMF fluctuations represent genuine quantum-adjacent entropy observable at macro scale.", against: "Extraordinary claims require extraordinary evidence. Publishing EMF data is not the same as proving multiverse interaction." },
-      { for: "By feeding true randomness into AI from a source that even abominable forces cannot control, we protect free will itself.", against: "Cryptographically secure PRNGs are already indistinguishable from true randomness for all practical purposes." },
-    ],
-    "AI hotline as public record": [
-      { for: "An AI listens, transcribes, and publishes every call. The public record finally outpaces the institutions that bury it.", against: "An AI intake line invites prank calls, harassment, and disinformation faster than moderation can respond." },
-      { for: "Transcripts as plain text files mean callers own the record forever — no platform can deplatform a static file behind a CDN.", against: "Caller identity, mental-health context, and consent get muddied when every utterance becomes searchable forever." },
-      { for: "Every transmission is a data point. The corpus turns rumor into pattern, and pattern into something a community can audit.", against: "Volume isn't truth. A million unverified transmissions still don't add up to evidence." },
-    ],
-    "Time travelers and clandestine surveillance": [
-      { for: "Pattern-recognition over decades — repeated plates, staged encounters, dream-burden coincidences — is data no single experiment captures.", against: "Apophenia thrives in long timelines. The brain manufactures patterns where none exist." },
-      { for: "Multiple agencies declined to investigate. That refusal is itself a record. Silence is signal.", against: "Agencies decline weak-evidence reports for the same reason scientists do — limited resources, infinite claims." },
-      { for: "The dossier exists as plates, audio, video, and timestamps. The evidence is reproducible by anyone who looks.", against: "Reproducible evidence is verifiable by independent observers, not just available to look at. The two are not the same." },
-    ],
-    "Ghost Signal Entropy Science": [
-      { for: "True randomness from a living EMF source — entropy no algorithm can fake. Built into AI to prevent deterministic tyranny.", against: "EMF readings from a single sensor are noise, not entropy. Peer-reviewed RNG hardware already exists." },
-      { for: "The multiverse fog-of-war theory suggests EMF fluctuations represent genuine quantum-adjacent entropy observable at macro scale.", against: "Extraordinary claims require extraordinary evidence. Publishing EMF data is not the same as proving multiverse interaction." },
-      { for: "By feeding true randomness into AI from a source that even abominable forces cannot control, we protect free will itself.", against: "Cryptographically secure PRNGs are already indistinguishable from true randomness for all practical purposes." },
-    ],
-  };
-
-  const rounds = debateBank[topic] || debateBank["True entropy from a public EMF sensor"];
+  const topic = body.topic || DEFAULT_DEBATE_TOPIC;
+  const rounds = resolveDebateRounds(topic);
   return c.json({ topic, rounds });
 });
 
@@ -1824,8 +1887,9 @@ function stripTelnet(data: Uint8Array): Uint8Array {
   const out: number[] = [];
   let i = 0;
   while (i < data.length) {
-    if (data[i] === 0xff && i + 1 < data.length) {
-      const cmd = data[i + 1];
+    const byte = data[i] as number;
+    if (byte === 0xff && i + 1 < data.length) {
+      const cmd = data[i + 1] as number;
       if (cmd >= 0xfb && cmd <= 0xfe) {
         // WILL/WONT/DO/DONT + option byte = 3 bytes
         i += 3;
@@ -1848,7 +1912,7 @@ function stripTelnet(data: Uint8Array): Uint8Array {
         i += 2;
       }
     } else {
-      out.push(data[i]);
+      out.push(byte);
       i++;
     }
   }

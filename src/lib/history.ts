@@ -72,10 +72,14 @@ export function parseHistoryWindow(input: {
 }
 
 /**
- * Largest-Triangle-Three-Buckets-style uniform downsample to `targetPoints` samples.
+ * Uniform index-based decimation down to `targetPoints` samples.
  *
- * Picks evenly spaced points by index. Returns the input unchanged when the request
- * is non-positive, larger than the input length, or otherwise impossible.
+ * Picks evenly spaced points along the input by index — preserves the first and
+ * last points exactly, samples interior points at a stride of `(N - 1)/(targetPoints - 1)`.
+ * This is cheaper than Largest-Triangle-Three-Buckets and adequate for the chart's
+ * resolution; LTTB would only pay off on data with visually significant outliers
+ * that uniform sampling can clip. Returns the input unchanged when the request
+ * is non-positive or larger than the input length.
  *
  * @param points        Time-ordered series.
  * @param targetPoints  Desired output length (typically the caller's `points` query param).

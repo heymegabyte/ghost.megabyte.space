@@ -74,6 +74,8 @@ D1 (`EMF_DB`):
 - `chat_messages` — sessioned visitor ↔ Ghost Signal exchange, append-only with a 50-message replay cap.
 - `call_transmissions` — Twilio hotline transcripts, one row per turn.
 - `newsletter_subscribers` — email + timestamp.
+- `email_events` — every Listmonk webhook delivery, raw payload retained.
+- `email_suppressions` — authoritative do-not-send list (`isSuppressed()` checks before every transactional send, fail-closed when `EMF_DB` unbound).
 
 KV (`RATE_LIMIT_KV`):
 - Per-IP fixed-window counter keys `rate-limit:public:<ip>:<minute-bucket>`. 120s TTL on each key (≥2× window so concurrent boundary requests can still read the prior bucket).
@@ -82,8 +84,9 @@ KV (`RATE_LIMIT_KV`):
 
 - **Home Assistant** — `HASS_SERVER` + `HASS_TOKEN` Bearer. Read-only access to specific entity ids. Non-200 → `502 HOME_ASSISTANT_UNAVAILABLE`.
 - **Anthropic Claude** — Sonnet for web chat, Haiku for voice. Failure falls through to Workers AI Llama; Llama failure falls through to a static line.
-- **Twilio Voice** — TwiML pipeline. The `escapeXml` helper is the only legal way to interpolate user content into TwiML.
-- **Listmonk** — newsletter passthrough. Basic-auth credentials in env.
+- **Twilio Voice** — TwiML pipeline. Every webhook is signature-verified by `verifyTwilioSignature` (HMAC-SHA1 over `url + sortedFormBody`, constant-time compare). The `escapeXml` helper is the only legal way to interpolate user content into TwiML.
+- **Listmonk** — newsletter passthrough. Basic-auth credentials in env. Webhook ingest verifies `X-Listmonk-Signature` (HMAC-SHA256 over raw body) and writes to `email_events` + `email_suppressions`.
+- **PostHog** — event fan-out for email events. Triggered by `forwardToPostHog` in `src/lib/email-events.ts`. Credentials optional; missing key skips the fan-out silently.
 
 ## Failure isolation
 
@@ -103,6 +106,9 @@ src/index.ts ──┬── src/lib/home-assistant.ts ── Home Assistant
                │                                └── D1.chat_messages
                ├── src/lib/twilio.ts ───────────┬── Anthropic (Haiku)
                │                                └── D1.call_transmissions
+               ├── src/lib/twilio-verify.ts ─── HMAC-SHA1 over Twilio webhook body
+               ├── src/lib/email-events.ts ────┬── PostHog (capture API)
+               │                                └── D1.email_events / email_suppressions
                ├── src/lib/rate-limit.ts ────── KV
                ├── src/lib/entropy.ts (pure)
                ├── src/lib/history.ts (pure)
