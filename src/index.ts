@@ -144,6 +144,27 @@ const StoryMilestoneSchema = z
   })
   .openapi("StoryMilestone");
 
+const TimelineEventSchema = z
+  .object({
+    id: z.string(),
+    date: z.string(),
+    title: z.string(),
+    body: z.string(),
+    category: z.string(),
+    severity: z.number().optional(),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    imageCaption: z.string().optional(),
+  })
+  .openapi("TimelineEvent");
+
+const TimelineCategorySchema = z
+  .object({
+    label: z.string(),
+    color: z.string(),
+  })
+  .openapi("TimelineCategory");
+
 const TimelineSchema = z
   .object({
     entityId: z.string(),
@@ -151,6 +172,8 @@ const TimelineSchema = z
     latestKnownAt: z.string(),
     annotations: z.array(TimelineAnnotationSchema),
     milestones: z.array(StoryMilestoneSchema),
+    events: z.array(TimelineEventSchema),
+    categories: z.record(z.string(), TimelineCategorySchema),
     safetyNote: z.string(),
   })
   .openapi("GhostEmfTimeline");

@@ -112,6 +112,12 @@ export interface TimelineEvent {
   body: string;
   category: string;
   severity?: number;
+  /** Path to a related evidence image, e.g. "/evidence-4gondor.webp". */
+  image?: string;
+  /** Accessible description of {@link TimelineEvent.image}. */
+  imageAlt?: string;
+  /** Short evidence caption shown under {@link TimelineEvent.image}. */
+  imageCaption?: string;
 }
 
 export interface TimelineCategory {

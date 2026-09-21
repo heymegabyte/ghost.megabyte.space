@@ -30,6 +30,9 @@ events:
     body: "Teenage internet life and the first rupture. Internet relationships, strangers appearing too close to home. The earliest confusion traces back here."
     category: narrative
     severity: 2
+    image: "/middle-earth-map.webp"
+    imageAlt: "Hand-drawn fantasy realm map — the kind of world a text MUD renders in prose"
+    imageCaption: "AVATAR MUD · outland.org"
 
   - id: avatar-identity
     date: "2012-06-06T00:00:00Z"
@@ -37,6 +40,9 @@ events:
     body: "A long-running sense of being larger than his circumstances. Harder to contain. Pulled toward a mission bigger than ordinary life."
     category: narrative
     severity: 3
+    image: "/pinky-brain.webp"
+    imageAlt: "Pinky and the Brain — the cartoon mice plotting to take over the world"
+    imageCaption: "A mission bigger than ordinary life"
 
   - id: rutgers-ultrasound
     date: "2014-09-01T00:00:00Z"
@@ -44,6 +50,9 @@ events:
     body: "Worked at the Rutgers nanotech lab on an ultrasonic pill property tester (github.com/timetravelershackedme/ultrasound.io). Probably already monitored by the clandestine force, but things kicked into high gear when I used a stack of iron washers to calibrate a 400V negative square-wave pulser wired to two piezoelectric ultrasound shear-wave transducers, plus high-amperage solenoids and stepper motors with advanced electrical-angle rotation — possibly ungrounded. The system entered a resonant state where oscilloscope readings climbed over time. The wider the gap I opened in the piezo circuit, the more the circuit seemed to grow in power. The resonance only ever occurred when the pulser–washer–piezo loop was mixed with a medium-sized set of electromagnetic coils — the solenoids and the stepper-motor windings. Pulser alone, washers alone, piezo alone: nothing. Add the coils into the same circuit and the system started feeding itself. I thought, 'I think I have found God.' Across the hall from the nanotech lab, people in the building moved as if in some sort of group-gangstalker harmony — controlling my computer, narrating my inner dialog, all in coherence, all in synchronicity."
     category: technical
     severity: 5
+    image: "/evidence-radiation-tdr.webp"
+    imageAlt: "Screenshot showing nearby cell-tower SSIDs renamed to Radiation TDS and Radiation TDR"
+    imageCaption: "Exhibit · WiFi SSIDs renamed 'Radiation TDR'"
 
   - id: gondor-recurrence
     date: "2018-06-06T06:06:00Z"
@@ -51,6 +60,9 @@ events:
     body: "A repeated sign witnessed across state lines by more than one family member. Too specific to ignore once it happens twice."
     category: signal
     severity: 5
+    image: "/evidence-4gondor.webp"
+    imageAlt: "4-GONDOR license plate on a Kia Stinger — a Lord of the Rings reference spotted in traffic"
+    imageCaption: "Exhibit · 4 GONDOR plate, Kia Stinger"
 
   - id: dallas-recovery
     date: "2019-01-01T00:00:00Z"
@@ -58,6 +70,9 @@ events:
     body: "Recovery, discipline, alarms, and amplified physical force. This chapter explains why the feed exists."
     category: narrative
     severity: 3
+    image: "/story/EXIT.webp"
+    imageAlt: "Illuminated EXIT sign — the way out"
+    imageCaption: "Dallas · the exit taken"
 
   - id: soup-kitchen
     date: "2020-03-01T00:00:00Z"
@@ -65,6 +80,9 @@ events:
     body: "Volunteering near Newark Penn Station. Calmness changes how the world responds. Multi-colored bags seemed to switch to black bags as if the scene had been edited in place."
     category: narrative
     severity: 4
+    image: "/evidence-jcsaves.webp"
+    imageAlt: "JCSAVES license plate on a Lexus RX 300 — 'JC Saves'"
+    imageCaption: "St. John's · Newark Penn Station"
 
   - id: dreams-and-coincidence
     date: "2021-06-06T00:00:00Z"
@@ -72,6 +90,9 @@ events:
     body: "Bizarre dreams. Unsettling physical sensations on waking. Before the time travelers came through, the dreams ran heroic — nanotechnology small enough to vanish, big enough to send data between now, the future, and the past. A supercomputer that time travels. Now the dreams have stopped, almost like someone needs the universe stable. They stay powerful anyway. One put me in the Oval Office — an alpha-figure leveraging the ghost world into the Presidency. The next run is being delayed as long as possible. A shaggy ghost dog resting through disturbing coincidences. A life that ranks unusually high in raw coincidence load."
     category: signal
     severity: 5
+    image: "/dream-president.webp"
+    imageAlt: "White House lawn portrait with the dreamer and fourteen adopted children — the POTUS dream"
+    imageCaption: "Dream · the Oval Office"
 
   - id: crop-circle-hike
     date: "2022-03-01T00:00:00Z"
@@ -79,6 +100,9 @@ events:
     body: "A friend and I went hiking in an out-of-normal way and found a crop circle. The same friend once got a royal flush. Sadly, we stopped talking. The coincidences pile up and the relationships drift apart."
     category: signal
     severity: 5
+    image: "/alien-hallucination.webp"
+    imageAlt: "Alien figure — the classic association behind crop-circle lore"
+    imageCaption: "The crop circle · off-trail"
 
   - id: cern-conversation
     date: "2022-09-15T00:00:00Z"
@@ -86,6 +110,9 @@ events:
     body: "A chance encounter with a scientist headed to CERN. Teleportation described as already possible. Time travel becomes a theoretical opening — the frame my Law of Attraction beliefs were always quietly built inside. 1950s parapsychology research already showed humans react to traumatic photos before they see them. Presentiment isn't fringe — it's a measured psychic phenomenon pointing at the same fact. Humans may never time travel in person — but a supercomputer sending data between now, the future, and the past sits squarely inside what's allowed. Stale data and delayed causality as part of the same cosmic question."
     category: discovery
     severity: 4
+    image: "/story/time-travelers.webp"
+    imageAlt: "Cartoony time-traveler dream imagery"
+    imageCaption: "The CERN question · time travel"
 
   - id: father-mark-exorcism
     date: "2024-06-01T00:00:00Z"
@@ -93,6 +120,9 @@ events:
     body: "Multiple priests, multiple rejections. The last was Father Mark, the exorcist from the Diocese of Paterson. Rejected because his spirit was scared. Everyone abandoned the guy who campaigned alien and 666."
     category: narrative
     severity: 5
+    image: "/evidence-church-gothic.webp"
+    imageAlt: "Dismantled Gothic church architecture with stained glass"
+    imageCaption: "Diocese of Paterson · exorcism declined"
 
   - id: usb-bridge-online
     date: "2026-04-03T02:47:58Z"
@@ -100,6 +130,9 @@ events:
     body: "The GQ EMF-390 sensor came online through the USB Hardware Bridge. Home Assistant began recording electromagnetic readings from an empty room."
     category: technical
     severity: 3
+    image: "/story/lightning-bolt.webp"
+    imageAlt: "Lightning bolt in the distance — raw electromagnetic energy"
+    imageCaption: "GQ EMF-390 · first reading"
 
   - id: six-six-six-pattern
     date: "2026-04-06T06:06:06Z"
@@ -107,6 +140,9 @@ events:
     body: "The number appears in the readings. In the timestamps. In the phone number. In the gaps between signals. Whether it means something or nothing, it keeps showing up."
     category: signal
     severity: 5
+    image: "/dream-antichrist.webp"
+    imageAlt: "Newspaper front page revealing the Antichrist — a face resembling the dreamer"
+    imageCaption: "666 · the recurring number"
 
   - id: public-api
     date: "2026-04-23T23:00:00Z"
@@ -114,6 +150,9 @@ events:
     body: "The sensor feed was published through a Cloudflare-cached API. Anyone can now poll, graph, and analyze the electromagnetic readings that something keeps affecting."
     category: technical
     severity: 4
+    image: "/story/collage.webp"
+    imageAlt: "Collage of the case evidence — the public dataset"
+    imageCaption: "Public API · Cloudflare-cached"
 
   - id: hotline-active
     date: "2026-04-23T23:30:00Z"
@@ -121,6 +160,9 @@ events:
     body: "The Ghost Signal Hotline went live. A number with 6666. Everything callers share becomes part of the signal. An AI listens, records, and remembers."
     category: transmission
     severity: 5
+    image: "/light-in-bathroom.webp"
+    imageAlt: "A light captured during the encounter that said 'tell your story'"
+    imageCaption: "Hotline · tell your story"
 
   - id: chat-signal
     date: "2026-04-23T23:45:00Z"
@@ -128,6 +170,9 @@ events:
     body: "An AI chat connected to the signal. Type what you know about 666. About the patterns. About the things you've seen that you can't explain. Everything becomes part of the dataset."
     category: transmission
     severity: 4
+    image: "/black-orb.webp"
+    imageAlt: "First-person POV: a black orb approaches and enters the body during the white-chariot dream"
+    imageCaption: "Chat · into the dataset"
 
   - id: backlash
     date: "2026-05-01T00:00:00Z"
@@ -135,4 +180,7 @@ events:
     body: "The story is real enough to bring backlash. People will say he needs a psych ward. He treats the site as a way to become a mystery people still have to solve later."
     category: narrative
     severity: 4
+    image: "/dream-doom.webp"
+    imageAlt: "First-person view in a hellish DOOM arena, lone pistol in hand, a distant figure walking away"
+    imageCaption: "Backlash · the unsolved mystery"
 

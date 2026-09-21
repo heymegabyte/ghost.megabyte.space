@@ -440,6 +440,20 @@ function renderTimeline() {
     catEl.style.color = color;
     header.append(dateEl, catEl);
     const title = el("h3", "tl-title", ev.title);
+    // Evidence image — gives each timeline entry visual validity
+    let media = null;
+    if (ev.image) {
+      media = el("figure", "tl-media");
+      const img = el("img", "tl-thumb");
+      img.src = ev.image;
+      img.alt = ev.imageAlt || ev.title;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.width = 480;
+      img.height = 300;
+      media.append(img);
+      if (ev.imageCaption) media.append(el("figcaption", "tl-media-cap", ev.imageCaption));
+    }
     const body = el("p", "tl-body", ev.body);
     const severity = el("div", "tl-severity");
     for (let s = 0; s < 5; s++) {
@@ -447,7 +461,7 @@ function renderTimeline() {
       pip.style.setProperty("--pip-color", color);
       severity.append(pip);
     }
-    card.append(header, title, body, severity);
+    card.append(header, title, ...(media ? [media] : []), body, severity);
     item.append(dot, card);
     timelineTrackEl.append(item);
   });
@@ -2406,14 +2420,9 @@ function initYouTubeFacades() {
   const facades = $$(".yt-facade");
   if (!facades.length) return;
 
-  // hqdefault.jpg + mqdefault.jpg are guaranteed for every YouTube video.
-  // maxresdefault/sddefault only exist for HD uploads — probing them fires
-  // 404s in DevTools for SD/older videos, so we use the guaranteed tier.
-  const thumbCandidates = (id) => [
-    `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
-    `https://i.ytimg.com/vi/${id}/mqdefault.jpg`,
-  ];
-
+  // Posters are self-hosted (CSP-clean, no i.ytimg.com) at /video-poster-<id>.webp.
+  // Motion (Ken Burns idle + hover sweep) is delivered via CSS so every thumbnail
+  // feels like video even when YouTube offers no animated preview for the id.
   facades.forEach((facade) => {
     const id = facade.dataset.yt;
     if (!id) return;
@@ -2422,22 +2431,32 @@ function initYouTubeFacades() {
     const allow = facade.dataset.allow ||
       "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 
-    if (!facade.style.backgroundImage) {
-      const candidates = thumbCandidates(id);
-      const probe = (i) => {
-        if (i >= candidates.length) return;
-        const im = new Image();
-        im.onload = () => {
-          if (im.naturalWidth >= 320) {
-            facade.style.backgroundImage = `url("${candidates[i]}")`;
-          } else {
-            probe(i + 1);
-          }
-        };
-        im.onerror = () => probe(i + 1);
-        im.src = candidates[i];
-      };
-      probe(0);
+    // Cinematic poster (self-hosted, object-fit cover, animated via CSS)
+    if (!facade.querySelector(".yt-facade-poster")) {
+      const poster = document.createElement("img");
+      poster.className = "yt-facade-poster";
+      poster.src = facade.dataset.poster || `/video-poster-${id}.webp`;
+      poster.alt = "";
+      poster.setAttribute("aria-hidden", "true");
+      poster.loading = "lazy";
+      poster.decoding = "async";
+      poster.addEventListener("error", () => facade.classList.add("yt-facade--noposter"), { once: true });
+      facade.appendChild(poster);
+    }
+
+    // Scanline sweep + "YouTube" medium badge (representative of the medium)
+    if (!facade.querySelector(".yt-facade-scan")) {
+      const scan = document.createElement("span");
+      scan.className = "yt-facade-scan";
+      scan.setAttribute("aria-hidden", "true");
+      facade.appendChild(scan);
+    }
+    if (!facade.querySelector(".yt-facade-badge")) {
+      const badge = document.createElement("span");
+      badge.className = "yt-facade-badge";
+      badge.setAttribute("aria-hidden", "true");
+      badge.textContent = "YouTube";
+      facade.appendChild(badge);
     }
 
     if (!facade.querySelector(".yt-facade-play")) {
@@ -2445,6 +2464,10 @@ function initYouTubeFacades() {
       btn.type = "button";
       btn.className = "yt-facade-play";
       btn.setAttribute("aria-label", `Play: ${title}`);
+      const ring = document.createElement("span");
+      ring.className = "yt-facade-play-ring";
+      ring.setAttribute("aria-hidden", "true");
+      btn.appendChild(ring);
       facade.appendChild(btn);
     }
     if (title && !facade.querySelector(".yt-facade-title")) {
