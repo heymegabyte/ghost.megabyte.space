@@ -119,7 +119,7 @@ const state = {
   activeTimelineIndex: -1,
   chatSessionId: localStorage.getItem("ghost-chat-session") || crypto.randomUUID(),
   chatOpen: false,
-  range: { preset: "24h", start: null, end: null },
+  range: { preset: "all", start: null, end: null },
   sensorStale: false,
   staleSince: null,
 };
@@ -211,8 +211,10 @@ function parseInitialRange() {
     const r = getPresetRange(p);
     return { preset: p, ...r };
   }
-  const r = getPresetRange("24h");
-  return { preset: "24h", ...r };
+  // Default to ALL-TIME so the full history is always on screen — especially important while
+  // the sensor is offline, when the chart is the only way to see the readings it did capture.
+  const r = getPresetRange("all");
+  return { preset: "all", ...r };
 }
 
 function rangeParams() {
