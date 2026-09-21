@@ -235,104 +235,558 @@ const GhostFeatures = (() => {
   function initSonification() {
     const btn = $("sonify-toggle");
     if (!btn) return;
+    const scope = document.getElementById("listen-scope");
+    const scopeCtx = scope ? scope.getContext("2d") : null;
+    const spec = document.getElementById("listen-spectrogram");
+    const specCtx = spec ? spec.getContext("2d") : null;
+    const stateTag = document.querySelector("[data-listen-scope-state]");
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Audio graph state
     let audioCtx = null;
-    let playing = false;
-    let oscillators = [];
-    let gainNode = null;
-    let lfo = null;
+    let masterGain = null;          // overall fade in/out
+    let busGain = null;             // post-FX bus
+    let compressor = null;          // safety limiter
+    let convolver = null;           // reverb
+    let dryGain = null;
+    let wetGain = null;
+    let highpass = null;
+    let lowpass = null;
+    let analyser = null;            // scope + spectrogram source
+    let osc1 = null, osc1Gain = null;             // drone fundamental
+    let osc1Sub = null, osc1SubGain = null;       // drone detuned sub
+    let osc2 = null, osc2Gain = null, osc2Vibrato = null, osc2VibratoDepth = null;
+    let osc3 = null, osc3Gain = null, osc3Pan = null, osc3PanLfo = null, osc3PanLfoGain = null;
+    let noiseSource = null, noiseGain = null, noiseFilter = null;
+    let tremolo = null, tremoloGain = null;
     let pollInterval = null;
+    let rafId = null;
+    let idleRafId = null;
+    let phase = 0;
+    let lastEmf = 0;
+    let smoothedEmf = 0;
+    let emfFloor = 0.4;             // adapt over time
+    let emfPeak = 1.0;
+    let playing = false;
+    let starting = false;
+    let stopping = false;
+    let visibilityHandler = null;
+    let peakHold = null;            // Float32Array peak envelope per scope sample
+    let peakDecay = 0.94;
 
-    function createSoundscape(emf) {
-      if (!audioCtx) return;
-
-      // Base drone — low frequency, always present
-      const baseFreq = 40 + emf * 20;
-      if (oscillators[0]) oscillators[0].frequency.setTargetAtTime(baseFreq, audioCtx.currentTime, 0.5);
-
-      // Harmonic layer — higher frequency modulated by EMF
-      const harmFreq = 220 + emf * 80;
-      if (oscillators[1]) oscillators[1].frequency.setTargetAtTime(harmFreq, audioCtx.currentTime, 0.3);
-
-      // Ghost whisper — noise modulation on spikes
-      const whisperGain = Math.min(0.15, emf / 20);
-      if (oscillators[2]) {
-        oscillators[2].frequency.setTargetAtTime(800 + Math.random() * 400 * emf, audioCtx.currentTime, 0.1);
+    function brandColor(v) {
+      // v: 0..255 → cyan (low) → purple (mid) → red (peak)
+      if (v < 6) return null;
+      const t = Math.min(1, v / 255);
+      let r, g, b;
+      if (t < 0.5) {
+        const k = t / 0.5;
+        r = Math.round(0 + (124 - 0) * k);
+        g = Math.round(229 - (229 - 58) * k);
+        b = Math.round(255 - (255 - 237) * k);
+      } else {
+        const k = (t - 0.5) / 0.5;
+        r = Math.round(124 + (255 - 124) * k);
+        g = Math.round(58 - (58 - 23) * k);
+        b = Math.round(237 - (237 - 68) * k);
       }
-      if (gainNode) {
-        gainNode.gain.setTargetAtTime(0.08 + whisperGain, audioCtx.currentTime, 0.2);
+      const a = Math.min(1, t * 1.45);
+      return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+    }
+
+    function syncCanvasSize(canvas) {
+      if (!canvas) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const r = canvas.getBoundingClientRect();
+      const targetW = Math.max(320, Math.floor(r.width * dpr));
+      const targetH = Math.max(80,  Math.floor(r.height * dpr));
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
       }
     }
 
-    function start() {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.08;
-      gainNode.connect(audioCtx.destination);
+    /* ── Synthesised impulse response (haunted corridor reverb) ── */
+    function buildImpulseResponse(ctx, durationSec, decay) {
+      const rate = ctx.sampleRate;
+      const len = Math.max(1, Math.floor(rate * durationSec));
+      const ir = ctx.createBuffer(2, len, rate);
+      for (let ch = 0; ch < 2; ch++) {
+        const data = ir.getChannelData(ch);
+        for (let i = 0; i < len; i++) {
+          // Exponentially decaying noise — subtle stereo decorrelation per channel
+          const t = i / len;
+          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, decay);
+        }
+      }
+      return ir;
+    }
 
-      // LFO for tremolo
-      lfo = audioCtx.createOscillator();
-      const lfoGain = audioCtx.createGain();
-      lfo.frequency.value = 0.3;
-      lfoGain.gain.value = 0.03;
-      lfo.connect(lfoGain);
-      lfoGain.connect(gainNode.gain);
-      lfo.start();
+    /* ── Pink-ish noise buffer (filtered white) for whisper bed ── */
+    function buildNoiseBuffer(ctx, seconds) {
+      const len = Math.floor(ctx.sampleRate * seconds);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      // Voss-McCartney-ish smoothing for pink character
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + w * 0.0555179;
+        b1 = 0.99332 * b1 + w * 0.0750759;
+        b2 = 0.96900 * b2 + w * 0.1538520;
+        b3 = 0.86650 * b3 + w * 0.3104856;
+        b4 = 0.55000 * b4 + w * 0.5329522;
+        b5 = -0.7616 * b5 - w * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11;
+        b6 = w * 0.115926;
+      }
+      return buf;
+    }
 
-      // Base drone
-      const osc1 = audioCtx.createOscillator();
-      osc1.type = "sine";
-      osc1.frequency.value = 55;
-      osc1.connect(gainNode);
-      osc1.start();
+    /* ── Visualisation: scope ── */
+    function drawScope() {
+      if (!scopeCtx || !scope || !analyser) return;
+      syncCanvasSize(scope);
+      const w = scope.width;
+      const h = scope.height;
+      scopeCtx.clearRect(0, 0, w, h);
 
-      // Harmonic
-      const osc2 = audioCtx.createOscillator();
-      osc2.type = "triangle";
-      osc2.frequency.value = 220;
-      const osc2Gain = audioCtx.createGain();
-      osc2Gain.gain.value = 0.04;
-      osc2.connect(osc2Gain);
-      osc2Gain.connect(gainNode);
-      osc2.start();
+      const buf = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(buf);
 
-      // Ghost whisper
-      const osc3 = audioCtx.createOscillator();
-      osc3.type = "sawtooth";
-      osc3.frequency.value = 800;
-      const osc3Gain = audioCtx.createGain();
-      osc3Gain.gain.value = 0.02;
-      osc3.connect(osc3Gain);
-      osc3Gain.connect(gainNode);
+      // Initialise peak-hold envelope sized to canvas width
+      if (!peakHold || peakHold.length !== Math.floor(w)) {
+        peakHold = new Float32Array(Math.floor(w));
+      }
+
+      // Glow pass — red (whisper layer) with broader stroke
+      scopeCtx.lineWidth = 4;
+      scopeCtx.strokeStyle = "rgba(255,23,68,0.22)";
+      scopeCtx.shadowBlur = 18;
+      scopeCtx.shadowColor = "rgba(255,23,68,0.55)";
+      scopeCtx.beginPath();
+      for (let i = 0; i < buf.length; i++) {
+        const x = (i / buf.length) * w;
+        const y = (buf[i] / 255) * h;
+        if (i === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+
+      // Main wave — cyan
+      scopeCtx.lineWidth = 1.6;
+      scopeCtx.strokeStyle = "#00E5FF";
+      scopeCtx.shadowBlur = 10;
+      scopeCtx.shadowColor = "rgba(0,229,255,0.8)";
+      scopeCtx.beginPath();
+      for (let i = 0; i < buf.length; i++) {
+        const x = (i / buf.length) * w;
+        const y = (buf[i] / 255) * h;
+        if (i === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+      scopeCtx.shadowBlur = 0;
+
+      // Peak-hold envelope — soft purple ribbon
+      scopeCtx.beginPath();
+      scopeCtx.strokeStyle = "rgba(124,58,237,0.55)";
+      scopeCtx.lineWidth = 1;
+      const mid = h / 2;
+      const samplesPerPx = buf.length / w;
+      for (let x = 0; x < w; x++) {
+        const sIdx = Math.floor(x * samplesPerPx);
+        const v = Math.abs((buf[sIdx] - 128) / 128);
+        if (v > peakHold[x]) peakHold[x] = v;
+        else peakHold[x] *= peakDecay;
+        const y = mid - peakHold[x] * (h * 0.48);
+        if (x === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+      scopeCtx.beginPath();
+      for (let x = 0; x < w; x++) {
+        const y = mid + peakHold[x] * (h * 0.48);
+        if (x === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+
+      drawSpectrogramFrame();
+      rafId = requestAnimationFrame(drawScope);
+    }
+
+    function drawSpectrogramFrame() {
+      if (!specCtx || !spec || !analyser) return;
+      syncCanvasSize(spec);
+      const w = spec.width;
+      const h = spec.height;
+      const scrollPx = 2;
+
+      const img = specCtx.getImageData(scrollPx, 0, w - scrollPx, h);
+      specCtx.putImageData(img, 0, 0);
+      specCtx.fillStyle = "rgba(6,6,16,0.05)";
+      specCtx.fillRect(0, 0, w - scrollPx, h);
+      specCtx.clearRect(w - scrollPx, 0, scrollPx, h);
+
+      const bins = analyser.frequencyBinCount;
+      const freq = new Uint8Array(bins);
+      analyser.getByteFrequencyData(freq);
+      const usableBins = Math.floor(bins * 0.5);
+      const colH = h / usableBins;
+      for (let i = 0; i < usableBins; i++) {
+        const v = freq[i];
+        const c = brandColor(v);
+        if (!c) continue;
+        const y = h - (i + 1) * colH;
+        specCtx.fillStyle = c;
+        specCtx.fillRect(w - scrollPx, y, scrollPx, Math.ceil(colH) + 1);
+      }
+    }
+
+    function drawIdle() {
+      if (!scopeCtx || !scope) return;
+      syncCanvasSize(scope);
+      const w = scope.width;
+      const h = scope.height;
+      scopeCtx.clearRect(0, 0, w, h);
+      // Idle wave reacts to remote EMF if we have one
+      const amp = 4 + Math.min(20, smoothedEmf * 14);
+      scopeCtx.lineWidth = 1;
+      scopeCtx.strokeStyle = "rgba(0,229,255,0.35)";
+      scopeCtx.shadowBlur = 6;
+      scopeCtx.shadowColor = "rgba(0,229,255,0.45)";
+      scopeCtx.beginPath();
+      const mid = h / 2;
+      for (let x = 0; x <= w; x += 2) {
+        const n = (Math.sin(x * 0.04 + phase) * 0.5 + (Math.random() - 0.5) * 0.6) * amp;
+        const y = mid + n;
+        if (x === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+      scopeCtx.shadowBlur = 0;
+      phase += 0.06;
+      idleRafId = reduceMotion ? null : requestAnimationFrame(drawIdle);
+    }
+
+    function startIdle() {
+      if (idleRafId) cancelAnimationFrame(idleRafId);
+      drawIdle();
+    }
+    function stopIdle() {
+      if (idleRafId) cancelAnimationFrame(idleRafId);
+      idleRafId = null;
+    }
+
+    /* ── EMF → synth parameter mapping (smooth, click-free) ── */
+    function applyEmf(emfRaw) {
+      if (!audioCtx) return;
+      lastEmf = emfRaw;
+      // Adaptive normalisation — track running floor + peak
+      emfFloor = emfFloor * 0.995 + Math.min(emfFloor, emfRaw) * 0.005;
+      emfPeak  = Math.max(emfPeak  * 0.997, emfRaw);
+      const norm = Math.max(0, Math.min(1, (emfRaw - emfFloor) / Math.max(0.0001, emfPeak - emfFloor)));
+      // Exponential smoothing for parameter writes
+      smoothedEmf = smoothedEmf * 0.7 + norm * 0.3;
+
+      const t = audioCtx.currentTime;
+
+      // Drone — 40-72 Hz, tiny detune for thickness
+      if (osc1) osc1.frequency.setTargetAtTime(40 + smoothedEmf * 32, t, 0.6);
+      if (osc1Sub) osc1Sub.frequency.setTargetAtTime(40 + smoothedEmf * 32 - 1.7, t, 0.6);
+
+      // Harmonic — 200-340 Hz with slow vibrato depth following EMF
+      if (osc2) osc2.frequency.setTargetAtTime(200 + smoothedEmf * 140, t, 0.35);
+      if (osc2VibratoDepth) osc2VibratoDepth.gain.setTargetAtTime(0.6 + smoothedEmf * 4, t, 0.4);
+
+      // Whisper — 600-1400 Hz drift
+      if (osc3) osc3.frequency.setTargetAtTime(600 + 800 * smoothedEmf, t, 0.18);
+      if (osc3Gain) osc3Gain.gain.setTargetAtTime(0.005 + 0.06 * smoothedEmf, t, 0.25);
+
+      // Pink-noise whisper bed — louder on spike
+      if (noiseGain) noiseGain.gain.setTargetAtTime(0.005 + 0.05 * smoothedEmf, t, 0.3);
+      if (noiseFilter) noiseFilter.frequency.setTargetAtTime(900 + smoothedEmf * 2200, t, 0.4);
+
+      // Reverb wet — more haunted on spike
+      if (wetGain) wetGain.gain.setTargetAtTime(0.18 + 0.32 * smoothedEmf, t, 0.5);
+
+      // Spike accent — when normalised value crosses threshold, fire short bell hit
+      if (norm > 0.55 && audioCtx && busGain) spikeAccent(norm);
+    }
+
+    /* ── One-shot bell-tone on EMF spike ── */
+    function spikeAccent(intensity) {
+      if (!audioCtx) return;
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      const pan = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+      osc.type = "triangle";
+      // Harmonic ratio — 4ths and 5ths above whisper for "ringing"
+      const baseHz = 660 + Math.random() * 220;
+      osc.frequency.setValueAtTime(baseHz, t);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(110, baseHz * 0.5), t + 1.4);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.06 * intensity, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+      if (pan) {
+        pan.pan.setValueAtTime((Math.random() * 2 - 1) * 0.7, t);
+        osc.connect(g).connect(pan).connect(busGain);
+      } else {
+        osc.connect(g).connect(busGain);
+      }
+      osc.start(t);
+      osc.stop(t + 1.55);
+    }
+
+    /* ── Build full audio graph ── */
+    function buildGraph() {
+      const Ctor = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new Ctor();
+      // Master + bus + safety
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.0001;             // start silent — we fade in
+      compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.value = -22;
+      compressor.knee.value = 24;
+      compressor.ratio.value = 6;
+      compressor.attack.value = 0.005;
+      compressor.release.value = 0.3;
+      busGain = audioCtx.createGain();
+      busGain.gain.value = 0.85;
+
+      // Reverb send/return
+      convolver = audioCtx.createConvolver();
+      convolver.buffer = buildImpulseResponse(audioCtx, 3.4, 2.6);
+      dryGain = audioCtx.createGain(); dryGain.gain.value = 0.78;
+      wetGain = audioCtx.createGain(); wetGain.gain.value = 0.22;
+
+      // Tonal shaping
+      highpass = audioCtx.createBiquadFilter();
+      highpass.type = "highpass";
+      highpass.frequency.value = 32;
+      lowpass = audioCtx.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.value = 5800;
+      lowpass.Q.value = 0.4;
+
+      // Analyser
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.85;
+      analyser.minDecibels = -90;
+      analyser.maxDecibels = -10;
+
+      // Routing: bus → highpass → lowpass → split (dry+wet) → compressor → master → dest
+      busGain.connect(highpass);
+      highpass.connect(lowpass);
+      lowpass.connect(dryGain);
+      lowpass.connect(convolver);
+      convolver.connect(wetGain);
+      dryGain.connect(compressor);
+      wetGain.connect(compressor);
+      compressor.connect(analyser);
+      analyser.connect(masterGain);
+      masterGain.connect(audioCtx.destination);
+
+      // Tremolo on bus — slow breath
+      tremolo = audioCtx.createOscillator();
+      tremoloGain = audioCtx.createGain();
+      tremolo.frequency.value = 0.28;
+      tremoloGain.gain.value = 0.04;
+      tremolo.connect(tremoloGain).connect(busGain.gain);
+      tremolo.start();
+
+      // ── Drone (CH1) — fundamental + slightly detuned sub
+      osc1 = audioCtx.createOscillator(); osc1.type = "sine"; osc1.frequency.value = 55;
+      osc1Gain = audioCtx.createGain();   osc1Gain.gain.value = 0.10;
+      osc1.connect(osc1Gain).connect(busGain);
+      osc1Sub = audioCtx.createOscillator(); osc1Sub.type = "triangle"; osc1Sub.frequency.value = 53.3;
+      osc1SubGain = audioCtx.createGain();   osc1SubGain.gain.value = 0.05;
+      osc1Sub.connect(osc1SubGain).connect(busGain);
+      osc1.start(); osc1Sub.start();
+
+      // ── Harmonic (CH2) — triangle with vibrato LFO
+      osc2 = audioCtx.createOscillator(); osc2.type = "triangle"; osc2.frequency.value = 220;
+      osc2Gain = audioCtx.createGain();   osc2Gain.gain.value = 0.045;
+      osc2Vibrato = audioCtx.createOscillator(); osc2Vibrato.type = "sine"; osc2Vibrato.frequency.value = 4.6;
+      osc2VibratoDepth = audioCtx.createGain(); osc2VibratoDepth.gain.value = 0.8;
+      osc2Vibrato.connect(osc2VibratoDepth).connect(osc2.frequency);
+      osc2.connect(osc2Gain).connect(busGain);
+      osc2.start(); osc2Vibrato.start();
+
+      // ── Whisper (CH3) — sawtooth with auto-pan
+      osc3 = audioCtx.createOscillator(); osc3.type = "sawtooth"; osc3.frequency.value = 800;
+      osc3Gain = audioCtx.createGain();   osc3Gain.gain.value = 0.012;
+      if (audioCtx.createStereoPanner) {
+        osc3Pan = audioCtx.createStereoPanner();
+        osc3PanLfo = audioCtx.createOscillator(); osc3PanLfo.type = "sine"; osc3PanLfo.frequency.value = 0.13;
+        osc3PanLfoGain = audioCtx.createGain();   osc3PanLfoGain.gain.value = 0.7;
+        osc3PanLfo.connect(osc3PanLfoGain).connect(osc3Pan.pan);
+        osc3.connect(osc3Gain).connect(osc3Pan).connect(busGain);
+        osc3PanLfo.start();
+      } else {
+        osc3.connect(osc3Gain).connect(busGain);
+      }
       osc3.start();
 
-      oscillators = [osc1, osc2, osc3];
-
-      pollInterval = setInterval(async () => {
-        try {
-          const r = await fetch("/api/v1/ghost-emf/current");
-          const d = await r.json();
-          createSoundscape(d.numericValue ?? 0);
-        } catch {}
-      }, 2000);
-
-      playing = true;
-      btn.textContent = "Stop Listening";
-      btn.classList.add("is-active");
+      // ── Pink noise whisper bed — filtered, very quiet, gated by EMF
+      const noiseBuf = buildNoiseBuffer(audioCtx, 4);
+      noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = noiseBuf;
+      noiseSource.loop = true;
+      noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = "bandpass";
+      noiseFilter.frequency.value = 1100;
+      noiseFilter.Q.value = 1.4;
+      noiseGain = audioCtx.createGain();
+      noiseGain.gain.value = 0.005;
+      noiseSource.connect(noiseFilter).connect(noiseGain).connect(busGain);
+      noiseSource.start();
     }
 
-    function stop() {
-      oscillators.forEach((o) => { try { o.stop(); } catch {} });
-      if (lfo) try { lfo.stop(); } catch {}
-      if (audioCtx) audioCtx.close();
+    async function start() {
+      if (playing || starting) return;
+      starting = true;
+      stopIdle();
+      try {
+        if (!audioCtx) buildGraph();
+        if (audioCtx.state === "suspended") await audioCtx.resume();
+
+        // Fade in master over 800ms — no jump-scare
+        const t = audioCtx.currentTime;
+        masterGain.gain.cancelScheduledValues(t);
+        masterGain.gain.setValueAtTime(0.0001, t);
+        masterGain.gain.exponentialRampToValueAtTime(0.32, t + 0.8);
+
+        // First parameter write so we don't hold default until first poll
+        applyEmf(lastEmf || 0.6);
+
+        // Poll EMF every second (cache TTL 2s — it's safe)
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(async () => {
+          try {
+            const r = await fetch("/api/v1/ghost-emf/current");
+            const d = await r.json();
+            applyEmf(Math.max(0, d.numericValue ?? 0));
+          } catch {}
+        }, 1000);
+
+        // Tab visibility — auto suspend / resume
+        if (visibilityHandler) document.removeEventListener("visibilitychange", visibilityHandler);
+        visibilityHandler = () => {
+          if (!audioCtx) return;
+          if (document.hidden && audioCtx.state === "running") audioCtx.suspend().catch(() => {});
+          else if (!document.hidden && audioCtx.state === "suspended" && playing) audioCtx.resume().catch(() => {});
+        };
+        document.addEventListener("visibilitychange", visibilityHandler);
+
+        playing = true;
+        btn.textContent = "Stop Listening";
+        btn.classList.add("is-active");
+        btn.setAttribute("aria-pressed", "true");
+        if (stateTag) {
+          stateTag.setAttribute("data-listen-scope-state", "LIVE");
+          stateTag.textContent = "LIVE";
+        }
+        if (spec) {
+          if (specCtx) specCtx.clearRect(0, 0, spec.width, spec.height);
+          spec.classList.add("is-active");
+        }
+        drawScope();
+      } catch (err) {
+        console.error("Sonification failed to start:", err);
+        btn.textContent = "Audio Blocked — Try Again";
+      } finally {
+        starting = false;
+      }
+    }
+
+    async function stop() {
+      if (!playing || stopping) return;
+      stopping = true;
+      // Fade out, then tear down
+      const t = audioCtx ? audioCtx.currentTime : 0;
+      if (audioCtx && masterGain) {
+        masterGain.gain.cancelScheduledValues(t);
+        masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      }
       clearInterval(pollInterval);
-      oscillators = [];
+      pollInterval = null;
+      if (visibilityHandler) {
+        document.removeEventListener("visibilitychange", visibilityHandler);
+        visibilityHandler = null;
+      }
+      // Wait for fade
+      await new Promise((r) => setTimeout(r, 650));
+      try { osc1 && osc1.stop(); } catch {}
+      try { osc1Sub && osc1Sub.stop(); } catch {}
+      try { osc2 && osc2.stop(); } catch {}
+      try { osc2Vibrato && osc2Vibrato.stop(); } catch {}
+      try { osc3 && osc3.stop(); } catch {}
+      try { osc3PanLfo && osc3PanLfo.stop(); } catch {}
+      try { tremolo && tremolo.stop(); } catch {}
+      try { noiseSource && noiseSource.stop(); } catch {}
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      try { audioCtx && audioCtx.close(); } catch {}
       audioCtx = null;
+      analyser = null;
+      osc1 = osc1Sub = osc2 = osc2Vibrato = osc3 = osc3PanLfo = tremolo = noiseSource = null;
+      osc1Gain = osc1SubGain = osc2Gain = osc2VibratoDepth = osc3Gain = osc3Pan = osc3PanLfoGain = null;
+      noiseFilter = noiseGain = highpass = lowpass = dryGain = wetGain = convolver = compressor = busGain = masterGain = null;
       playing = false;
-      btn.textContent = "Listen to the Ghost";
+      btn.textContent = "Press to Listen";
       btn.classList.remove("is-active");
+      btn.setAttribute("aria-pressed", "false");
+      if (stateTag) {
+        stateTag.setAttribute("data-listen-scope-state", "STANDBY");
+        stateTag.textContent = "STANDBY";
+      }
+      if (spec) {
+        spec.classList.remove("is-active");
+        setTimeout(() => specCtx && specCtx.clearRect(0, 0, spec.width, spec.height), 1300);
+      }
+      stopping = false;
+      startIdle();
     }
 
     btn.addEventListener("click", () => playing ? stop() : start());
+    // Keyboard activation feels right
+    btn.addEventListener("keydown", (e) => {
+      if ((e.key === " " || e.key === "Enter") && !e.repeat) {
+        e.preventDefault();
+        playing ? stop() : start();
+      }
+    });
+
+    // Idle scope — react to remote EMF readings even before user presses play
+    setInterval(async () => {
+      if (playing) return;
+      try {
+        const r = await fetch("/api/v1/ghost-emf/current");
+        const d = await r.json();
+        const v = Math.max(0, d.numericValue ?? 0);
+        smoothedEmf = smoothedEmf * 0.7 + (v / 5) * 0.3; // crude normalise for idle viz
+      } catch {}
+    }, 3000);
+
+    // Resize handling
+    let resizeT = null;
+    window.addEventListener("resize", () => {
+      if (resizeT) clearTimeout(resizeT);
+      resizeT = setTimeout(() => {
+        peakHold = null;
+        if (scope) syncCanvasSize(scope);
+        if (spec) syncCanvasSize(spec);
+      }, 120);
+    });
+
+    syncCanvasSize(scope);
+    syncCanvasSize(spec);
+    startIdle();
   }
 
   /* ═══════════════════════════════════════════════
@@ -603,49 +1057,267 @@ const GhostFeatures = (() => {
     const remoteReading = panel.querySelector(".detector-remote-value");
     const meterFill = panel.querySelector(".detector-meter-fill");
     const statusText = panel.querySelector(".detector-status");
+    const localUnit = panel.querySelector(".listen-feature-reading:not(.listen-feature-reading--remote) .detector-unit");
 
-    let sensorAvailable = false;
+    /* ── shared state ─────────────────────────────────────── */
+    let smoothedLocal = 0;          // EMA mG
+    let baselineLocal = 0;          // running floor
+    let peakLocal = 0;              // running peak
+    let smoothedRemote = 0;         // EMA mG (remote)
+    let lastTickTs = 0;             // hz calc
+    let tickHz = 0;                 // measured update rate
+    let sourceLabel = "";           // "magnetometer" | "motion" | "orientation"
+    let permissionGranted = false;
+    let sensorOnline = false;
+    let permissionButton = null;
 
-    // Try Magnetometer API
-    if ("Magnetometer" in window) {
-      try {
-        const magnetometer = new Magnetometer({ frequency: 10 });
-        magnetometer.addEventListener("reading", () => {
-          const magnitude = Math.sqrt(magnetometer.x ** 2 + magnetometer.y ** 2 + magnetometer.z ** 2);
-          const mG = magnitude * 10; // Tesla to milliGauss approximation
-          if (localReading) localReading.textContent = mG.toFixed(2);
-          if (meterFill) meterFill.style.width = Math.min(100, mG * 10) + "%";
-          sensorAvailable = true;
-        });
-        magnetometer.addEventListener("error", () => {
-          if (statusText) statusText.textContent = "Magnetometer permission denied";
-        });
-        magnetometer.start();
-      } catch {
-        if (statusText) statusText.textContent = "Magnetometer not available — showing remote sensor only";
+    /* ── status helpers ───────────────────────────────────── */
+    const setStatus = (txt, kind = "neutral") => {
+      if (!statusText) return;
+      statusText.textContent = txt;
+      statusText.dataset.state = kind; // CSS may color: live | denied | waiting | offline | warn
+    };
+    const setLocalUnit = (txt) => {
+      if (localUnit) localUnit.textContent = txt;
+    };
+
+    /* ── EMA + meter renderer ─────────────────────────────── */
+    function pushLocal(rawMg) {
+      const now = performance.now();
+      if (lastTickTs) {
+        const dt = (now - lastTickTs) / 1000;
+        if (dt > 0) tickHz = tickHz * 0.85 + (1 / dt) * 0.15;
       }
-    } else if (window.DeviceOrientationEvent) {
-      // Fallback: use device orientation compass as rough proxy
-      window.addEventListener("deviceorientation", (e) => {
-        if (e.alpha !== null) {
-          const pseudo = Math.abs(e.alpha % 90) / 30;
-          if (localReading) localReading.textContent = pseudo.toFixed(2);
-          if (meterFill) meterFill.style.width = Math.min(100, pseudo * 20) + "%";
-          sensorAvailable = true;
-        }
-      });
-    } else {
-      if (statusText) statusText.textContent = "No device sensors — showing remote sensor only";
+      lastTickTs = now;
+
+      smoothedLocal = smoothedLocal * 0.78 + rawMg * 0.22;
+      baselineLocal = baselineLocal === 0
+        ? smoothedLocal
+        : Math.min(baselineLocal * 1.0005, baselineLocal * 0.995 + smoothedLocal * 0.005);
+      peakLocal = Math.max(peakLocal * 0.997, smoothedLocal);
+
+      if (localReading) localReading.textContent = smoothedLocal.toFixed(2);
+      renderMeter();
+      maybeUpdateStatus();
     }
 
-    // Poll remote sensor
-    setInterval(async () => {
+    function renderMeter() {
+      if (!meterFill) return;
+      const span = Math.max(0.05, peakLocal - baselineLocal);
+      const norm = Math.min(1, Math.max(0, (smoothedLocal - baselineLocal) / span));
+      const remoteNorm = Math.min(1, smoothedRemote / 0.4);
+      const combined = Math.max(norm, remoteNorm);
+      meterFill.style.width = (combined * 100).toFixed(1) + "%";
+
+      // Alarm coloring — both sides hot = ghost detected
+      const both = norm > 0.55 && remoteNorm > 0.55;
+      const localHot = norm > 0.65;
+      const remoteHot = remoteNorm > 0.65;
+      meterFill.dataset.state = both
+        ? "ghost"
+        : localHot
+        ? "local"
+        : remoteHot
+        ? "remote"
+        : "calm";
+    }
+
+    function maybeUpdateStatus() {
+      if (!sensorOnline) return;
+      const span = Math.max(0.05, peakLocal - baselineLocal);
+      const norm = Math.min(1, Math.max(0, (smoothedLocal - baselineLocal) / span));
+      const hzTxt = tickHz ? ` · ${tickHz.toFixed(1)} Hz` : "";
+      if (norm > 0.65 && smoothedRemote > 0.18) {
+        setStatus(`Both sides spiking${hzTxt} · ${sourceLabel} live`, "warn");
+      } else if (norm > 0.6) {
+        setStatus(`Local spike${hzTxt} · ${sourceLabel} live`, "live");
+      } else if (smoothedRemote > 0.25) {
+        setStatus(`Corridor spike · ${sourceLabel} live${hzTxt}`, "live");
+      } else {
+        setStatus(`${sourceLabel} live${hzTxt}`, "live");
+      }
+    }
+
+    /* ── sensor sources ───────────────────────────────────── */
+    function startMagnetometer() {
+      if (!("Magnetometer" in window)) return false;
       try {
-        const r = await fetch("/api/v1/ghost-emf/current");
+        const mag = new Magnetometer({ frequency: 10 });
+        mag.addEventListener("reading", () => {
+          const mag2 = mag.x * mag.x + mag.y * mag.y + mag.z * mag.z;
+          const mG = Math.sqrt(mag2) * 10; // µT → mG (rough; sensor reports µT)
+          sensorOnline = true;
+          pushLocal(mG);
+        });
+        mag.addEventListener("error", (e) => {
+          sensorOnline = false;
+          if (e?.error?.name === "NotAllowedError") {
+            setStatus("Magnetometer permission denied", "denied");
+          } else {
+            attemptDeviceMotion();
+          }
+        });
+        mag.start();
+        sourceLabel = "magnetometer";
+        setLocalUnit("milligauss");
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function attemptDeviceMotion() {
+      if (typeof DeviceMotionEvent === "undefined") return attemptDeviceOrientation();
+      let received = false;
+      const handler = (e) => {
+        const acc = e.accelerationIncludingGravity || e.acceleration;
+        if (!acc) return;
+        received = true;
+        // Use micro-jitter as a stand-in field disturbance proxy
+        const jitter = Math.sqrt(
+          (acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2
+        );
+        // Subtract gravity-magnitude (~9.8) and rescale to a "mG-ish" value
+        const proxy = Math.max(0, Math.abs(jitter - 9.8)) * 12;
+        sensorOnline = true;
+        pushLocal(proxy);
+      };
+      window.addEventListener("devicemotion", handler);
+      sourceLabel = "motion";
+      setLocalUnit("milligauss · proxy");
+      // If nothing arrives within 2s, fall back further
+      setTimeout(() => {
+        if (!received) {
+          window.removeEventListener("devicemotion", handler);
+          attemptDeviceOrientation();
+        }
+      }, 2000);
+      return true;
+    }
+
+    function attemptDeviceOrientation() {
+      if (!window.DeviceOrientationEvent) {
+        sensorOnline = false;
+        setStatus("No phone sensors · remote feed only", "offline");
+        return false;
+      }
+      let received = false;
+      const handler = (e) => {
+        if (e.alpha == null && e.beta == null && e.gamma == null) return;
+        received = true;
+        const a = Math.abs(((e.alpha || 0) % 90) / 90);
+        const b = Math.abs(((e.beta || 0) % 90) / 90);
+        const g = Math.abs(((e.gamma || 0) % 90) / 90);
+        const proxy = (a + b + g) / 3 * 0.5; // 0..0.5 range pseudo mG
+        sensorOnline = true;
+        pushLocal(proxy);
+      };
+      window.addEventListener("deviceorientation", handler);
+      sourceLabel = "orientation";
+      setLocalUnit("milligauss · proxy");
+      setTimeout(() => {
+        if (!received) {
+          sensorOnline = false;
+          setStatus("Phone sensors silent · remote feed only", "offline");
+        }
+      }, 2500);
+      return true;
+    }
+
+    /* ── iOS 13+ permission gate ──────────────────────────── */
+    function needsPermission() {
+      const motionGate =
+        typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission === "function";
+      const orientGate =
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function";
+      return motionGate || orientGate;
+    }
+
+    async function requestPermission() {
+      try {
+        let granted = true;
+        if (
+          typeof DeviceMotionEvent !== "undefined" &&
+          typeof DeviceMotionEvent.requestPermission === "function"
+        ) {
+          const r = await DeviceMotionEvent.requestPermission();
+          granted = granted && r === "granted";
+        }
+        if (
+          typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+          const r2 = await DeviceOrientationEvent.requestPermission();
+          granted = granted && r2 === "granted";
+        }
+        permissionGranted = granted;
+        return granted;
+      } catch {
+        return false;
+      }
+    }
+
+    function injectPermissionButton() {
+      if (permissionButton) return;
+      permissionButton = document.createElement("button");
+      permissionButton.type = "button";
+      permissionButton.className = "button button-ghost detector-enable-btn";
+      permissionButton.textContent = "Enable Phone Sensors";
+      permissionButton.setAttribute("aria-label", "Enable phone motion and magnetometer sensors for ghost detection");
+      const head = panel.querySelector(".listen-feature-detector-head") || panel;
+      head.appendChild(permissionButton);
+      permissionButton.addEventListener("click", async () => {
+        permissionButton.disabled = true;
+        permissionButton.textContent = "Requesting…";
+        const ok = await requestPermission();
+        if (ok) {
+          permissionButton.remove();
+          permissionButton = null;
+          startSensors();
+        } else {
+          permissionButton.disabled = false;
+          permissionButton.textContent = "Permission denied · try again";
+          setStatus("Permission denied · remote feed only", "denied");
+        }
+      });
+    }
+
+    function startSensors() {
+      if (!startMagnetometer()) {
+        attemptDeviceMotion();
+      }
+      setStatus("Waiting for first reading…", "waiting");
+    }
+
+    /* ── boot ─────────────────────────────────────────────── */
+    if (needsPermission()) {
+      setStatus("Tap to enable phone sensors", "waiting");
+      injectPermissionButton();
+    } else {
+      startSensors();
+    }
+
+    /* ── remote poll w/ EMA + tighter cadence ─────────────── */
+    async function pollRemote() {
+      try {
+        const r = await fetch("/api/v1/ghost-emf/current", { cache: "no-store" });
         const d = await r.json();
-        if (remoteReading) remoteReading.textContent = (d.numericValue ?? 0).toFixed(3);
+        const v = Math.max(0, Number(d.numericValue ?? 0));
+        smoothedRemote = smoothedRemote * 0.6 + v * 0.4;
+        if (remoteReading) remoteReading.textContent = smoothedRemote.toFixed(3);
+        renderMeter();
+        if (!sensorOnline) {
+          setStatus(
+            smoothedRemote > 0.25 ? "Corridor spike · remote feed only" : "Remote feed live",
+            smoothedRemote > 0.25 ? "warn" : "offline"
+          );
+        }
       } catch {}
-    }, 3000);
+    }
+    pollRemote();
+    setInterval(pollRemote, 2500);
   }
 
   /* ═══════════════════════════════════════════════

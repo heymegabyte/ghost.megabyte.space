@@ -26,6 +26,7 @@ pnpm-debug.log*
 
 # Test artifacts
 .playwright/
+.playwright-mcp/
 playwright-report/
 playwright/.cache/
 test-results/
@@ -59,6 +60,12 @@ public/logo-candidates/
 mud-terminal.png
 qa-temp.mjs
 test-mud.mjs
+*-verified.png
+ghost-chart-*.png
+
+# pnpm project — reject stray npm/yarn lockfiles (pnpm-lock.yaml is the source of truth)
+package-lock.json
+yarn.lock
 
 # Misc local cruft
 *.bak

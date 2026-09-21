@@ -1,18 +1,40 @@
 {
   "name": "The Ghost Signal",
   "short_name": "Ghost Signal",
-  "start_url": "/",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#060610",
   "theme_color": "#060610",
-  "description": "A public EMF sensor, an AI hotline at (601) 666-6602, and a public record built on radical truth.",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["science", "utilities", "news", "developer"],
+  "description": "A public EMF sensor, an AI hotline at (601) 666-6602, true entropy API, and a public record built on radical truth.",
+  "prefer_related_applications": false,
   "icons": [
+    { "src": "/favicon-16x16.png?v=20260501-ghost", "sizes": "16x16", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon-32x32.png?v=20260501-ghost", "sizes": "32x32", "type": "image/png", "purpose": "any" },
+    { "src": "/apple-touch-icon.png?v=20260501-ghost", "sizes": "180x180", "type": "image/png", "purpose": "any" },
     { "src": "/android-chrome-192x192.png?v=20260501-ghost", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/android-chrome-512x512.png?v=20260501-ghost", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/maskable-icon-512.png?v=20260501-ghost", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
+  "screenshots": [
+    { "src": "/og-image.jpg?v=20260501-666", "sizes": "1200x630", "type": "image/jpeg", "form_factor": "wide", "label": "The Ghost Signal — public EMF sensor, AI hotline, true entropy" }
+  ],
   "shortcuts": [
-    { "name": "Current Reading", "url": "/api/v1/ghost-emf/current" },
-    { "name": "Developer Docs", "url": "/docs" }
-  ]
+    { "name": "Live EMF Reading", "short_name": "EMF", "url": "/api/v1/ghost-emf/current", "description": "Current sensor sample" },
+    { "name": "Call the Hotline", "short_name": "Hotline", "url": "tel:+16016666602", "description": "AI hotline (601) 666-6602" },
+    { "name": "Developer Docs", "short_name": "Docs", "url": "/docs", "description": "API reference" },
+    { "name": "Transmissions", "short_name": "Feed", "url": "/transmissions", "description": "Live transmission feed" }
+  ],
+  "share_target": {
+    "action": "/?share=1",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  },
+  "launch_handler": { "client_mode": "navigate-existing" }
 }

@@ -3,6 +3,23 @@
   let allEntries = [];
   let currentFilter = "all";
 
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(value);
+  }
+
+  function setLive(status) {
+    const indicator = document.getElementById("tx-live-indicator");
+    const statusEl = document.getElementById("feed-status");
+    if (statusEl) statusEl.textContent = status;
+    if (indicator) indicator.classList.toggle("is-offline", status !== "LIVE");
+    const since = document.getElementById("tx-last-update");
+    if (since && status === "LIVE") {
+      const now = new Date();
+      since.textContent = " · " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+  }
+
   async function loadTransmissions() {
     try {
       const [liveRes, countRes] = await Promise.all([
@@ -16,17 +33,22 @@
 
       const calls = allEntries.filter(e => e.type === "call");
       const chats = allEntries.filter(e => e.type === "chat");
-      document.getElementById("tx-total-calls").textContent = String(count.calls ?? calls.length);
-      document.getElementById("tx-total-chats").textContent = String(count.chats ?? chats.length);
-      document.getElementById("tx-total").textContent = String(count.count ?? allEntries.length);
+      setText("tx-total-calls", count.calls ?? calls.length);
+      setText("tx-total-chats", count.chats ?? chats.length);
+      setText("tx-total", count.count ?? allEntries.length);
+      setText("feed-total", live.total ?? allEntries.length);
 
       buildSynopsis(allEntries);
       renderEntries();
+      setLive("LIVE");
     } catch(e) {
-      document.getElementById("tx-list").innerHTML =
+      const list = document.getElementById("tx-list");
+      const topics = document.getElementById("tx-topics");
+      if (list) list.innerHTML =
         '<div class="tx-empty">No transmissions yet. Call <a href="tel:+16016666602" style="color:var(--accent-red);text-decoration:none">(601) 666-6602</a> to be first.</div>';
-      document.getElementById("tx-topics").innerHTML =
+      if (topics) topics.innerHTML =
         "<li>No significant transmissions yet. Be the first to call.</li>";
+      setLive("OFFLINE");
     }
   }
 
@@ -160,12 +182,14 @@
     return d.innerHTML;
   }
 
-  document.getElementById("tx-list").addEventListener("click", function(e) {
+  const txListEl = document.getElementById("tx-list");
+  if (txListEl) txListEl.addEventListener("click", function(e) {
     const card = e.target.closest(".tx-card");
     if (card) card.classList.toggle("expanded");
   });
 
-  document.getElementById("tx-filters").addEventListener("click", function(e) {
+  const txFiltersEl = document.getElementById("tx-filters");
+  if (txFiltersEl) txFiltersEl.addEventListener("click", function(e) {
     const btn = e.target.closest(".tx-filter-btn");
     if (!btn) return;
     const filter = btn.dataset.filter;
