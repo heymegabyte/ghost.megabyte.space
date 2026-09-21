@@ -1,7 +1,7 @@
 import { ApiError } from "./errors";
 import { getCurrentCacheTtl } from "./config";
 import { buildMockHistoryPoints, buildMockReading, isMockSensorMode } from "./mock-sensor";
-import type { Env, HistoryPoint, HistoryWindow, HomeAssistantState, NormalizedReading } from "../types";
+import type { Env, HistoryPoint, HistoryWindow, HomeAssistantState, NormalizedReading, SnapshotRecord } from "../types";
 
 function getBaseUrl(env: Env): URL {
   try {
@@ -133,6 +133,61 @@ export async function fetchAllSensors(env: Env): Promise<AllSensorReadings> {
 
   await Promise.all(fetches);
   return sensors;
+}
+
+/**
+ * Build a last-known-good reading from a stored D1 snapshot row, flagged `stale`
+ * so callers can clearly label it as sample data (not a live measurement).
+ */
+function buildStaleReading(env: Env, row: SnapshotRecord): NormalizedReading {
+  return {
+    entityId: row.entityId,
+    friendlyName: row.entityId === env.EMF_SENSOR_ENTITY_ID ? (env.EMF_SENSOR_NAME ?? row.entityId) : row.entityId,
+    state: row.state,
+    numericValue: row.numericValue,
+    unit: row.unit ?? null,
+    lastChanged: row.lastChanged,
+    lastUpdated: row.lastUpdated,
+    source: "home-assistant",
+    sampledAt: row.sampledAt,
+    stale: true,
+    staleSince: row.sampledAt,
+    cache: {
+      maxAgeSeconds: getCurrentCacheTtl(env),
+      staleWhileRevalidateSeconds: 15,
+      strategy: "cloudflare-cache-api",
+    },
+  };
+}
+
+/**
+ * The most recent stored snapshot for one entity, or null if none exists / D1 is unbound.
+ * Used to degrade gracefully to last-known-good sample data when the live sensor is unreachable.
+ */
+export async function fetchLastKnownReading(env: Env, entityId: string): Promise<NormalizedReading | null> {
+  if (!env.EMF_DB) return null;
+  const row = await env.EMF_DB.prepare(
+    `SELECT entity_id AS entityId, state, numeric_value AS numericValue, unit,
+            last_changed AS lastChanged, last_updated AS lastUpdated, sampled_at AS sampledAt, source
+     FROM emf_snapshots WHERE entity_id = ?1 ORDER BY sampled_at DESC LIMIT 1`,
+  )
+    .bind(entityId)
+    .first<SnapshotRecord>();
+
+  return row ? buildStaleReading(env, row) : null;
+}
+
+/** Last-known-good readings for every configured sensor, all flagged `stale`. */
+export async function fetchLastKnownAllSensors(
+  env: Env,
+): Promise<AllSensorReadings & { stale: true }> {
+  const [emf, ef, rf] = await Promise.all([
+    fetchLastKnownReading(env, env.EMF_SENSOR_ENTITY_ID),
+    env.EF_SENSOR_ENTITY_ID ? fetchLastKnownReading(env, env.EF_SENSOR_ENTITY_ID) : Promise.resolve(null),
+    env.RF_SENSOR_ENTITY_ID ? fetchLastKnownReading(env, env.RF_SENSOR_ENTITY_ID) : Promise.resolve(null),
+  ]);
+  const sampledAt = emf?.staleSince ?? ef?.staleSince ?? rf?.staleSince ?? new Date().toISOString();
+  return { emf, ef, rf, sampledAt, stale: true };
 }
 
 export async function fetchHistoryPoints(env: Env, window: HistoryWindow): Promise<HistoryPoint[]> {

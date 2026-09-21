@@ -7,7 +7,14 @@ import { calculateEntropy } from "./lib/entropy";
 import { ApiError, jsonError } from "./lib/errors";
 import { applyResponseHeaders, getSecurityHeaders } from "./lib/headers";
 import { downsamplePoints, parseHistoryWindow } from "./lib/history";
-import { fetchCurrentReading, fetchAllSensors, fetchHistoryPoints, persistSnapshot } from "./lib/home-assistant";
+import {
+  fetchCurrentReading,
+  fetchAllSensors,
+  fetchHistoryPoints,
+  persistSnapshot,
+  fetchLastKnownReading,
+  fetchLastKnownAllSensors,
+} from "./lib/home-assistant";
 import { areTestHelpersEnabled, resetSnapshots, seedSnapshots } from "./lib/test-helpers";
 import { publicReadRateLimit } from "./lib/rate-limit";
 import {
@@ -77,6 +84,8 @@ const CurrentSchema = z
     lastUpdated: z.string(),
     source: z.literal("home-assistant"),
     sampledAt: z.string(),
+    stale: z.boolean().optional(),
+    staleSince: z.string().nullable().optional(),
     cache: z.object({
       maxAgeSeconds: z.number(),
       staleWhileRevalidateSeconds: z.number(),
@@ -91,6 +100,7 @@ const AllSensorsSchema = z
     ef: CurrentSchema.nullable(),
     rf: CurrentSchema.nullable(),
     sampledAt: z.string(),
+    stale: z.boolean().optional(),
   })
   .openapi("AllSensorReadings");
 
@@ -585,6 +595,15 @@ app.openapi(currentRoute, async (c) => {
 
     return response;
   } catch {
+    // Live sensor unreachable — degrade to last-known-good sample data (clearly flagged stale).
+    const lastKnown = await fetchLastKnownReading(c.env, c.env.EMF_SENSOR_ENTITY_ID);
+    if (lastKnown) {
+      const response = c.json(lastKnown, 200);
+      response.headers.set("cache-control", "no-store");
+      response.headers.set("x-cache-status", "STALE");
+      response.headers.set("x-emf-status", "stale");
+      return response;
+    }
     return c.json({ error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR" }, 503);
   }
 });
@@ -622,6 +641,19 @@ app.openapi(sensorsRoute, async (c) => {
 
   try {
     const readings = await fetchAllSensors(c.env);
+    // fetchAllSensors swallows per-sensor failures and returns nulls; treat an all-null
+    // result as "sensor down" and degrade to last-known-good sample data.
+    if (!readings.emf && !readings.ef && !readings.rf) {
+      const lastKnown = await fetchLastKnownAllSensors(c.env);
+      if (lastKnown.emf || lastKnown.ef || lastKnown.rf) {
+        const response = c.json(lastKnown, 200);
+        response.headers.set("cache-control", "no-store");
+        response.headers.set("x-emf-status", "stale");
+        return response;
+      }
+      return c.json({ error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR" }, 503);
+    }
+
     const response = c.json(readings, 200);
     const cacheControl = `public, max-age=${ttl}, stale-while-revalidate=15`;
 
@@ -631,6 +663,13 @@ app.openapi(sensorsRoute, async (c) => {
 
     return response;
   } catch {
+    const lastKnown = await fetchLastKnownAllSensors(c.env);
+    if (lastKnown.emf || lastKnown.ef || lastKnown.rf) {
+      const response = c.json(lastKnown, 200);
+      response.headers.set("cache-control", "no-store");
+      response.headers.set("x-emf-status", "stale");
+      return response;
+    }
     return c.json({ error: "Sensor upstream unavailable", code: "UPSTREAM_ERROR" }, 503);
   }
 });

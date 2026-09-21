@@ -42,6 +42,10 @@ export interface NormalizedReading {
   lastUpdated: string;
   source: "home-assistant";
   sampledAt: string;
+  /** True when this reading is a last-known-good sample served because the live sensor is unreachable. */
+  stale?: boolean;
+  /** ISO timestamp of the last confirmed live reading, present only when `stale` is true. */
+  staleSince?: string | null;
   cache: {
     maxAgeSeconds: number;
     staleWhileRevalidateSeconds: number;
