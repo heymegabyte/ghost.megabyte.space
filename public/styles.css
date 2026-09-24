@@ -2707,6 +2707,86 @@
   .dossier-feature--avatar-mud .dossier-feature-body { text-align: center; }
   .dossier-feature--avatar-mud .dossier-feature-title { margin-inline: auto; }
   .dossier-feature--avatar-mud .dossier-feature-body { margin-inline: auto; }
+
+  /* AVATAR MUD — "the song I made about it" listen card */
+  .mud-song-card {
+    display: flex; align-items: center; gap: 1.15rem;
+    width: 100%; max-width: 480px;
+    margin: 1.85rem auto 0;
+    padding: 1rem 1.15rem;
+    text-align: left;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 229, 255, 0.28);
+    background:
+      radial-gradient(120% 140% at 0% 0%, rgba(124, 58, 237, 0.16), transparent 60%),
+      linear-gradient(135deg, rgba(6, 6, 16, 0.9), rgba(10, 12, 26, 0.82));
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    transition: transform 0.18s ease, border-color 0.25s ease, box-shadow 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mud-song-card:hover,
+  .mud-song-card:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(0, 229, 255, 0.55);
+    box-shadow: 0 14px 52px rgba(0, 229, 255, 0.18), 0 0 0 1px rgba(0, 229, 255, 0.12);
+    outline: none;
+  }
+  .mud-song-visual {
+    position: relative; flex: 0 0 auto;
+    display: grid; place-items: center;
+    width: 58px; height: 58px;
+    color: #00E5FF;
+  }
+  .mud-song-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 229, 255, 0.5);
+    animation: mudSongPulse 2.8s ease-out infinite;
+  }
+  .mud-song-ring:nth-child(2) { animation-delay: 0.9s; }
+  .mud-song-ring:nth-child(3) { animation-delay: 1.8s; }
+  .mud-song-play {
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.6));
+    transition: transform 0.18s ease;
+  }
+  .mud-song-card:hover .mud-song-play { transform: scale(1.12); }
+  .mud-song-copy { display: flex; flex-direction: column; gap: 0.15rem; flex: 1 1 auto; min-width: 0; }
+  .mud-song-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(0, 229, 255, 0.75);
+  }
+  .mud-song-title { font-size: 1.12rem; font-weight: 700; line-height: 1.15; color: #fff; }
+  .mud-song-artist {
+    font-size: 0.76rem; color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mud-song-cta {
+    flex: 0 0 auto;
+    font-family: var(--font-mono);
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;
+    color: #00E5FF;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid rgba(0, 229, 255, 0.35);
+    border-radius: 999px;
+    transition: background-color 0.2s ease, transform 0.18s ease;
+  }
+  .mud-song-card:hover .mud-song-cta { background: rgba(0, 229, 255, 0.12); transform: translateX(2px); }
+  @keyframes mudSongPulse {
+    0% { transform: scale(0.55); opacity: 0.9; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+  @media (max-width: 520px) {
+    .mud-song-card { flex-wrap: wrap; gap: 0.85rem; padding: 0.9rem 1rem; }
+    .mud-song-cta { margin-left: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mud-song-ring { animation: none; opacity: 0.4; }
+    .mud-song-card, .mud-song-play, .mud-song-cta { transition: none; }
+    .mud-song-card:hover { transform: none; }
+  }
+
   .dossier-feature-shell > .dossier-feature-figure:not(.dossier-feature-figure--float-right),
   .dossier-feature-shell > .dossier-feature-media-row {
     width: 100%; max-width: none;
